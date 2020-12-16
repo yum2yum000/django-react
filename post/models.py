@@ -20,3 +20,12 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f'{self.username}'
 
+
+class Post(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT,default='null')
+    title = models.CharField('عنوان', max_length=100)
+    content = models.TextField('محتوا')
+    send_date = models.DateTimeField('تاریخ ارسال', auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.title}-{self.user.username}'
