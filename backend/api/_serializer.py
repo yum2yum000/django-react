@@ -7,7 +7,7 @@ from post.models import CustomUser, Post
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('username', 'password', 'phone')
+        fields = ('id', 'username', 'password', 'phone')
         # fields = '__all__'
         extra_kwargs = {'password': {'write_only': True}}
         # exclude=['password',]
@@ -18,8 +18,8 @@ class UserSerializer(serializers.ModelSerializer):
     # def get_permissions(self):
     def create(self, validated_data):
         user = CustomUser(
-            username=validated_data['username'],
-            phone=validated_data['phone'],
+            username=validated_data.get('username'),
+            phone=validated_data.get('phone'),
             # email=validated_data
         )
         user.set_password(validated_data['password'])
