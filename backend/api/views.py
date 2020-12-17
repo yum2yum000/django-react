@@ -1,6 +1,8 @@
-from rest_framework import viewsets
+from django.contrib.auth import authenticate
+from rest_framework import viewsets, status
 from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_404, CreateAPIView
 from rest_framework.response import Response
+from rest_framework.test import force_authenticate
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 
@@ -31,6 +33,9 @@ class UserViewSets(viewsets.ModelViewSet):
 
 
 class CreateUser(CreateAPIView):
+    # این دو کلاس به صورت پیش فرش در فایل settings.py تعریف شده است
+    authentication_classes = ()
+    permission_classes = ()
     serializer_class = UserSerializer
     #
     # def get(self, request):
@@ -41,9 +46,20 @@ class CreateUser(CreateAPIView):
     #         return Response(data)
 
 
+class LoginView(APIView):
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        if user:
+            return Response({'token': user.auth_token.key})
+        else:
+            return Response({'error': 'Wrong Credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PostList(APIView):
+    
     def get(self, request):
         objs = Post.objects.all()
         data = PostSerializer(objs, many=True).data

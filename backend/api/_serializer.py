@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 
 from post.models import CustomUser, Post
 
@@ -6,8 +7,8 @@ from post.models import CustomUser, Post
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        # fields = ('username', 'first_name', 'last_name')
-        fields = '__all__'
+        fields = ('username', 'password', 'phone')
+        # fields = '__all__'
         extra_kwargs = {'password': {'write_only': True}}
         # exclude=['password',]
         # read_only_fields = ('email',)
@@ -18,10 +19,12 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = CustomUser(
             username=validated_data['username'],
+            phone=validated_data['phone'],
             # email=validated_data
         )
         user.set_password(validated_data['password'])
         user.save()
+        Token.objects.create(user=user)
         return user
 
 
