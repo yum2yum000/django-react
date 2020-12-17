@@ -30,8 +30,9 @@ render(){
   return(
     <div>
       {this.state.todos.map(item => (
-        <div key={item.id}>
+        <div  key={item.id}>
         <h1>{item.title}</h1>
+        <h2 >{item.content}</h2>
         </div>
       ))}
     </div>
