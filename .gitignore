@@ -4,5 +4,10 @@
 
 backend/venv/
 
+env/
+
+.idea/
+
+
 backend/media/
 
