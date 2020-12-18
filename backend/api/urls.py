@@ -14,7 +14,12 @@ urlpatterns = [
     path('users/', CreateUser.as_view(), name='create_user'),
     #برای تغیر پروفایل
     path('users/<id>/', UserProfile.as_view()),
-    path('users/login/', LoginView.as_view()),
+    #دقت شود اگر در روت زیر به جای user
+    # از users
+    #استفاده کنیم، به صورت پیشفرض از روت users/id استفاده خواهد کرد. و این مشکلی است که با استفاده از
+    #ViewSetها
+    #قابل رفع می باشد.
+    path('user/login/', LoginView.as_view()),
     path('post/list/<id>/', PostList.as_view(), name='post_list'),
     path('post/detail/<pk>/', PostDetail.as_view(), name='post_detail')
 ]

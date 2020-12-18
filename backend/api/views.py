@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate
 from rest_framework import viewsets, status
-from rest_framework.generics import ListAPIView, RetrieveAPIView, get_object_or_404, CreateAPIView
+from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.test import force_authenticate
@@ -35,26 +35,30 @@ from post.models import CustomUser, Post
 #         fields = '__all__'
 
 
-class CreateUser(APIView):
+class CreateUser(generics.CreateAPIView):
     # این دو کلاس به صورت پیش فرش در فایل settings.py تعریف شده است
     authentication_classes = ()
     permission_classes = ()
     serializer_class = UserSerializer
-    #
-    # def get(self, request):
-    #     if request.method.POST:
-    #         username = request.POST['username']
-    #         password = request.POST['password']
-    #         data = UserViewSets((username, password)).data
-    #         return Response(data)
+
+    # def post(self, request):
+
+
+#
+# def get(self, request):
+#     if request.method.POST:
+#         username = request.POST['username']
+#         password = request.POST['password']
+#         data = UserViewSets((username, password)).data
+#         return Response(data)
 
 
 class UserProfile(APIView):
-    permission_classes  = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def put(self, request, id):
         # توکن ارسالی مربوط به ای دی ارسالی می باشد و این کاربر مجاز به تغییرات در پروفایل است
-        if request.user.id == id:
+        if str(request.user.id) == id:
             user = CustomUser.objects.get(id=id)
             user.phone = request.data.get('phone')
             user.save()
@@ -99,6 +103,6 @@ class PostList(APIView):
 
 class PostDetail(APIView):
     def get(self, request, pk):
-        obj = get_object_or_404(Post, pk=pk)
+        obj = generics.get_object_or_404(Post, pk=pk)
         data = PostSerializer(obj, many=False).data
         return Response(data)
