@@ -10,10 +10,11 @@
                 </router-link>
                 <div :class="{collapse:!show}" class=" navbar-collapse text-right" id="ftco-nav" >
                     <ul class="navbar-nav nav ml-auto">
-                        <li class="nav-item ml-3"><a href="#home-section" class="nav-link active"><span>خانه</span></a></li>
-                        <li class="nav-item ml-3"><a href="#services-section" class="nav-link"><span>درباره ما</span></a></li>
-                        <li class="nav-item ml-3"><a href="#projects-section" class="nav-link"><span>بلاگ</span></a></li>
-                        <li class="nav-item ml-3"><a href="#about-section" class="nav-link"><span>تماس با ما</span></a></li>
+                        <li class="nav-item ml-3"><router-link to="/" class="nav-link active">خانه</router-link></li>
+                        <li class="nav-item ml-3"><router-link to="/" class="nav-link active">درباره ما</router-link></li>
+                        <li class="nav-item ml-3"><router-link to="/" class="nav-link active">بلاگ</router-link></li>
+                        <li class="nav-item ml-3"><router-link to="/" class="nav-link active">تماس با ما</router-link></li>
+
 
                     </ul>
                 </div>

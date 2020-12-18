@@ -16,7 +16,7 @@
                                 <div class="input-container">
                                     <div class="input-group">
                                         <label class="label">نام خانوادگی</label>
-                                        <input v-model="user.last_name" class="input--style-4" type="text" >
+                                        <input v-model.trim="user.last_name" class="input--style-4" type="text" >
                                     </div>
                                 </div>
                             </div>
@@ -24,7 +24,7 @@
                                 <div class="input-container">
                                     <div class="input-group">
                                         <label class="label">نام کاربری</label>
-                                        <input v-model="user.username" class="input--style-4" type="text" >
+                                        <input v-model="$v.user.username.$model" class="input--style-4" type="text" >
                                     </div>
                                 </div>
                                 <div class="input-container">
@@ -61,9 +61,17 @@
 </template>
 
 <script>
-    import ProductService from '@/services/ProductService.js'
+    import UserService from '@/services/UserServices.js'
+    import { required } from 'vuelidate/lib/validators'
     export default {
         name: "Login",
+        validations:{
+            user:{
+                username: { required },
+                password: { required }
+
+            }
+        },
         data(){
             return{
                 user:{}
@@ -71,7 +79,9 @@
         },
         methods:{
             add(){
-                ProductService.createUser(this.user);
+                UserService.createUser(this.user).then((res)=>{
+                    console.log(res)
+                });
 
             }
         }

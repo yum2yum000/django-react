@@ -551,7 +551,8 @@ ul.location_icon {
 	margin: 0;
 	padding: 0;
 	width: 100%;
-	float: left!important;
+	display: flex!important;
+	justify-content: center;
 }
 @media (max-width: 1199px) and (min-width: 992px) {
 	ul.location_icon li {
@@ -569,4 +570,49 @@ ul.location_icon {
 
 .footer .Follow {
 	margin-bottom: 27px;
+}
+.footer .Follow h3 {
+	color: #fff;
+	font-size: 25px;
+	line-height: 30px;
+	font-weight: 600;
+	border-bottom: #fff solid 1px;
+	border-bottom-width: 1px;
+	border-width: 1px;
+	display: inline-block;
+	padding-bottom: 2px;
+	font-size:17px!important;
+}
+.white{
+	color:white!important;
+	font-size:17px!important;
+}
+
+@media (max-width: 1199px) and (min-width: 992px){
+	.footer .Newsletter {
+		width: 72%;
+	}}
+	.footer .Newsletter {
+		padding: 13px 26px;
+		padding-top: 10px;
+		padding-right: 26px;
+		padding-bottom: 10px;
+		padding-left: 26px;
+		border: #fff solid 1px;
+
+	}
+.footer .Subscribe {
+	padding: 3px 20px;
+	margin-left: -3px;
+	border: #0e0c0c solid 1px;
+	background: #0e0c0c;
+	color: #fff;
+
+}
+.email-container{
+	display: flex;
+	flex-direction: row-reverse;
+}
+.nav-link{
+	font-size:20px;
 }
