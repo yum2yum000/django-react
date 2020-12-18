@@ -89,7 +89,7 @@ class LoginView(APIView):
 #     queryset = Post.objects.all()
 
 
-class PostList(APIView):
+class Posts(APIView):
     permission_classes = (IsAuthenticated,)
 
     # درخواست لیست پست ها
