@@ -1,3 +1,4 @@
+from django.contrib.auth import password_validation
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
@@ -14,15 +15,19 @@ class UserSerializer(serializers.ModelSerializer):
         # read_only_fields = ('email',)
         # URL_FIELD_NAME='newurl'
 
-    # username = serializers.CharField(max_length=100)
-    # def get_permissions(self):
+    def validate(self, data):
+        password_validation.validate_password(data.get('password'))
+        return data
+
+
+
     def create(self, validated_data):
         user = CustomUser(
             username=validated_data.get('username'),
             phone=validated_data.get('phone'),
-            # email=validated_data
+            # email=validated_data ...
         )
-        user.set_password(validated_data['password'])
+        user.set_password(validated_data.get('password'))
         user.save()
         Token.objects.create(user=user)
         return user
@@ -39,6 +44,6 @@ class PostSerializer(serializers.ModelSerializer):
     # user = UserSerializer()
     class Meta:
         model = Post
-        fields = ('user', 'title', 'content')
+        fields = ('id','user', 'title', 'content')
     # username = serializers.CharField(max_length=100)
     # url = serializers.HyperlinkedRelatedField(view_name=CustomUser, queryset=CustomUser.objects.all())

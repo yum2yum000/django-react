@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, serializers
 from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.test import force_authenticate
@@ -58,13 +59,15 @@ class UserProfile(APIView):
 
     def put(self, request, id):
         # توکن ارسالی مربوط به ای دی ارسالی می باشد و این کاربر مجاز به تغییرات در پروفایل است
-        if str(request.user.id) == id:
+        # if request.data.get('phone').isdigit() is not True:
+        #     raise serializers.ValidationError({'error': 'Phone is not digit'})
+        if request.user.id == id:
             user = CustomUser.objects.get(id=id)
             user.phone = request.data.get('phone')
             user.save()
-            return Response(status=status.HTTP_200_OK)
+            return Response(data={'update': 'Ok'}, status=status.HTTP_200_OK)
         else:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            return Response(data={'update': 'Forbiden'}, status=status.HTTP_403_FORBIDDEN)
 
 
 class LoginView(APIView):
@@ -75,30 +78,47 @@ class LoginView(APIView):
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
         if user:
-            return Response({'token': user.auth_token.key})
+            return Response({'token': user.auth_token.key, 'id': user.id})
         else:
             return Response({'error': 'Wrong Credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-#
+# class PostList1(generics.ListAPIView):
+#     permission_classes = (IsAuthenticated,)
+#     serializer_class = PostSerializer
+#     queryset = Post.objects.all()
+
+
 class PostList(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, id):
+    # درخواست لیست پست ها
+    def get(self, request, pk=None):
         # زمانی که این متد فراخوانی شود یعنی توکن تایید شده است و
         # request.user
         # در دسترس قرار می گیرد.
-        user_id = request.user.id
-        # ایدی ارسالی مربوط به ایدی صاحب توکن است یا خیر
-        # در صورتی که توکن تایید شود
-        # request.user
-        # در دسترس قرار میگیرد
-        if str(user_id) == id:
-            objs = Post.objects.filter(user_id=user_id)
+
+        # لیست کل پست ها
+        if pk is None:
+            objs = Post.objects.filter(user_id=request.user.id)
             data = PostSerializer(objs, many=True).data
-            return Response(data)
+            return Response(data, status=status.HTTP_200_OK)
         else:
-            return Response(status=status.HTTP_403_FORBIDDEN)
+            post = Post.objects.filter(user_id=request.user.id)
+            obj = get_object_or_404(post, pk=pk)
+            if obj is not None:
+                data = PostSerializer(obj).data
+                return Response(data, status=status.HTTP_200_OK)
+            else:
+                return Response({'post': 'not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    def post(self, request):
+        user = request.user
+        title = request.data.get('title')
+        content = request.data.get('content')
+        post = Post(user=user, title=title, content=content)
+        post.save()
+        return Response(data={'save': 'Ok'}, status=status.HTTP_201_CREATED)
 
 
 class PostDetail(APIView):

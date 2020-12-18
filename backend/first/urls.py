@@ -20,7 +20,7 @@ from first import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('api.urls')),
+    path('v1/', include('api.urls')),
 ]
 if settings.DEBUG:
     from django.conf.urls.static import static

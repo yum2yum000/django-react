@@ -16,7 +16,7 @@ class App extends Component {
   // new
   getTodos() {
   axios
-  .get('http://127.0.0.1:8000/post/list/')
+  .get('http://127.0.0.1:8000/posts/list/')
   .then(res => {
   this.setState({ todos: res.data });
   })
