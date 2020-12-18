@@ -44,7 +44,9 @@ class CustomUserAdmin(UserAdmin):
     # list_display = [..., 'image_tag', ]
     readonly_fields = ('avatar_tag',)
 
-
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['title', 'user', 'send_date']
+    list_display = ['pk','title', 'user', 'send_date']
+    list_filter = ('send_date',)
+    #برای سرچ با استفاده از فیلدهای ارتباطی به طریق زیر عمل می کنیم.
+    search_fields = ('title','pk','user__username')
