@@ -1,7 +1,7 @@
 
 
 ./backend/db.sqlite3
-
+env
 backend/venv/
 
 env/
@@ -10,4 +10,5 @@ env/
 
 
 backend/media/
+
 
