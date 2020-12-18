@@ -100,29 +100,28 @@ class PostList(APIView):
 
         # لیست کل پست ها
         if pk is None:
+            # همه ی پست های یک کاربر داده می شود
             objs = Post.objects.filter(user_id=request.user.id)
             data = PostSerializer(objs, many=True).data
             return Response(data, status=status.HTTP_200_OK)
         else:
-            post = Post.objects.filter(user_id=request.user.id)
-            obj = get_object_or_404(post, pk=pk)
-            if obj is not None:
-                data = PostSerializer(obj).data
-                return Response(data, status=status.HTTP_200_OK)
-            else:
-                return Response({'post': 'not found'}, status=status.HTTP_404_NOT_FOUND)
+            # محتوای یک پست داده می شود.
+            obj = get_object_or_404(Post, user_id=request.user.id, pk=pk)
+            data = PostSerializer(obj).data
+            return Response(data, status=status.HTTP_200_OK)
 
     def post(self, request):
+        """
+        برای ذخیره کردن پست های کاربر خاصی از این متد استفاده می شود
+        توجه شود که می توان درخواست های زیادی را پی در پی فرستاد که این موجب اخلال درکار وب سرویس خواهد کرد
+        برای جلوگیری از این اتفاق باید یک timespan قرار داده شود.
+        در production حتما این کار انجام شود.
+        :param request:
+        :return:
+        """
         user = request.user
         title = request.data.get('title')
         content = request.data.get('content')
         post = Post(user=user, title=title, content=content)
         post.save()
-        return Response(data={'save': 'Ok'}, status=status.HTTP_201_CREATED)
-
-
-class PostDetail(APIView):
-    def get(self, request, pk):
-        obj = generics.get_object_or_404(Post, pk=pk)
-        data = PostSerializer(obj, many=False).data
-        return Response(data)
+        return Response(data={'id': post.id, 'save': 'Ok'}, status=status.HTTP_201_CREATED)
