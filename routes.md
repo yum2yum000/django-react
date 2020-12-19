@@ -25,10 +25,9 @@ user:{
             avatar:'image'
         },
         receive:{
-            id:'user id',
-            username:'username',
+            success: user infoes
             status:201,
-            error_status:400,
+            error_status:400,406,
         }
     },
     login:{
@@ -63,6 +62,8 @@ user:{
         },
         receive:{
             user infoes
+            status:200,
+            error_status=400, 403
         }
     },
 }
