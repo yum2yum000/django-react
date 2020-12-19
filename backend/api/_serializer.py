@@ -8,7 +8,7 @@ from post.models import CustomUser, Post
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ('id', 'username', 'password', 'phone')
+        exclude = ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
         # fields = '__all__'
         extra_kwargs = {'password': {'write_only': True}}
         # exclude=['password',]
@@ -18,8 +18,6 @@ class UserSerializer(serializers.ModelSerializer):
     def validate(self, data):
         password_validation.validate_password(data.get('password'))
         return data
-
-
 
     def create(self, validated_data):
         user = CustomUser(
@@ -44,6 +42,6 @@ class PostSerializer(serializers.ModelSerializer):
     # user = UserSerializer()
     class Meta:
         model = Post
-        fields = ('id','user', 'title', 'content')
+        fields = ('id', 'user', 'title', 'content')
     # username = serializers.CharField(max_length=100)
     # url = serializers.HyperlinkedRelatedField(view_name=CustomUser, queryset=CustomUser.objects.all())

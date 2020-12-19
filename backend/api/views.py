@@ -1,6 +1,7 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, password_validation
 from rest_framework import viewsets, status, serializers
 from rest_framework import generics
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -57,17 +58,44 @@ class CreateUser(generics.CreateAPIView):
 class UserProfile(APIView):
     permission_classes = (IsAuthenticated,)
 
+    # یک توکن و یک ای دی دریافت می شود. در صورتی که توکن مربوط به ای دی باشد اپدیت انجام می شود.
     def put(self, request, id):
         # توکن ارسالی مربوط به ای دی ارسالی می باشد و این کاربر مجاز به تغییرات در پروفایل است
         # if request.data.get('phone').isdigit() is not True:
         #     raise serializers.ValidationError({'error': 'Phone is not digit'})
         if request.user.id == id:
             user = CustomUser.objects.get(id=id)
-            user.phone = request.data.get('phone')
-            user.save()
-            return Response(data={'update': 'Ok'}, status=status.HTTP_200_OK)
-        else:
-            return Response(data={'update': 'Forbiden'}, status=status.HTTP_403_FORBIDDEN)
+            update = request.data.get('update')
+            if update == "data":
+                return self.update_data(request, user)
+            elif update == 'password':
+                return self.update_password(request, user)
+            else:
+                return Response({'user': UserSerializer(user).data}, status=status.HTTP_200_OK)
+
+        return Response(data={'update': 'Forbiden', 'detail': 'This user not matched with token string'},
+                        status=status.HTTP_403_FORBIDDEN)
+
+    def validate(self, data):
+        return True
+
+    def update_data(self, request, user):
+        # update all data except the password
+        # update all infoes
+        user.phone = request.data.get('phone')
+        # user.set_password(request.data.get('password'))
+        # user = UserSerializer(request.data).data
+        # if user.is_valid():
+        user.save()
+        return Response(data={'update': 'Ok', "user": UserSerializer(user).data}, status=status.HTTP_200_OK)
+
+    def update_password(self, request, user):
+        try:
+            password_validation.validate_password(request.data.get('password'))
+        except Exception as err:
+            return Response({'non_field_errors': err}, status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(request.data.get('password'))
+        return Response({'password': 'updated'}, status=status.HTTP_200_OK)
 
 
 class LoginView(APIView):
@@ -78,7 +106,7 @@ class LoginView(APIView):
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
         if user:
-            return Response({'token': user.auth_token.key, 'id': user.id})
+            return Response({'token': user.auth_token.key, 'id': user.id}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Wrong Credentials'}, status=status.HTTP_400_BAD_REQUEST)
 

@@ -1,15 +1,19 @@
 url:'http://localhost:8000/v1/'
 
-دقت شود که
-Authorization ها
-رو تو header http
-باید بفرستی
+هر ایتمی که بالای آن 
+login_required
+گذاشته باشم. باید در 
+http header
+مقدار زیر را قرار دهید
+Auhtorization: 'Token token_string'
+
+token_string همان مقداری است که در موقع لاگین شدن کاربر از سرور دریافت می شود
 
 user:{
     create:{
         uri:'users/',
         method:'POST',
-        data:{
+        send:{
             username:'username',  //required
             password:'password',    //required
             first_name:'first_name',
@@ -20,31 +24,34 @@ user:{
             desc:'bio',
             avatar:'image'
         },
-        output:{
+        receive:{
             id:'user id',
             username:'username',
+            status:201,
+            error_status:400,
         }
     },
     login:{
         uri:'users/login/,
         method:'POST',
-        data:{
+        send:{
             username:'username',
             password:'password',
         },
-        output:{
+        receive:{
             id:'user id',
-            token:'token string'
+            token:'token string',
+            status:200,
+            error_status:400
         }
     },
     //edit profile
+    //login_required
     profile:{
         uri:'users/login/<int:user_id>/',
         method:'PUT',
-        data:{
-            Authorization:'Token token_string'
-        },
-        output:{
+        send:{},
+        receive:{
             user infoes
         }
     },
@@ -52,32 +59,32 @@ user:{
 
 
 post:{
+    //login_required
     create:{
         uri:'posts/',
         method:'POST',
-        data:{
-            Authorization: 'Token token_string',
+        send:{
             title:'post title',
             content:'post content',
         },
-        output:{
+        receive:{
             new post
         }
     },
+    //login_required
     list:{
         uri:'posts/',
         method:'GET',
-        data:{
-            Authorization: 'Token token_string',
-        },
-        output:{
+        send:{},
+        receive:{
             all user posts
         }
     },
+    //login_required
     detail:{
         uri:'posts/<int:post_pk>/',
-        Authorization: 'Token token_string',
-        output:{
+        send:{},
+        receive:{
             one user post
         }
     },
