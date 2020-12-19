@@ -10,11 +10,11 @@ class CustomUser(AbstractUser):
     class Meta:
         pass
 
-    #قابل نال کردن فیلد نام
-    #AbstractUser._meta.get_field('first_name)._unique=False
+    # قابل نال کردن فیلد نام
+    # AbstractUser._meta.get_field('first_name)._unique=False
     AbstractUser._meta.get_field('first_name').null = True
-    AbstractUser._meta.get_field('last_name').null=True
-    AbstractUser._meta.get_field('email').null=True
+    AbstractUser._meta.get_field('last_name').null = True
+    AbstractUser._meta.get_field('email').null = True
 
     phone = models.CharField('شماره تلفن', max_length=11, null=True, blank=True)
     adres = models.TextField('آدرس', null=True, blank=True)
@@ -43,6 +43,7 @@ class Post(models.Model):
     title = models.CharField('عنوان', max_length=100, )
     content = models.TextField('محتوا')
     send_date = models.DateTimeField('تاریخ ارسال', auto_now_add=True)
+    last_update = models.DateTimeField('تاریخ آخرین اپدیت', auto_now=True)
 
     def __str__(self):
         return f'{self.title}-{self.user.username}'

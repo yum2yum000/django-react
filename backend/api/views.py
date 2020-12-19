@@ -227,6 +227,7 @@ class Posts(APIView):
         :return:
         """
         if request.user.id == user_id:
+            # create post
             user = request.user
             title = request.data.get('title')
             content = request.data.get('content')
@@ -235,3 +236,4 @@ class Posts(APIView):
             return Response(data={'id': post.pk, 'save': 'Ok'}, status=status.HTTP_201_CREATED)
         else:
             return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
