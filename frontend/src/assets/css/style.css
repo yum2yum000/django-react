@@ -527,7 +527,7 @@ input {
 
 .card-4 .card-body {
 	padding: 57px 65px;
-	padding-bottom: 65px;
+	padding-bottom: 10px!important;
 }
 
 @media (max-width: 767px) {
@@ -615,4 +615,13 @@ ul.location_icon {
 }
 .nav-link{
 	font-size:20px;
+}
+
+.submit{
+	background: linear-gradient(315deg, rgba(73,18,148,1) 40%, rgba(151,8,150,1) 100%)!important;
+}
+
+.home a{
+	text-decoration:none!important;
+	color:#fc2c77;
 }

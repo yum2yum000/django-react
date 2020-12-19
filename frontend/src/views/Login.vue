@@ -4,22 +4,8 @@
             <div class="wrapper wrapper--w680 p-3">
                 <div class="card card-4">
                     <div class="card-body">
-                        <h2 class="title text-right">فرم ثبت نام</h2>
+                        <h2 class="title text-right">فرم ورود</h2>
                         <form @submit.prevent="add">
-                            <div class="row row-space">
-                                <div class="input-container">
-                                    <div class="input-group">
-                                        <label class="label">نام</label>
-                                        <input v-model="user.first_name" class="input--style-4" type="text" >
-                                    </div>
-                                </div>
-                                <div class="input-container">
-                                    <div class="input-group">
-                                        <label class="label">نام خانوادگی</label>
-                                        <input v-model.trim="user.last_name" class="input--style-4" type="text" >
-                                    </div>
-                                </div>
-                            </div>
                             <div class="row row-space">
                                 <div class="input-container">
                                     <div class="input-group">
@@ -33,24 +19,15 @@
                                         <input v-model="user.password" class="input--style-4" type="password" >
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row row-space">
-                                <div class="input-container">
-                                    <div class="input-group">
-                                        <label class="label">شماره تلفن</label>
-                                        <input v-model="user.phone" class="input--style-4" type="text" >
-                                    </div>
-                                </div>
-                                <div class="input-container">
-                                    <div class="input-group">
-                                        <label class="label">آدرس</label>
-                                        <input v-model="user.adres" class="input--style-4" type="text" >
-                                    </div>
-                                </div>
+                                <label >
+                                    <input type="checkbox" name="rememberme" value="1" style="width:20px">
+                                    <span class="um-field-checkbox-option"> مرا به خاطر بسپار</span>
+                                </label>
                             </div>
 
-                            <div class="p-t-15 text-center ">
-                                <button class="btn btn--radius-2 submit">ثبت نام</button>
+
+                            <div class="p-t-15 text-center">
+                                <button class="btn btn--radius-2 submit">ورود</button>
                             </div>
                             <div class="text-center mt-4 home">
                                 <router-link to="/">بازگشت به صفحه اصلی</router-link>
@@ -67,7 +44,7 @@
     import Service from '@/services/Service.js'
     import { required } from 'vuelidate/lib/validators'
     export default {
-        name: "Login",
+        name: "Register",
         validations:{
             user:{
                 username: { required },
@@ -90,7 +67,8 @@
 </script>
 
 <style scoped>
-.input-container{
-    width:45%;
-}
+    .input-container{
+        width:100%;
+    }
+
 </style>
