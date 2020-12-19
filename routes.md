@@ -50,7 +50,17 @@ user:{
     profile:{
         uri:'users/login/<int:user_id>/',
         method:'PUT',
-        send:{},
+        send:{
+            update:'password','data', None
+            در صورتی که پسورد ارسال کنید، درخواست تغییر پسورد داده اید. و در صورتی که دیتا ارسال
+            کنید درخواست تغییر چیزهایی به غیر از پسورد داده اید. 
+            و در صورتی که خالی ارسال کنید، اطلاعات فعلی یوزر را درخواست کرده اید.
+
+            username 
+            last_login
+            date_joined
+            غیر قابل تغییر می باشند
+        },
         receive:{
             user infoes
         }
