@@ -215,7 +215,7 @@ class Posts(APIView):
             return Response(data, status=status.HTTP_200_OK)
         else:
             # همه ی پست های یک کاربر داده می شود
-            return Response({'user': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'user': 'Token or user id invalid'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request, user_id):
         """
@@ -230,8 +230,10 @@ class Posts(APIView):
             # create post
             title = request.data.get('title')
             content = request.data.get('content')
+            # فیلدهای title و content هم باید ارسال شوند و هم باید مقدار داشته باشند.
             if title is None or content is None or title.strip() == "" or content.strip() == "":
                 return Response({'post': 'title or content is empty'}, status=status.HTTP_400_BAD_REQUEST)
+
             user = request.user
             title = request.data.get('title')
             content = request.data.get('content')
@@ -244,9 +246,9 @@ class Posts(APIView):
         else:
             return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # update post
     def put(self, request, user_id, post_pk):
         if request.user.id == user_id:
-            # update post
             post = get_object_or_404(Post, pk=post_pk)
             post.title = request.data.get('title') or post.title
             post.content = request.data.get('content') or post.content
@@ -256,6 +258,7 @@ class Posts(APIView):
         else:
             return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
+    # delete post
     def delete(self, request, user_id, post_pk):
         if request.user.id == user_id:
             post = get_object_or_404(Post, pk=post_pk)

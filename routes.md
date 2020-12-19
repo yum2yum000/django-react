@@ -82,31 +82,63 @@ post:{
 
     //login_required
     create:{
-        uri:'posts/',
+        uri:'posts/<user_id>/',
         method:'POST',
         send:{
-            title:'post title',
-            content:'post content',
+            title:'post title', //required
+            content:'post content', //required
         },
         receive:{
             new post
-        }
+        },
+        status: 200,
     },
     //login_required
     list:{
-        uri:'posts/',
+        //لیست کردن پست های یک یوزر خاص
+        uri:'posts/<user_id>/',
         method:'GET',
         send:{},
         receive:{
             all user posts
-        }
+        },
+        status: 200,
+        err_status: 404
     },
     //login_required
-    detail:{
-        uri:'posts/<int:post_pk>/',
+    one_post:{
+        //گرفتن یک پست از یک یوزر خاص
+        uri:'posts/<user_id>/<post_pk>/',
+        method:'GET',
         send:{},
         receive:{
             one user post
-        }
+        },
+        status: 201,
+        err_status: 400
     },
+    //login_required
+    update:{
+        uri:'posts/<user_id>/<post_pk>/',
+        method:'PUT',
+        send:{
+            title:'new title',
+            content:'new content'
+        },
+        receive:{
+            new post
+        },
+        status: 200,
+        err_status: 400
+    },
+    DELETE:{
+        uri:'posts/<user_id>/<post_pk>/',
+        method:'DELETE',
+        send:{}
+        recevive:{
+            'post':'deleted'
+        },
+        status: 200,
+        err_status: 400
+    }
 }
