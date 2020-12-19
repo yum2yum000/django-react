@@ -78,7 +78,8 @@ post:{
             all posts 
         },
         status:200,
-    }
+    },
+
     //login_required
     create:{
         uri:'posts/',

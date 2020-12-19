@@ -228,11 +228,18 @@ class Posts(APIView):
         """
         if request.user.id == user_id:
             # create post
+            title = request.data.get('title')
+            content = request.data.get('content')
+            if title is None or content is None or title.strip() == "" or content.strip() == "":
+                return Response({'post': 'title or content is empty'}, status=status.HTTP_400_BAD_REQUEST)
             user = request.user
             title = request.data.get('title')
             content = request.data.get('content')
-            post = Post(user=user, title=title, content=content)
-            post.save()
+            try:
+                post = Post(user=user, title=title, content=content)
+                post.save()
+            except:
+                return Response({'post': 'post title is duplicated'}, status=status.HTTP_400_BAD_REQUEST)
             return Response(data={'id': post.pk, 'save': 'Ok'}, status=status.HTTP_201_CREATED)
         else:
             return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
