@@ -62,7 +62,7 @@ class CreateUser(generics.CreateAPIView):
 
         # phone validate
         if data.get('phone'):
-            if re.match('^09[0-9]{9}$', data.get('phone') ) is None:
+            if re.match('^09[0-9]{9}$', data.get('phone')) is None:
                 return Response({'phone': 'Not valid'}, status=status.HTTP_400_BAD_REQUEST)
 
         # email validate
@@ -189,48 +189,49 @@ class LoginView(APIView):
 #     queryset = Post.objects.all()
 
 
-class AllPostList(APIView):
-    def get(self, request):
-        posts = Post.objects.all()
-        data = PostSerializer(posts, many=True).data
-        return Response(data, status=status.HTTP_200_OK)
+class AllPostList(generics.ListAPIView):
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
 
 
 class Posts(APIView):
     permission_classes = (IsAuthenticated,)
 
     # درخواست لیست پست ها
-    def get(self, request, id=None, pk=None):
+    def get(self, request, user_id=None, post_pk=None):
         # زمانی که این متد فراخوانی شود یعنی توکن تایید شده است و
         # request.user
         # در دسترس قرار می گیرد.
 
         # اگر ای دی کاربر با ای دی توکن یکسان باشد
-        if request.user.id == id:
+        if request.user.id == user_id:
             objs = Post.objects.filter(user_id=request.user.id)
-            if pk:
+
+            if post_pk:
                 # اگر پست خاصی مد نظر باشد.
-                objs = obj = get_object_or_404(objs, pk=pk)
+                objs = get_object_or_404(objs, pk=post_pk)
                 # اگر پست خاص پیدا نشود.
-            data = PostSerializer(objs, many=True).data
+            data = PostSerializer(objs, many=not post_pk).data
             return Response(data, status=status.HTTP_200_OK)
         else:
             # همه ی پست های یک کاربر داده می شود
             return Response({'user': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
 
-
-def post(self, request):
-    """
-    برای ذخیره کردن پست های کاربر خاصی از این متد استفاده می شود
-    توجه شود که می توان درخواست های زیادی را پی در پی فرستاد که این موجب اخلال درکار وب سرویس خواهد کرد
-    برای جلوگیری از این اتفاق باید یک timespan قرار داده شود.
-    در production حتما این کار انجام شود.
-    :param request:
-    :return:
-    """
-    user = request.user
-    title = request.data.get('title')
-    content = request.data.get('content')
-    post = Post(user=user, title=title, content=content)
-    post.save()
-    return Response(data={'id': post.id, 'save': 'Ok'}, status=status.HTTP_201_CREATED)
+    def post(self, request, user_id):
+        """
+        برای ذخیره کردن پست های کاربر خاصی از این متد استفاده می شود
+        توجه شود که می توان درخواست های زیادی را پی در پی فرستاد که این موجب اخلال درکار وب سرویس خواهد کرد
+        برای جلوگیری از این اتفاق باید یک timespan قرار داده شود.
+        در production حتما این کار انجام شود.
+        :param request:
+        :return:
+        """
+        if request.user.id == user_id:
+            user = request.user
+            title = request.data.get('title')
+            content = request.data.get('content')
+            post = Post(user=user, title=title, content=content)
+            post.save()
+            return Response(data={'id': post.pk, 'save': 'Ok'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)

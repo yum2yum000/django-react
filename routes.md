@@ -70,6 +70,15 @@ user:{
 
 
 post:{
+    all_posts:{
+        uri:'posts/',
+        method:'GET',
+        send:{},
+        receive:{
+            all posts 
+        },
+        status:200,
+    }
     //login_required
     create:{
         uri:'posts/',

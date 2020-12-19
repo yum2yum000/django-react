@@ -18,7 +18,7 @@ urlpatterns = [
     # استفاده کنیم، به صورت پیشفرض از روت users/id استفاده خواهد کرد. و این مشکلی است که با استفاده از
     # ViewSetها
     # قابل رفع می باشد.
-    path('users/login/', LoginView.as_view(),name='user_login'),
+    path('users/login/', LoginView.as_view(), name='user_login'),
     # برای تغیر پروفایل
     path('users/login/<int:id>/', UserProfile.as_view(), name='profile'),
 
@@ -27,8 +27,9 @@ urlpatterns = [
     # نیاز به توکن
 
     path('posts/', AllPostList.as_view(), name='post_list'),
-    #چزئیات یک پست را برمیگرداند
-    path('posts/users/<int:id>/<int:pk>/', Posts.as_view(), name='post_detail'),
+    # چزئیات یک پست را برمیگرداند
+    path('posts/users/<int:user_id>/', Posts.as_view(), name='post_detail'),
+    path('posts/users/<int:user_id>/<post_pk>/', Posts.as_view()),
     # جزئیات یک پست خاص
     # path('posts/detail/<pk>/', PostDetail.as_view(), name='post_detail')
 ]
