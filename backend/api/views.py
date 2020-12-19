@@ -237,3 +237,15 @@ class Posts(APIView):
         else:
             return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
+    def put(self, request, user_id, post_pk):
+        if request.user.id == user_id:
+            # update post
+            post = get_object_or_404(Post, pk=post_pk)
+            post.title = request.data.get('title') or post.title
+            post.content = request.data.get('content') or post.content
+            post.save()
+            data = PostSerializer(post).data
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
