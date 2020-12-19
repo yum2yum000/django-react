@@ -249,3 +249,10 @@ class Posts(APIView):
         else:
             return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
+    def delete(self, request, user_id, post_pk):
+        if request.user.id == user_id:
+            post = get_object_or_404(Post, pk=post_pk)
+            post.delete()
+            return Response({'post': 'deleted'}, status=status.HTTP_200_OK)
+        else:
+            return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
