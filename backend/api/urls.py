@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from api.views import PostList, CreateUser, LoginView, UserProfile
+from api.views import Posts, CreateUser, LoginView, UserProfile, AllPostList
 
 # router = routers.DefaultRouter()
 # router.register('users', UserViewSets)
@@ -26,9 +26,9 @@ urlpatterns = [
     # لیست کردن پست های کاربر خاص
     # نیاز به توکن
 
-    path('posts/list/', PostList.as_view(), name='post_list'),
+    path('posts/', AllPostList.as_view(), name='post_list'),
     #چزئیات یک پست را برمیگرداند
-    path('posts/list/<int:pk>/', PostList.as_view(), name='post_detail'),
+    path('posts/users/<int:id>/<int:pk>/', Posts.as_view(), name='post_detail'),
     # جزئیات یک پست خاص
     # path('posts/detail/<pk>/', PostDetail.as_view(), name='post_detail')
 ]

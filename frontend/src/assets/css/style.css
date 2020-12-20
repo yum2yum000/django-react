@@ -476,7 +476,7 @@ input {
 
 .input-group {
 	position: relative;
-	margin-bottom: 22px;
+	margin-bottom: 15px;
 }
 
 .input-group-icon {
@@ -624,4 +624,23 @@ ul.location_icon {
 .home a{
 	text-decoration:none!important;
 	color:#fc2c77;
+}
+.textarea--style-4
+   {
+	width: 100%;
+	background: #fafafa;
+	box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, 0.08);
+	border-radius: 5px;
+	border: 0;
+	height: 100px;}
+
+.textarea--style-4:focus{
+	border: 0 none #FFF;
+	overflow: hidden;
+	outline:none;
+}
+.error{
+	color:red;
+	position:relative;
+	top:-9px;
 }

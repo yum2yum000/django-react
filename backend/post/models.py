@@ -10,9 +10,15 @@ class CustomUser(AbstractUser):
     class Meta:
         pass
 
+    #قابل نال کردن فیلد نام
+    #AbstractUser._meta.get_field('first_name)._unique=False
+    AbstractUser._meta.get_field('first_name').null = True
+    AbstractUser._meta.get_field('last_name').null=True
+    AbstractUser._meta.get_field('email').null=True
+
     phone = models.CharField('شماره تلفن', max_length=11, null=True, blank=True)
     adres = models.TextField('آدرس', null=True, blank=True)
-    desc = models.TextField('توضیحات', null=True, blank=True)
+    bio = models.TextField('توضیحات', null=True, blank=True)
     avatar = models.ImageField('تصویر', upload_to='images', null=True, blank=True)
 
     # USERNAME_FIELD = 'username'
@@ -21,12 +27,12 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return f'{self.username}'
 
-    #این متد برای نشان دادن عکس در پنل ادمین است.
+    # این متد برای نشان دادن عکس در پنل ادمین است.
     # برای کارکرد درست این متد، باید تغییراتی در فایل admin
-    #داده شود
-    #به فایل admin مراجعه شود
+    # داده شود
+    # به فایل admin مراجعه شود
     def avatar_tag(self):
-        #تابع format_html و mark_safe ورودی را به یک فایل html می چسبانند
+        # تابع format_html و mark_safe ورودی را به یک فایل html می چسبانند
         return format_html('<img src="%s" width="150px" height="150px" />' % (self.avatar.url))
 
     avatar_tag.short_description = 'تصویر'
@@ -34,7 +40,7 @@ class CustomUser(AbstractUser):
 
 class Post(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default='deleted')
-    title = models.CharField('عنوان', max_length=100,)
+    title = models.CharField('عنوان', max_length=100, )
     content = models.TextField('محتوا')
     send_date = models.DateTimeField('تاریخ ارسال', auto_now_add=True)
 
