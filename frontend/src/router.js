@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Home from './views/Home.vue'
 //
 import Register from './views/Register.vue'
+import Login from './views/Login.vue'
 //
 // import Loading from 'vue-loading-overlay';
 import NotFound from './views/NotFound'
@@ -25,6 +26,11 @@ const router = new Router({
             path: '/register',
             name: 'register',
             component: Register
+        },
+        {
+            path: '/login',
+            name: 'login',
+            component: Login
         },
 
         {

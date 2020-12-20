@@ -476,7 +476,7 @@ input {
 
 .input-group {
 	position: relative;
-	margin-bottom: 22px;
+	margin-bottom: 15px;
 }
 
 .input-group-icon {
@@ -527,7 +527,7 @@ input {
 
 .card-4 .card-body {
 	padding: 57px 65px;
-	padding-bottom: 65px;
+	padding-bottom: 10px!important;
 }
 
 @media (max-width: 767px) {
@@ -551,7 +551,8 @@ ul.location_icon {
 	margin: 0;
 	padding: 0;
 	width: 100%;
-	float: left!important;
+	display: flex!important;
+	justify-content: center;
 }
 @media (max-width: 1199px) and (min-width: 992px) {
 	ul.location_icon li {
@@ -569,4 +570,77 @@ ul.location_icon {
 
 .footer .Follow {
 	margin-bottom: 27px;
+}
+.footer .Follow h3 {
+	color: #fff;
+	font-size: 25px;
+	line-height: 30px;
+	font-weight: 600;
+	border-bottom: #fff solid 1px;
+	border-bottom-width: 1px;
+	border-width: 1px;
+	display: inline-block;
+	padding-bottom: 2px;
+	font-size:17px!important;
+}
+.white{
+	color:white!important;
+	font-size:17px!important;
+}
+
+@media (max-width: 1199px) and (min-width: 992px){
+	.footer .Newsletter {
+		width: 72%;
+	}}
+	.footer .Newsletter {
+		padding: 13px 26px;
+		padding-top: 10px;
+		padding-right: 26px;
+		padding-bottom: 10px;
+		padding-left: 26px;
+		border: #fff solid 1px;
+
+	}
+.footer .Subscribe {
+	padding: 3px 20px;
+	margin-left: -3px;
+	border: #0e0c0c solid 1px;
+	background: #0e0c0c;
+	color: #fff;
+
+}
+.email-container{
+	display: flex;
+	flex-direction: row-reverse;
+}
+.nav-link{
+	font-size:20px;
+}
+
+.submit{
+	background: linear-gradient(315deg, rgba(73,18,148,1) 40%, rgba(151,8,150,1) 100%)!important;
+}
+
+.home a{
+	text-decoration:none!important;
+	color:#fc2c77;
+}
+.textarea--style-4
+   {
+	width: 100%;
+	background: #fafafa;
+	box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, 0.08);
+	border-radius: 5px;
+	border: 0;
+	height: 100px;}
+
+.textarea--style-4:focus{
+	border: 0 none #FFF;
+	overflow: hidden;
+	outline:none;
+}
+.error{
+	color:red;
+	position:relative;
+	top:-9px;
 }
