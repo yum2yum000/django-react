@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from api.views import Posts, CreateUser, LoginView, UserProfile, AllPostList
+from api.views import Posts, CreateUser, LoginView, UserProfile, AllPostList, SearchUser
 
 # router = routers.DefaultRouter()
 # router.register('users', UserViewSets)
@@ -13,6 +13,7 @@ urlpatterns = [
     # -----------------------------------------------------------------------
 
     path('users/', CreateUser.as_view(), name='create_user'),
+    path('users/search/', SearchUser.as_view()),
     # دقت شود اگر در روت زیر به جای user
     # از users
     # استفاده کنیم، به صورت پیشفرض از روت users/id استفاده خواهد کرد. و این مشکلی است که با استفاده از
@@ -28,13 +29,13 @@ urlpatterns = [
 
     path('posts/', AllPostList.as_view(), name='post_list'),
     # چزئیات یک پست را برمیگرداند
-    #GETهمه ی پست های یک یوزر خاص را بر میگرداند
-    #ایجاد پست جدید برای کاربر خاصPOST
+    # GETهمه ی پست های یک یوزر خاص را بر میگرداند
+    # ایجاد پست جدید برای کاربر خاصPOST
     path('posts/<int:user_id>/', Posts.as_view(), name='post_detail'),
 
-    #GETیک پست از یک یوزر خاص را بر می گرداند.
-    #POSTویرایش یک پست از یک یوزر خاص
-    #حذف یک پست از یک یوزر خاصِDELETE
+    # GETیک پست از یک یوزر خاص را بر می گرداند.
+    # POSTویرایش یک پست از یک یوزر خاص
+    # حذف یک پست از یک یوزر خاصِDELETE
     path('posts/<int:user_id>/<post_pk>/', Posts.as_view()),
     # جزئیات یک پست خاص
     # path('posts/detail/<pk>/', PostDetail.as_view(), name='post_detail')

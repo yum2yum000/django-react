@@ -1,5 +1,6 @@
 import re
 
+from django.db.models import Q
 from django.db.utils import IntegrityError
 
 from django.contrib.auth import authenticate, password_validation
@@ -266,3 +267,18 @@ class Posts(APIView):
             return Response({'post': 'deleted'}, status=status.HTTP_200_OK)
         else:
             return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SearchUser(APIView):
+
+    def get(self, request):
+        data = request.data
+        if data.get('content'):
+            users = CustomUser.objects.all()
+            # users = CustomUser.objects.filter(first_name__contains=first_name).all()
+            # users = CustomUser.objects.filter(last_name__contains=last_name).all()
+
+            data = UserSerializer(users, many=(users.count() - 1 == True)).data if users.count() > 0 else {'search': 'Not Found'}
+            return Response(data, status=(status.HTTP_200_OK if users.count() > 0 else status.HTTP_404_NOT_FOUND))
+        else:
+            return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
