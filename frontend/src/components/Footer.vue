@@ -4,30 +4,33 @@
             <div class="footer">
                 <div class="container">
                     <div class="row pdn-top-30">
-                        <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
-                            <div class="Follow">
-                                <h3>Follow Us</h3>
+                        <div class="col-xl-5 col-lg-5 col-md-4 col-sm-12">
+                            <div class="Follow text-center mt-2">
+                                <h3 class="white mt-2">ما را دنبال کنید</h3>
                             </div>
                             <ul class="location_icon">
-                                <li> <a href="#"><img src="icon/facebook.png"></a></li>
-                                <li> <a href="#"><img src="icon/Twitter.png"></a></li>
-                                <li> <a href="#"><img src="icon/linkedin.png"></a></li>
-                                <li> <a href="#"><img src="icon/instagram.png"></a></li>
+                               <li><router-link to="/"><img src="@/assets/images/facebook.png" alt=""></router-link></li>
+                               <li><router-link to="/"><img src="@/assets/images/Twitter.png" alt=""></router-link></li>
+                               <li><router-link to="/"><img src="@/assets/images/instagram.png" alt=""></router-link></li>
+                               <li><router-link to="/"><img src="@/assets/images/linkedin.png" alt=""></router-link></li>
                             </ul>
                         </div>
-                        <div class="col-xl-8 col-lg-8 col-md-8 col-sm-12">
-                            <div class="Follow">
-                                <h3>Newsletter</h3>
+                        <div class="col-xl-7 col-lg-7 col-md-8 col-sm-12">
+                            <div class="Follow mt-4 text-center">
+                                <h3>دریافت خبرنامه</h3>
                             </div>
-                            <input class="Newsletter" placeholder="Enter your email" type="Enter your email">
-                            <button class="Subscribe">Subscribe</button>
+                            <div class="email-container">
+                                <input class="Newsletter" placeholder="ایمیل خود را وارد کنید" type="Enter your email">
+                                <button class="Subscribe">ارسال</button>
+                            </div>
+
                         </div>
                     </div>
                 </div>
             </div>
             <div class="copyright">
                 <div class="container">
-                    <p>Copyright 2019 All Right Reserved By <a href="https://html.design/">Free html Templates</a></p>
+                    <p class="text-center">تمامی حقوق متعلق به ماست </p>
                 </div>
             </div>
         </footer>

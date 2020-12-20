@@ -5,15 +5,26 @@
                 <button @click="show=!show" class="navbar-toggler js-fh5co-nav-toggle fh5co-nav-toggle" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="oi oi-menu"></span> فهرست
                 </button>
-                <router-link :to="{name:'register'}" :class="{order:!show}" class="navbar-brand">
-                    <img src="@/assets/images/top-icon.png" alt="">
-                </router-link>
+
+                <div class="flex-items">
+                    <router-link data-toggle="tooltip" data-placement="right" :to="{name:'register'}" :class="{order:!show}" class="navbar-brand">
+                        <svg aria-labelledby="svg-inline--fa-title-RtIOD4oBszjx" data-prefix="far" data-icon="sign-in-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="signup svg-inline--fa fa-sign-in-alt fa-w-16 fa-fw fa-lg"><title id="svg-inline--fa-title-RtIOD4oBszjx" class="">ثبت نام</title><path fill="white" d="M144 112v51.6H48c-26.5 0-48 21.5-48 48v88.6c0 26.5 21.5 48 48 48h96v51.6c0 42.6 51.7 64.2 81.9 33.9l144-143.9c18.7-18.7 18.7-49.1 0-67.9l-144-144C195.8 48 144 69.3 144 112zm192 144L192 400v-99.7H48v-88.6h144V112l144 144zm80 192h-84c-6.6 0-12-5.4-12-12v-24c0-6.6 5.4-12 12-12h84c26.5 0 48-21.5 48-48V160c0-26.5-21.5-48-48-48h-84c-6.6 0-12-5.4-12-12V76c0-6.6 5.4-12 12-12h84c53 0 96 43 96 96v192c0 53-43 96-96 96z" class=""></path></svg>
+
+                    </router-link>
+                    <router-link :to="{name:'login'}" :class="{order:!show}" class="navbar-brand">
+                        <img  data-toggle="tooltip" data-placement="right" title="ورود" class="login-height" src="@/assets/images/top-icon.png" alt="">
+
+
+                    </router-link>
+                </div>
+
                 <div :class="{collapse:!show}" class=" navbar-collapse text-right" id="ftco-nav" >
                     <ul class="navbar-nav nav ml-auto">
-                        <li class="nav-item ml-3"><a href="#home-section" class="nav-link active"><span>خانه</span></a></li>
-                        <li class="nav-item ml-3"><a href="#services-section" class="nav-link"><span>درباره ما</span></a></li>
-                        <li class="nav-item ml-3"><a href="#projects-section" class="nav-link"><span>بلاگ</span></a></li>
-                        <li class="nav-item ml-3"><a href="#about-section" class="nav-link"><span>تماس با ما</span></a></li>
+                        <li class="nav-item ml-3"><router-link to="/" class="nav-link active">خانه</router-link></li>
+                        <li class="nav-item ml-3"><router-link to="/" class="nav-link active">درباره ما</router-link></li>
+                        <li class="nav-item ml-3"><router-link to="/" class="nav-link active">بلاگ</router-link></li>
+                        <li class="nav-item ml-3"><router-link to="/" class="nav-link active">تماس با ما</router-link></li>
+
 
                     </ul>
                 </div>
@@ -49,4 +60,18 @@
         position:absolute;
         width:100%;
     }
+    .login-height{
+        height:25px;
+    }
+    .signup{
+        height: 25px;
+        width: 45px;
+        position: relative;
+        top: 2px;
+    }
+@media(min-width:992px){
+    .flex-items{
+        display:contents!important;
+    }
+}
 </style>

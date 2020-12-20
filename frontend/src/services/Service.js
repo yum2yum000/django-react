@@ -13,8 +13,7 @@ const apiClient = axios.create({
 export default {
 
     createUser(user) {
-        console.log(user)
-        axios.post('http://127.0.0.1:8000/users/', user)
+       return apiClient.post('/users/', user)
     },
     getProducts(perPage, page) {
         return apiClient.get('/products?_limit='+ perPage + '&_page=' + page)
