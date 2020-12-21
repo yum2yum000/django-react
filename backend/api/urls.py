@@ -24,8 +24,6 @@ urlpatterns = [
     path('users/login/<int:id>/', UserProfile.as_view(), name='profile'),
 
     # ------------------------------------------------------------------------
-    # لیست کردن پست های کاربر خاص
-    # نیاز به توکن
 
     path('posts/', AllPostList.as_view(), name='post_list'),
     # چزئیات یک پست را برمیگرداند

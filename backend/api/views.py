@@ -9,7 +9,7 @@ from django.core.validators import EmailValidator, validate_email
 from rest_framework import viewsets, status, serializers
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -139,6 +139,14 @@ class UserProfile(APIView):
         # update all data except the password
         # update all infoes
         data = request.data
+        if data.get('username'):
+            # اگر نام درخواستی برای تغییر در دیتابیس باشد، تغییر امکان پذیر نیست
+            try:
+                username = CustomUser.objects.get(username=data.get('username'))
+                return Response(data={'username': 'user name does exists'})
+            except:
+                # اگر نام کاربری درخواستی در دیتابیس نباشد، می توان تغییرداد
+                user.username = data.get('username')
         user.first_name = data.get('first_name') or user.first_name
         user.last_name = data.get('last_name') or user.last_name
         user.adres = data.get('adres') or user.adres
@@ -273,12 +281,15 @@ class SearchUser(APIView):
 
     def get(self, request):
         data = request.data
-        if data.get('content'):
-            users = CustomUser.objects.all()
+        if data.get('search'):
+            users = CustomUser.objects.filter(Q(username__contains=data.get('search')) |
+                                              Q(first_name__contains=data.get('search')) |
+                                              Q(last_name__contains=data.get('search'))).all()
             # users = CustomUser.objects.filter(first_name__contains=first_name).all()
             # users = CustomUser.objects.filter(last_name__contains=last_name).all()
-
-            data = UserSerializer(users, many=(users.count() - 1 == True)).data if users.count() > 0 else {'search': 'Not Found'}
-            return Response(data, status=(status.HTTP_200_OK if users.count() > 0 else status.HTTP_404_NOT_FOUND))
+            # Q(username__contains=data.get('search'))
+            # data_serialized = UserSerializer(users, many=(users.count() - 1 == True)).data if users.count() > 0 else {'search': 'Not Found'}
+            data_serialized = UserSerializer(users, many=True).data
+            return Response(data_serialized, status=(status.HTTP_200_OK if users.count() > 0 else status.HTTP_404_NOT_FOUND))
         else:
             return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
