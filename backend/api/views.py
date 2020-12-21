@@ -166,26 +166,36 @@ class UserProfile(APIView):
         user.avatar = data.get('avatar') or user.avatar
         user.phone = data.get('phone') or user.phone
 
-        # email validation
+        # email validate
         email = data.get('email')
         if email:
+            # چک کردن اینکه ایمیل تکراری وارد نشود
+            try:
+                # ایمیل تکراری است
+                #اگر ایمیل وارد شده مربوط به کاربر حاضر نباشد. نمی توان این ایمیل را به کاربر دیگر تخصیص داد پس
+                if CustomUser.objects.get(email=data.get('email')).id != user.id:
+                    return Response({'email': 'email does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            except:
+                #اگر ایمیل وارد شده در دیتابیس نباشد پس می توان ایمیل کاربر حاضر را به آن تغغیر داد
+                pass
             try:
                 validate_email(email)
                 user.email = email
             except Exception as err:
+                # فرمت ایمیل درست نیست
                 return Response({'email': err}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # فیلد ایمیل لازم است
+            return Response({'email': 'Required'}, status=status.HTTP_411_LENGTH_REQUIRED)
 
-        # user.set_password(request.data.get('password'))
-        # user = UserSerializer(request.data).data
-        # if user.is_valid():
         user.save()
-        return Response(data={'update': 'Ok', "user": UserSerializer(user).data}, status=status.HTTP_200_OK)
+        return Response(data={'data': 'updated', "user": UserSerializer(user).data}, status=status.HTTP_200_OK)
 
     def update_password(self, request, user):
         try:
             password_validation.validate_password(request.data.get('password'))
         except Exception as err:
-            return Response({'non_field_errors': err}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'password': err}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(request.data.get('password'))
         return Response({'password': 'updated'}, status=status.HTTP_200_OK)
 
