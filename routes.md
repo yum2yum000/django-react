@@ -141,4 +141,34 @@ post:{
         status: 200,
         err_status: 400
     }
+},
+
+
+search:{
+    user:{
+        uri:'users/search/',
+        method:'GET',
+        send:{
+            search:'something',
+        },
+        receive:{
+            search result
+        },
+        status: 200,
+        not_found_status:404,
+        bad_request_status:400
+    },
+    post:{
+        uri:'posts/search/',
+        method:'GET',
+        send:{
+            search:'something'
+        },
+        receive:{
+            search result
+        },
+        status: 200,
+        not_found_status:404,
+        bad_request_status:400
+    }
 }
