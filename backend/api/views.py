@@ -116,15 +116,6 @@ class CreateUser(generics.CreateAPIView):
     # def post(self, request):
 
 
-#
-# def get(self, request):
-#     if request.method.POST:
-#         username = request.POST['username']
-#         password = request.POST['password']
-#         data = UserViewSets((username, password)).data
-#         return Response(data)
-
-
 class LoginOrUpdateProfile(APIView):
     serializer_class = UserSerializer
 
@@ -225,13 +216,13 @@ class Posts(APIView):
     permission_classes = (IsAuthenticated,)
 
     # درخواست لیست پست ها
-    def get(self, request, user_id=None, post_pk=None):
+    def get(self, request, post_pk=None):
         # زمانی که این متد فراخوانی شود یعنی توکن تایید شده است و
         # request.user
         # در دسترس قرار می گیرد.
 
         # اگر ای دی کاربر با ای دی توکن یکسان باشد
-        if request.user.id == user_id:
+        if request.user.id:
             objs = Post.objects.filter(user_id=request.user.id)
 
             if post_pk:
@@ -244,7 +235,7 @@ class Posts(APIView):
             # همه ی پست های یک کاربر داده می شود
             return Response({'user': 'Token or user id invalid'}, status=status.HTTP_404_NOT_FOUND)
 
-    def post(self, request, user_id):
+    def post(self, request):
         """
         برای ذخیره کردن پست های کاربر خاصی از این متد استفاده می شود
         توجه شود که می توان درخواست های زیادی را پی در پی فرستاد که این موجب اخلال درکار وب سرویس خواهد کرد
@@ -253,7 +244,8 @@ class Posts(APIView):
         :param request:
         :return:
         """
-        if request.user.id == user_id:
+        # اگر توکن وارد شده در صحیح باشد
+        if request.user.id:
             # create post
             title = request.data.get('title')
             content = request.data.get('content')
@@ -274,8 +266,8 @@ class Posts(APIView):
             return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
     # update post
-    def put(self, request, user_id, post_pk):
-        if request.user.id == user_id:
+    def put(self, request, post_pk):
+        if request.user.id:
             post = get_object_or_404(Post, pk=post_pk)
             post.title = request.data.get('title') or post.title
             post.content = request.data.get('content') or post.content
@@ -286,8 +278,8 @@ class Posts(APIView):
             return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
     # delete post
-    def delete(self, request, user_id, post_pk):
-        if request.user.id == user_id:
+    def delete(self, request, post_pk):
+        if request.user.id:
             post = get_object_or_404(Post, pk=post_pk)
             post.delete()
             return Response({'post': 'deleted'}, status=status.HTTP_200_OK)

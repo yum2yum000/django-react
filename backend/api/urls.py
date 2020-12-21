@@ -28,15 +28,15 @@ urlpatterns = [
 
     path('posts/', AllPostList.as_view(), name='post_list'),
     path('posts/search/', PostSearch.as_view(), name='post_search'),
-    # چزئیات یک پست را برمیگرداند
+
     # GETهمه ی پست های یک یوزر خاص را بر میگرداند
     # ایجاد پست جدید برای کاربر خاصPOST
-    path('posts/<int:user_id>/', Posts.as_view(), name='post_detail'),
+    path('posts/user/', Posts.as_view(), name='post_detail'),
 
     # GETیک پست از یک یوزر خاص را بر می گرداند.
     # POSTویرایش یک پست از یک یوزر خاص
     # حذف یک پست از یک یوزر خاصِDELETE
-    path('posts/<int:user_id>/<post_pk>/', Posts.as_view()),
+    path('posts/user/<post_pk>/', Posts.as_view()),
     # جزئیات یک پست خاص
     # path('posts/detail/<pk>/', PostDetail.as_view(), name='post_detail')
 ]
