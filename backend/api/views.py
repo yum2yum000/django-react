@@ -43,7 +43,6 @@ from post.models import CustomUser, Post
 #         fields = '__all__'
 
 
-
 class CreateUser(generics.CreateAPIView):
     # این دو کلاس به صورت پیش فرش در فایل settings.py تعریف شده است
     authentication_classes = ()
@@ -126,15 +125,26 @@ class CreateUser(generics.CreateAPIView):
 #         return Response(data)
 
 
-class UserProfile(APIView):
-    permission_classes = (IsAuthenticated,)
+class LoginOrUpdateProfile(APIView):
+    serializer_class = UserSerializer
 
-    # یک توکن و یک ای دی دریافت می شود. در صورتی که توکن مربوط به ای دی باشد اپدیت انجام می شود.
-    def put(self, request, id):
+    # لاگین شدن
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        if user:
+            update_last_login(None, user)
+            return Response({'token': user.auth_token.key, 'id': user.id}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Wrong Credentials'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # اپدیت پروفایل
+    def put(self, request):
         # توکن ارسالی مربوط به ای دی ارسالی می باشد و این کاربر مجاز به تغییرات در پروفایل است
         # if request.data.get('phone').isdigit() is not True:
         #     raise serializers.ValidationError({'error': 'Phone is not digit'})
-        if request.user.id == id:
+        if request.user.id:
             user = CustomUser.objects.get(id=id)
             update = request.data.get('update').lower()
             if update == "data":
@@ -144,7 +154,7 @@ class UserProfile(APIView):
             else:
                 return Response({'user': UserSerializer(user).data}, status=status.HTTP_200_OK)
 
-        return Response(data={'update': 'Forbiden', 'detail': 'This user not matched with token string'},
+        return Response(data={'user': 'Forbiden', 'detail': 'This user not matched with token string'},
                         status=status.HTTP_403_FORBIDDEN)
 
     def update_data(self, request, user):
@@ -172,11 +182,11 @@ class UserProfile(APIView):
             # چک کردن اینکه ایمیل تکراری وارد نشود
             try:
                 # ایمیل تکراری است
-                #اگر ایمیل وارد شده مربوط به کاربر حاضر نباشد. نمی توان این ایمیل را به کاربر دیگر تخصیص داد پس
+                # اگر ایمیل وارد شده مربوط به کاربر حاضر نباشد. نمی توان این ایمیل را به کاربر دیگر تخصیص داد پس
                 if CustomUser.objects.get(email=data.get('email')).id != user.id:
                     return Response({'email': 'email does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             except:
-                #اگر ایمیل وارد شده در دیتابیس نباشد پس می توان ایمیل کاربر حاضر را به آن تغغیر داد
+                # اگر ایمیل وارد شده در دیتابیس نباشد پس می توان ایمیل کاربر حاضر را به آن تغغیر داد
                 pass
             try:
                 validate_email(email)
@@ -198,20 +208,6 @@ class UserProfile(APIView):
             return Response({'password': err}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(request.data.get('password'))
         return Response({'password': 'updated'}, status=status.HTTP_200_OK)
-
-
-class LoginView(APIView):
-    serializer_class = UserSerializer
-
-    def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        user = authenticate(username=username, password=password)
-        if user:
-            update_last_login(None, user)
-            return Response({'token': user.auth_token.key, 'id': user.id}, status=status.HTTP_200_OK)
-        else:
-            return Response({'error': 'Wrong Credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # class PostList1(generics.ListAPIView):

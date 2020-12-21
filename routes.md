@@ -59,12 +59,16 @@ user:{
             last_login
             date_joined
             غیر قابل تغییر می باشند
+
+            username و email : required
+
         },
         receive:{
             user infoes
+            }
             status:200,
-            error_status=400, 403
-        }
+            error_status=400, 403, 406, 411
+
     },
 }
 
