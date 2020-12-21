@@ -126,7 +126,7 @@ class LoginOrUpdateProfile(APIView):
 
     # لاگین شدن
     def post(self, request):
-        username = request.data.get('username')
+        username = request.data.get('username').lower()
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
         if user:
@@ -140,7 +140,8 @@ class LoginOrUpdateProfile(APIView):
         # توکن ارسالی مربوط به ای دی ارسالی می باشد و این کاربر مجاز به تغییرات در پروفایل است
         # if request.data.get('phone').isdigit() is not True:
         #     raise serializers.ValidationError({'error': 'Phone is not digit'})
-        if request.user.id:
+        id = request.user.id
+        if id:
             user = CustomUser.objects.get(id=id)
             update = request.data.get('update').lower()
             if update == "data":
@@ -168,13 +169,13 @@ class LoginOrUpdateProfile(APIView):
                 user.username = data.get('username').lower()
 
         # email validate
-        email = data.get('email')
+        email = data.get('email').lower()
         if email:
             # چک کردن اینکه ایمیل تکراری وارد نشود
             try:
                 # ایمیل تکراری است
                 # اگر ایمیل وارد شده مربوط به کاربر حاضر نباشد. نمی توان این ایمیل را به کاربر دیگر تخصیص داد پس
-                if CustomUser.objects.get(email=data.get('email').lower()).id != user.id:
+                if CustomUser.objects.get(email=email).id != user.id:
                     return Response({'email': 'email does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             except:
                 # اگر ایمیل وارد شده در دیتابیس نباشد پس می توان ایمیل کاربر حاضر را به آن تغغیر داد
@@ -333,31 +334,28 @@ class PasswordRecovery(APIView):
 
     def get(self, request):
         data = request.data
-        # اگر درخواست توکن داشته باشد
-        if request.user.id:
-            try:
-                email = data.get('email').lower()
-                user = CustomUser.objects.get(email=email)
-                # send email
-                # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
-                password = self.password_generator()
-                user.set_password(password)
-                rendered_message = get_template('password_recovery.html').render({
-                    'password': password, 'username': user.username
-                })
-                # fail_silently=True
-                # پیش فرض False
-                # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
-                # smtplib.SMTPException
-                #
-                # hmtl_message
-                # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
-                # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
-                send_mail(subject='بازیابی رمز عبور', message='', from_email=settings.EMAIL_HOST_USER,
-                          recipient_list=(email,),
-                          fail_silently=True,
-                          html_message=rendered_message)
-            except:
-                return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response({'email': 'Token Invalid'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+        try:
+            email = data.get('email').lower()
+            user = CustomUser.objects.get(email=email)
+            # send email
+            # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
+            password = self.password_generator()
+            user.set_password(password)
+            rendered_message = get_template('password_recovery.html').render({
+                'password': password, 'username': user.username
+            })
+            # fail_silently=True
+            # پیش فرض False
+            # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
+            # smtplib.SMTPException
+            #
+            # hmtl_message
+            # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
+            # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
+            send_mail(subject='بازیابی رمز عبور', message='', from_email=settings.EMAIL_HOST_USER,
+                      recipient_list=(email,),
+                      fail_silently=True,
+                      html_message=rendered_message)
+        except:
+            return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)
