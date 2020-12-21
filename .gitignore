@@ -2,7 +2,7 @@
 
 ./backend/db.sqlite3
 
-
+remaining.md
 
 backend/first/mail_info.py
 
@@ -11,7 +11,6 @@ backend/venv/
 
 backend/.idea/
 
-remaining.md
 
 
 backend/media/

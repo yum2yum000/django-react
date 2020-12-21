@@ -277,7 +277,7 @@ class Posts(APIView):
             return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SearchUser(APIView):
+class UserSearch(APIView):
 
     def get(self, request):
         data = request.data
@@ -285,11 +285,18 @@ class SearchUser(APIView):
             users = CustomUser.objects.filter(Q(username__contains=data.get('search')) |
                                               Q(first_name__contains=data.get('search')) |
                                               Q(last_name__contains=data.get('search'))).all()
-            # users = CustomUser.objects.filter(first_name__contains=first_name).all()
-            # users = CustomUser.objects.filter(last_name__contains=last_name).all()
-            # Q(username__contains=data.get('search'))
-            # data_serialized = UserSerializer(users, many=(users.count() - 1 == True)).data if users.count() > 0 else {'search': 'Not Found'}
             data_serialized = UserSerializer(users, many=True).data
             return Response(data_serialized, status=(status.HTTP_200_OK if users.count() > 0 else status.HTTP_404_NOT_FOUND))
+        else:
+            return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PostSearch(APIView):
+    def get(self, request):
+        data = request.data
+        if data.get('search'):
+            posts = Post.objects.filter(Q(title__contains=data.get('search')) | Q(content__contains=data.get('search')))
+            data_serialized = PostSerializer(posts, many=True).data
+            return Response(data_serialized, status=(status.HTTP_200_OK if posts.count() > 0 else status.HTTP_404_NOT_FOUND))
         else:
             return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
