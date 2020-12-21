@@ -43,6 +43,7 @@ from post.models import CustomUser, Post
 #         fields = '__all__'
 
 
+
 class CreateUser(generics.CreateAPIView):
     # این دو کلاس به صورت پیش فرش در فایل settings.py تعریف شده است
     authentication_classes = ()
@@ -69,17 +70,27 @@ class CreateUser(generics.CreateAPIView):
         # email validate
         email = data.get('email')
         if email:
+            # چک کردن اینکه ایمیل تکراری وارد نشود
+            try:
+                # ایمیل تکراری است
+                CustomUser.objects.get(email=data.get('email'))
+                return Response({'email': 'email does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            except:
+                pass
             try:
                 validate_email(email)
                 user.email = email
             except Exception as err:
+                # فرمت ایمیل درست نیست
                 return Response({'email': err}, status=status.HTTP_400_BAD_REQUEST)
-
+        else:
+            # فیلد ایمیل لازم است
+            return Response({'email': 'Required'}, status=status.HTTP_411_LENGTH_REQUIRED)
         # password validate
         try:
             password_validation.validate_password(data.get('password'))
         except ValidationError as err:
-            return Response({'error': err}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'password': err}, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -89,12 +100,13 @@ class CreateUser(generics.CreateAPIView):
 
         user = CustomUser(
             username=data.get('username'),
-            phone=data.get('phone'),
             first_name=data.get('first_name'),
             last_name=data.get('last_name'),
+            email=data.get('email'),
             adres=data.get('adres'),
             bio=data.get('bio'),
             avatar=data.get('avatar'),
+            phone=data.get('phone'),
         )
         user.set_password(data.get('password'))
         user.save()
@@ -143,7 +155,7 @@ class UserProfile(APIView):
             # اگر نام درخواستی برای تغییر در دیتابیس باشد، تغییر امکان پذیر نیست
             try:
                 username = CustomUser.objects.get(username=data.get('username'))
-                return Response(data={'username': 'user name does exists'})
+                return Response(data={'username': 'user name does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             except:
                 # اگر نام کاربری درخواستی در دیتابیس نباشد، می توان تغییرداد
                 user.username = data.get('username')
@@ -297,6 +309,14 @@ class PostSearch(APIView):
         if data.get('search'):
             posts = Post.objects.filter(Q(title__contains=data.get('search')) | Q(content__contains=data.get('search')))
             data_serialized = PostSerializer(posts, many=True).data
+            # اگر چیزی پیدا نشود، 404 ارسال می کند.
             return Response(data_serialized, status=(status.HTTP_200_OK if posts.count() > 0 else status.HTTP_404_NOT_FOUND))
         else:
+            # اگر دیتا ارسال نشود 400 ارسال می کند.
             return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
+
+#
+# class PasswordRecovery(APIView):
+#
+#     def get(self, request):
+#         data = request.data

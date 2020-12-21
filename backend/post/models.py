@@ -14,8 +14,8 @@ class CustomUser(AbstractUser):
     # AbstractUser._meta.get_field('first_name)._unique=False
     AbstractUser._meta.get_field('first_name').null = True
     AbstractUser._meta.get_field('last_name').null = True
-    AbstractUser._meta.get_field('email').null = True
-    # AbstractUser._meta.get_field('email')._unique=True
+    AbstractUser._meta.get_field('email').null = False
+    AbstractUser._meta.get_field('email')._unique=True
 
     phone = models.CharField('شماره تلفن', max_length=11, null=True, blank=True)
     adres = models.TextField('آدرس', null=True, blank=True)

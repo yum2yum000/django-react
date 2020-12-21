@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from api.views import Posts, CreateUser, LoginView, UserProfile, AllPostList, UserSearch, PostSearch
+from api.views import Posts, CreateUser, LoginView, UserProfile, AllPostList, UserSearch, PostSearch, PasswordRecovery
 
 # router = routers.DefaultRouter()
 # router.register('users', UserViewSets)
@@ -13,7 +13,11 @@ urlpatterns = [
     # -----------------------------------------------------------------------
 
     path('users/', CreateUser.as_view(), name='create_user'),
+
+    #جستوجو در نام کاربری، نام و نام خانوادگی
+    #بدون نیاز به احراز هویت
     path('users/search/', UserSearch.as_view()),
+    # path('users/password-recovery/',PasswordRecovery.as_view()),
     # دقت شود اگر در روت زیر به جای user
     # از users
     # استفاده کنیم، به صورت پیشفرض از روت users/id استفاده خواهد کرد. و این مشکلی است که با استفاده از
