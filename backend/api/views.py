@@ -357,5 +357,6 @@ class PasswordRecovery(APIView):
                       recipient_list=(email,),
                       fail_silently=True,
                       html_message=rendered_message)
+            return Response({'email': 'sent'}, status=status.HTTP_200_OK)
         except:
             return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)

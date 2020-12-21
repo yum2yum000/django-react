@@ -71,6 +71,19 @@ user:{
             ایمیل وارد شده، تکراری باشد 406
             نام کاربری تکراری باشد 406
     },
+    password_recovery:{
+        uri:'users/password-recovery',
+        method:'GET',
+        send:{
+            'email':' email',
+        },
+        receive:{
+            'email:'sent',
+        },
+        status:200,
+        not_found_status:404
+
+    }
 }
 
 
