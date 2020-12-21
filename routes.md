@@ -18,7 +18,7 @@ user:{
             password:'password',    //required
             first_name:'first_name',
             last_name:'lastname',
-            email:'email',
+            email:'email',  //required
             phone:'phone',
             adres:'adres',
             desc:'bio',
@@ -47,7 +47,7 @@ user:{
     //edit profile
     //login_required
     profile:{
-        uri:'users/login/<int:user_id>/',
+        uri:'users/login/',
         method:'PUT',
         send:{
             update:'password','data', None
@@ -68,7 +68,8 @@ user:{
             }
             status:200,
             error_status=400, 403, 406, 411
-
+            ایمیل وارد شده، تکراری باشد 406
+            نام کاربری تکراری باشد 406
     },
 }
 
@@ -86,7 +87,7 @@ post:{
 
     //login_required
     create:{
-        uri:'posts/<user_id>/',
+        uri:'posts/user/',
         method:'POST',
         send:{
             title:'post title', //required
@@ -100,7 +101,7 @@ post:{
     //login_required
     list:{
         //لیست کردن پست های یک یوزر خاص
-        uri:'posts/<user_id>/',
+        uri:'posts/user/',
         method:'GET',
         send:{},
         receive:{
@@ -112,7 +113,7 @@ post:{
     //login_required
     one_post:{
         //گرفتن یک پست از یک یوزر خاص
-        uri:'posts/<user_id>/<post_pk>/',
+        uri:'posts/user/<post_pk>/',
         method:'GET',
         send:{},
         receive:{
@@ -123,7 +124,7 @@ post:{
     },
     //login_required
     update:{
-        uri:'posts/<user_id>/<post_pk>/',
+        uri:'posts/user/<post_pk>/',
         method:'PUT',
         send:{
             title:'new title',
@@ -136,7 +137,7 @@ post:{
         err_status: 400
     },
     DELETE:{
-        uri:'posts/<user_id>/<post_pk>/',
+        uri:'posts/user/<post_pk>/',
         method:'DELETE',
         send:{}
         recevive:{
