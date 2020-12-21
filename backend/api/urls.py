@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 
 from api.views import (Posts, CreateUser,
-                       AllPostList, UserSearch, PostSearch, LoginOrUpdateProfile, )
+                       AllPostList, UserSearch, PostSearch, LoginOrUpdateProfile, PasswordRecovery, )
 
 # router = routers.DefaultRouter()
 # router.register('users', UserViewSets)
@@ -18,7 +18,7 @@ urlpatterns = [
     # جستوجو در نام کاربری، نام و نام خانوادگی
     # بدون نیاز به احراز هویت
     path('users/search/', UserSearch.as_view()),
-    # path('users/password-recovery/',PasswordRecovery.as_view()),
+    path('users/password-recovery/',PasswordRecovery.as_view()),
 
     #post لاگین کردن
     #put اپدیت کردن پروفایل

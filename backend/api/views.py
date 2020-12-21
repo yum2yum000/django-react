@@ -1,11 +1,14 @@
 import re
+from random import random
 
+from django.core.mail import send_mail
 from django.db.models import Q
 from django.db.utils import IntegrityError
 
 from django.contrib.auth import authenticate, password_validation
 from django.contrib.auth.models import update_last_login
 from django.core.validators import EmailValidator, validate_email
+from django.template.loader import get_template
 from rest_framework import viewsets, status, serializers
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
@@ -16,6 +19,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api._serializer import UserSerializer, PostSerializer
+from first import settings
 from post.models import CustomUser, Post
 
 
@@ -69,10 +73,11 @@ class CreateUser(generics.CreateAPIView):
         # email validate
         email = data.get('email')
         if email:
+            email = email.lower()
             # چک کردن اینکه ایمیل تکراری وارد نشود
             try:
                 # ایمیل تکراری است
-                CustomUser.objects.get(email=data.get('email'))
+                CustomUser.objects.get(email=email)
                 return Response({'email': 'email does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             except:
                 pass
@@ -98,10 +103,10 @@ class CreateUser(generics.CreateAPIView):
             return self.validate(data)
 
         user = CustomUser(
-            username=data.get('username'),
+            username=data.get('username').lower(),
             first_name=data.get('first_name'),
             last_name=data.get('last_name'),
-            email=data.get('email'),
+            email=data.get('email').lower(),
             adres=data.get('adres'),
             bio=data.get('bio'),
             avatar=data.get('avatar'),
@@ -155,17 +160,12 @@ class LoginOrUpdateProfile(APIView):
         if data.get('username'):
             # اگر نام درخواستی برای تغییر در دیتابیس باشد، تغییر امکان پذیر نیست
             try:
-                username = CustomUser.objects.get(username=data.get('username'))
+                # اگر خط زیر دست اجرا شود، پس نمیتوان نام  کاربری درخواستی را به یوزر نسبت داد. چون همچین نامی وجود دارد
+                CustomUser.objects.get(username=data.get('username').lower())
                 return Response(data={'username': 'user name does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             except:
                 # اگر نام کاربری درخواستی در دیتابیس نباشد، می توان تغییرداد
-                user.username = data.get('username')
-        user.first_name = data.get('first_name') or user.first_name
-        user.last_name = data.get('last_name') or user.last_name
-        user.adres = data.get('adres') or user.adres
-        user.bio = data.get('bio') or user.bio
-        user.avatar = data.get('avatar') or user.avatar
-        user.phone = data.get('phone') or user.phone
+                user.username = data.get('username').lower()
 
         # email validate
         email = data.get('email')
@@ -174,7 +174,7 @@ class LoginOrUpdateProfile(APIView):
             try:
                 # ایمیل تکراری است
                 # اگر ایمیل وارد شده مربوط به کاربر حاضر نباشد. نمی توان این ایمیل را به کاربر دیگر تخصیص داد پس
-                if CustomUser.objects.get(email=data.get('email')).id != user.id:
+                if CustomUser.objects.get(email=data.get('email').lower()).id != user.id:
                     return Response({'email': 'email does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             except:
                 # اگر ایمیل وارد شده در دیتابیس نباشد پس می توان ایمیل کاربر حاضر را به آن تغغیر داد
@@ -188,6 +188,13 @@ class LoginOrUpdateProfile(APIView):
         else:
             # فیلد ایمیل لازم است
             return Response({'email': 'Required'}, status=status.HTTP_411_LENGTH_REQUIRED)
+
+        user.first_name = data.get('first_name') or user.first_name
+        user.last_name = data.get('last_name') or user.last_name
+        user.adres = data.get('adres') or user.adres
+        user.bio = data.get('bio') or user.bio
+        user.avatar = data.get('avatar') or user.avatar
+        user.phone = data.get('phone') or user.phone
 
         user.save()
         return Response(data={'data': 'updated', "user": UserSerializer(user).data}, status=status.HTTP_200_OK)
@@ -313,8 +320,44 @@ class PostSearch(APIView):
             # اگر دیتا ارسال نشود 400 ارسال می کند.
             return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
 
-#
-# class PasswordRecovery(APIView):
-#
-#     def get(self, request):
-#         data = request.data
+
+class PasswordRecovery(APIView):
+
+    def password_generator(self):
+        s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
+        length = random.randrange(8, 12)
+        passowrd = ''
+        for p in range(length):
+            passowrd += random.choice(s)
+        return passowrd
+
+    def get(self, request):
+        data = request.data
+        # اگر درخواست توکن داشته باشد
+        if request.user.id:
+            try:
+                email = data.get('email').lower()
+                user = CustomUser.objects.get(email=email)
+                # send email
+                # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
+                password = self.password_generator()
+                user.set_password(password)
+                rendered_message = get_template('password_recovery.html').render({
+                    'password': password, 'username': user.username
+                })
+                # fail_silently=True
+                # پیش فرض False
+                # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
+                # smtplib.SMTPException
+                #
+                # hmtl_message
+                # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
+                # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
+                send_mail(subject='بازیابی رمز عبور', message='', from_email=settings.EMAIL_HOST_USER,
+                          recipient_list=(email,),
+                          fail_silently=True,
+                          html_message=rendered_message)
+            except:
+                return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'email': 'Token Invalid'}, status=status.HTTP_406_NOT_ACCEPTABLE)
