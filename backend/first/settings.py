@@ -43,11 +43,8 @@ INSTALLED_APPS = [
     # برای دادن دسترسی به دامینهای دیگر
     'corsheaders',
 
-<<<<<<< HEAD
     # ارسال داده به کلاینت بدون اینکه درخواست کند
     # 'channels',
-=======
->>>>>>> browser_error
     # local
     'post',
 ]
@@ -97,6 +94,9 @@ TEMPLATES = [
         },
     },
 ]
+
+
+
 
 WSGI_APPLICATION = 'first.wsgi.application'
 
@@ -161,3 +161,8 @@ EMAIL_HOST = mail_info.email_host
 EMAIL_PORT = mail_info.email_port
 EMAIL_HOST_PASSWORD = mail_info.email_host_password
 EMAIL_HOST_USER = mail_info.email_host_user
+
+
+JWT_SECRET = 'hEHGOng%y!gUzgS%6mYz' #secret key
+JWT_ALGORITHM = 'HS256' #algorithm
+JWT_EXP_DELTA_SECONDS =86400 #expire time

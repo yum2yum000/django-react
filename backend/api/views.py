@@ -1,4 +1,5 @@
 import re
+from datetime import timedelta, datetime
 from random import random
 
 from django.core.mail import send_mail
@@ -9,6 +10,7 @@ from django.contrib.auth import authenticate, password_validation
 from django.contrib.auth.models import update_last_login
 from django.core.validators import EmailValidator, validate_email
 from django.template.loader import get_template
+from jwt import jwt
 from rest_framework import viewsets, status, serializers
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
@@ -324,13 +326,25 @@ class PostSearch(APIView):
 
 class PasswordRecovery(APIView):
 
-    def password_generator(self):
-        s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
-        length = random.randrange(8, 12)
-        passowrd = ''
-        for p in range(length):
-            passowrd += random.choice(s)
-        return passowrd
+    def encoded_reset_token(user_id):
+        payload = {
+            'user_id': user_id,
+            'exp': datetime.utcnow() + timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS)
+        }
+        encoded_data = jwt.encode(
+            payload, settings.JWT_SECRET, settings.JWT_ALGORITHM)
+        return encoded_data.decode('utf-8')
+
+
+
+    #
+    # def password_generator(self):
+    #     s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
+    #     length = random.randrange(8, 12)
+    #     passowrd = ''
+    #     for p in range(length):
+    #         passowrd += random.choice(s)
+    #     return passowrd
 
     def get(self, request):
         data = request.data
