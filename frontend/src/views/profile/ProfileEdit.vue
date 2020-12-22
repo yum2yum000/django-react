@@ -20,11 +20,10 @@
                                     </div>
                                 </div>
                                 <label >
-                                    <input type="checkbox" name="rememberme" v-model="saveLog" style="width:20px">
+                                    <input type="checkbox" name="rememberme" value="1" style="width:20px">
                                     <span class="um-field-checkbox-option"> مرا به خاطر بسپار</span>
                                 </label>
                             </div>
-
 
                             <div class="p-t-15 text-center">
                                 <button class="btn btn--radius-2 submit">ورود</button>
@@ -43,7 +42,7 @@
 <script>
 
     import { required } from 'vuelidate/lib/validators'
-    import store from '@/store/store'
+    import axios from 'axios'
     export default {
         name: "Login",
         validations:{
@@ -55,19 +54,18 @@
         },
         data(){
             return{
-                user:{},
-                saveLog:false
+                user:{}
             }
         },
         methods:{
-           login(){
-               store.dispatch('login/login',{
-                   user:this.user,
-                   saveLog:this.saveLog
-               }).then(()=>{
-                   this.$router.push({name:'home'})
-               })
-           }
+            login(){
+                axios.put("http://127.0.0.1:8000/users/login/113/",{update:'passwor766d'}).then((res)=>
+                {console.log(res)})
+                    .catch((e)=>{
+                    console.log('kkkk')
+                    console.log(e.reponse)
+                })
+            }
 
         }
     }

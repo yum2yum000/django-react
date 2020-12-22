@@ -15,6 +15,9 @@ export default {
     createUser(user) {
        return apiClient.post('/users/', user)
     },
+    loginUser(user) {
+        return apiClient.post('/users/login/', user)
+    },
     getProducts(perPage, page) {
         return apiClient.get('/products?_limit='+ perPage + '&_page=' + page)
     },
