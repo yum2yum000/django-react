@@ -18,8 +18,7 @@ urlpatterns = [
     # جستوجو در نام کاربری، نام و نام خانوادگی
     # بدون نیاز به احراز هویت
     path('users/search/', UserSearch.as_view()),
-    path('users/password-recovery/',PasswordRecovery.as_view()),
-
+    path('reset-password/', PasswordRecovery.as_view()),
     #post لاگین کردن
     #put اپدیت کردن پروفایل
     path('users/login/', LoginOrUpdateProfile.as_view(), name='user_login'),

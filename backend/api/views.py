@@ -10,7 +10,7 @@ from django.contrib.auth import authenticate, password_validation
 from django.contrib.auth.models import update_last_login
 from django.core.validators import EmailValidator, validate_email
 from django.template.loader import get_template
-from jwt import jwt
+import jwt
 from rest_framework import viewsets, status, serializers
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
@@ -326,24 +326,6 @@ class PostSearch(APIView):
 
 class PasswordRecovery(APIView):
 
-    def encoded_reset_token(user_id):
-        payload = {
-            'user_id': user_id,
-            'exp': datetime.utcnow() + timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS)
-        }
-        encoded_data = jwt.encode(
-            payload, settings.JWT_SECRET, settings.JWT_ALGORITHM)
-        return encoded_data.decode('utf-8')
-
-    def decode_reset_token(reset_token):
-        try:
-            decoded_data = jwt.decode(reset_token, settings.JWT_SECRET,
-                                      algorithms=[settings.JWT_ALGORITHM])
-        except (jwt.DecodeError, jwt.ExpiredSignatureError):
-            return None  # means expired token
-
-        return decoded_data['user_id']
-
     #
     # def password_generator(self):
     #     s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
@@ -353,31 +335,52 @@ class PasswordRecovery(APIView):
     #         passowrd += random.choice(s)
     #     return passowrd
 
+    def encoded_reset_token(self, user_id):
+        payload = {
+            'user_id': user_id,
+            'exp': datetime.utcnow() + timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS)
+        }
+
+        encoded_data = jwt.encode(
+            payload, settings.JWT_SECRET, settings.JWT_ALGORITHM)
+        return encoded_data.decode('utf-8')
+
+    def decode_reset_token(self, reset_token):
+        try:
+            decoded_data = jwt.decode(reset_token, settings.JWT_SECRET,
+                                      algorithms=[settings.JWT_ALGORITHM])
+        except (jwt.DecodeError, jwt.ExpiredSignatureError):
+            return None  # means expired token
+
+        return decoded_data['user_id']
+
     def get(self, request):
         data = request.data
 
-        try:
-            email = data.get('email').lower()
-            user = CustomUser.objects.get(email=email)
-            # send email
-            # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
-            password = self.password_generator()
-            user.set_password(password)
-            rendered_message = get_template('password_recovery.html').render({
-                'password': password, 'username': user.username
-            })
-            # fail_silently=True
-            # پیش فرض False
-            # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
-            # smtplib.SMTPException
-            #
-            # hmtl_message
-            # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
-            # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
-            send_mail(subject='بازیابی رمز عبور', message='', from_email=settings.EMAIL_HOST_USER,
-                      recipient_list=(email,),
-                      fail_silently=True,
-                      html_message=rendered_message)
-            return Response({'email': 'sent'}, status=status.HTTP_200_OK)
-        except:
-            return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)
+        # try:
+        email = data.get('email').lower()
+        user = CustomUser.objects.get(email=email)
+        # send email
+        # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
+        base_url = 'http://localhost:8000/'
+        url = self.encoded_reset_token(user_id=user.id)
+        rendered_message = get_template('password_recovery.html').render({
+            'url': url, 'username': user.username
+        })
+
+        # fail_silently=True
+        # پیش فرض False
+        # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
+        # smtplib.SMTPException
+        #
+        # hmtl_message
+        # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
+        # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
+        send_mail(subject='بازیابی رمز عبور', message='', from_email=settings.EMAIL_HOST_USER,
+                  recipient_list=(email,),
+                  fail_silently=True,
+                  html_message=rendered_message)
+        return Response({'email': 'sent'}, status=status.HTTP_200_OK)
+
+    # except:
+    #     return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)
