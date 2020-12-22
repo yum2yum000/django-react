@@ -43,21 +43,14 @@ INSTALLED_APPS = [
     # برای دادن دسترسی به دامینهای دیگر
     'corsheaders',
 
+<<<<<<< HEAD
     # ارسال داده به کلاینت بدون اینکه درخواست کند
     # 'channels',
+=======
+>>>>>>> browser_error
     # local
     'post',
 ]
-
-# CHANNEL_LAYERS = {
-#     'default': {
-#         # 'BACKEND': 'asgi_redis.RedisChannelLayer',
-#         'CONFIG': {
-#             'hosts': [('localhost', 6379)],
-#         },
-#         'ROUTING': 'example_channels.routing.channel_routing',
-#     }
-# }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -168,8 +161,3 @@ EMAIL_HOST = mail_info.email_host
 EMAIL_PORT = mail_info.email_port
 EMAIL_HOST_PASSWORD = mail_info.email_host_password
 EMAIL_HOST_USER = mail_info.email_host_user
-
-# برای درست کردن لینک بازیابی ایمیل
-JWT_SECRET = 'ae&&#GZKZicfiHp2y!eRry(@@k0LZr)A4e#rz@HF'  # secret key
-JWT_ALGORITHM = 'HS256'  # algorithm
-JWT_EXP_DELTA_SECONDS = 86400  # expire time

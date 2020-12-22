@@ -11,9 +11,13 @@ backend/first/mail_info.py
 
 backend/venv/
 
+<<<<<<< HEAD
 
 .idea/
 
+=======
+.idea/
+>>>>>>> browser_error
 
 
 backend/media/
