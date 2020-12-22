@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # ارسال داده به کلاینت بدون اینکه درخواست کند
-    #'channels',
+    # 'channels',
     # local
     'post',
 ]
@@ -154,6 +154,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'post.CustomUser'
+
+# SESSION_COOKIE_KEY
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

@@ -1,6 +1,6 @@
 from django.urls import path, include, re_path
 from rest_framework import routers
-
+from django.contrib.admin.templates import admin
 from api.views import (Posts, CreateUser,
                        AllPostList, UserSearch, PostSearch, LoginOrUpdateProfile, ResetPassword, PasswordRecovery, RedirectTest, )
 
