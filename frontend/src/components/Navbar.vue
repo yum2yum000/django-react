@@ -72,7 +72,7 @@
         color:white!important;
     }
     .navbar{
-        position:absolute;
+        position:absolute!important;
         width:100%;
     }
     .login-height{

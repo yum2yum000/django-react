@@ -5,6 +5,7 @@ import Home from './views/Home.vue'
 import Register from './views/Register.vue'
 import Login from './views/Login.vue'
 import ProfileEdit from './views/profile/ProfileEdit.vue'
+import ProfileUser from './views/profile/ProfileUser.vue'
 import Profile from './views/profile/Profile.vue'
 //
 // import Loading from 'vue-loading-overlay';
@@ -36,18 +37,28 @@ const router = new Router({
             meta: { requiresVisitor: true }
         },
         {
-            path: '/profile/edit/:id',
-            name: 'profileEdit',
-            component: ProfileEdit,
-            meta: { requiresAuth: true },
-            props:true,
-        },
-        {
             path: '/profile/',
             name: 'profile',
             component: Profile,
+            redirect: "profile/user",
             meta: { requiresAuth: true },
-            props:true,
+            children:[
+                {
+                    path: 'edit/:id',
+                    name: 'profileEdit',
+                    component: ProfileEdit,
+                    props:true,
+                },
+                {
+                    path: 'user',
+                    name: 'profileUser',
+                    component: ProfileUser,
+                    props:true,
+                },
+
+
+            ]
+
         },
 
         {

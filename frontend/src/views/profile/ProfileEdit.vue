@@ -4,34 +4,7 @@
             <div class="wrapper wrapper--w680 p-3">
                 <div class="card card-4">
                     <div class="card-body">
-                        <h2 class="title text-right">فرم ورود</h2>
-                        <form @submit.prevent="login">
-                            <div class="row row-space">
-                                <div class="input-container">
-                                    <div class="input-group">
-                                        <label class="label">نام کاربری</label>
-                                        <input v-model="user.username" class="input--style-4" type="text" >
-                                    </div>
-                                </div>
-                                <div class="input-container">
-                                    <div class="input-group">
-                                        <label class="label">رمز عبور</label>
-                                        <input v-model="user.password" class="input--style-4" type="password" >
-                                    </div>
-                                </div>
-                                <label >
-                                    <input type="checkbox" name="rememberme" value="1" style="width:20px">
-                                    <span class="um-field-checkbox-option"> مرا به خاطر بسپار</span>
-                                </label>
-                            </div>
 
-                            <div class="p-t-15 text-center">
-                                <button class="btn btn--radius-2 submit">ورود</button>
-                            </div>
-                            <div class="text-center mt-4 home">
-                                <router-link to="/">بازگشت به صفحه اصلی</router-link>
-                            </div>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -59,7 +32,7 @@
         },
         methods:{
             login(){
-                axios.put("http://127.0.0.1:8000/users/login/113/",{update:'passwor766d'}).then((res)=>
+                axios.put("http://127.0.0.1:8000/users/login/",{bio:'passwor766d'}).then((res)=>
                 {console.log(res)})
                     .catch((e)=>{
                     console.log('kkkk')

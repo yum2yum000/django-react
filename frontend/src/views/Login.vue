@@ -64,9 +64,10 @@
                store.dispatch('login/login',{
                    user:this.user,
                    saveLog:this.saveLog
-               }).then(()=>{
+               }).then((res)=>{
+                   console.log('hhhhh',res)
                    this.$router.push({name:'home'})
-               })
+               }).catch((e)=>console.log(e.response))
            }
 
         }

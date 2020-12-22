@@ -18,7 +18,7 @@ user:{
             password:'password',    //required
             first_name:'first_name',
             last_name:'lastname',
-            email:'email',
+            email:'email',  //required
             phone:'phone',
             adres:'adres',
             desc:'bio',
@@ -47,7 +47,7 @@ user:{
     //edit profile
     //login_required
     profile:{
-        uri:'users/login/<int:user_id>/',
+        uri:'users/login/',
         method:'PUT',
         send:{
             update:'password','data', None
@@ -59,44 +59,134 @@ user:{
             last_login
             date_joined
             غیر قابل تغییر می باشند
+
+            username و email : required
+
         },
         receive:{
             user infoes
+            }
             status:200,
-            error_status=400, 403
-        }
+            error_status=400, 403, 406, 411
+            ایمیل وارد شده، تکراری باشد 406
+            نام کاربری تکراری باشد 406
     },
+    password_recovery:{
+        uri:'users/password-recovery',
+        method:'GET',
+        send:{
+            'email':' email',
+        },
+        receive:{
+            'email:'sent',
+        },
+        status:200,
+        not_found_status:404
+
+    }
 }
 
 
 post:{
-    //login_required
-    create:{
-        uri:'posts/',
-        method:'POST',
-        send:{
-            title:'post title',
-            content:'post content',
-        },
-        receive:{
-            new post
-        }
-    },
-    //login_required
-    list:{
+    all_posts:{
         uri:'posts/',
         method:'GET',
         send:{},
         receive:{
-            all user posts
-        }
+            all posts 
+        },
+        status:200,
+    },
+
+    //login_required
+    create:{
+        uri:'posts/user/',
+        method:'POST',
+        send:{
+            title:'post title', //required
+            content:'post content', //required
+        },
+        receive:{
+            new post
+        },
+        status: 200,
     },
     //login_required
-    detail:{
-        uri:'posts/<int:post_pk>/',
+    list:{
+        //لیست کردن پست های یک یوزر خاص
+        uri:'posts/user/',
+        method:'GET',
+        send:{},
+        receive:{
+            all user posts
+        },
+        status: 200,
+        err_status: 404
+    },
+    //login_required
+    one_post:{
+        //گرفتن یک پست از یک یوزر خاص
+        uri:'posts/user/<post_pk>/',
+        method:'GET',
         send:{},
         receive:{
             one user post
-        }
+        },
+        status: 201,
+        err_status: 400
     },
+    //login_required
+    update:{
+        uri:'posts/user/<post_pk>/',
+        method:'PUT',
+        send:{
+            title:'new title',
+            content:'new content'
+        },
+        receive:{
+            new post
+        },
+        status: 200,
+        err_status: 400
+    },
+    DELETE:{
+        uri:'posts/user/<post_pk>/',
+        method:'DELETE',
+        send:{}
+        recevive:{
+            'post':'deleted'
+        },
+        status: 200,
+        err_status: 400
+    }
+},
+
+
+search:{
+    user:{
+        uri:'users/search/',
+        method:'GET',
+        send:{
+            search:'something',
+        },
+        receive:{
+            search result
+        },
+        status: 200,
+        not_found_status:404,
+        bad_request_status:400
+    },
+    post:{
+        uri:'posts/search/',
+        method:'GET',
+        send:{
+            search:'something'
+        },
+        receive:{
+            search result
+        },
+        status: 200,
+        not_found_status:404,
+        bad_request_status:400
+    }
 }

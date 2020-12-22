@@ -23,7 +23,7 @@ from post.models import CustomUser, Post
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        exclude = ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
+        exclude = ['is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions']
         # fields = '__all__'
         extra_kwargs = {'password': {'write_only': True}, }
         # exclude=['password',]
@@ -41,9 +41,22 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    # user = UserSerializer()
+    # user = serializers.CharField(source='CoustomeUser.username', read_only=True)
+    # برای گرفتن فیلدهای خاصی از مدل یوزر از این کلاس استفاده می کنیم.
+
     class Meta:
         model = Post
-        fields = ('id', 'user', 'title', 'content')
+        # fields=('user','id','title','content')
+        fields = '__all__'
+        # depth=1
+
+    class UserDetails(serializers.ModelSerializer):
+        class Meta:
+            model = CustomUser
+            fields = ('id', 'username',)
+
+    user = UserDetails()
+
+    # fields = ('id', 'user__username', 'title', 'content')
     # username = serializers.CharField(max_length=100)
     # url = serializers.HyperlinkedRelatedField(view_name=CustomUser, queryset=CustomUser.objects.all())

@@ -2,11 +2,16 @@
 
 ./backend/db.sqlite3
 
+remaining.md
+
+#اطلاعات ارسال کننده ی ایمیل ها
+backend/first/mail_info.py
+
 backend/venv/
+
 
 backend/.idea/
 
 
+
 backend/media/
-
-

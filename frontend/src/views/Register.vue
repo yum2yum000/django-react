@@ -24,15 +24,27 @@
                             </div>
                             <div class="row row-space">
                                 <div class="input-container">
+                                    <BaseInput type="email" inputClass="input--style-4" label="ایمیل" v-model="user.email"  @blur="$v.user.email.$touch()"></BaseInput>
+                                    <div v-if="$v.user.email.$error">
+                                        <p class="text-right error" v-if="!$v.user.email.required"> ایمیل باید وارد شود</p>
+                                        <p class="text-right error" v-if="!$v.user.email.email"> ایمیل باید فرمت معتبر باشد</p>
+                                    </div>
+                                </div>
+                                <div class="input-container">
+                                    <BaseInput type="text" inputClass="input--style-4" label="درباره شما" v-model="user.bio" ></BaseInput>
+                                </div>
+                            </div>
+
+                            <div class="row row-space">
+                                <div class="input-container">
                                     <BaseInput type="text" inputClass="input--style-4" label="نام" v-model="user.first_name" ></BaseInput>
                                 </div>
                                 <div class="input-container">
-                                    <div class="input-group">
-                                        <label class="label">نام خانوادگی</label>
-                                        <input v-model.trim="user.last_name" class="input--style-4" type="text" >
-                                    </div>
+                                    <BaseInput type="text" inputClass="input--style-4" label="نام خانوادگی" v-model="user.last_name" ></BaseInput>
                                 </div>
                             </div>
+
+
 
                             <div class="row row-space">
                                 <div class="input-container">
@@ -68,7 +80,7 @@
 
 <script>
     import Service from '@/services/Service.js'
-    import { required,minLength } from 'vuelidate/lib/validators'
+    import { required,minLength,email } from 'vuelidate/lib/validators'
     export default {
         name: "Register",
         validations:{
@@ -81,7 +93,8 @@
                         console.log(containsNumber && containsLetter)
                         return containsNumber && containsLetter
                     }
-                }
+                },
+                email:{required,email}
 
             }
         },
@@ -109,6 +122,17 @@
                 if (e.response && e.response.status === 400) {
                     console.log(e.response.data)
                     this.error='لطفا ورودی ها را کنترل نمایید.'
+                }
+                else if (e.response && e.response.status === 406) {
+                    if(e.response.data.username)
+                    {
+                        this.error='نام کاربری  تکراری است'
+                    }
+                    else if(e.response.data.email)
+                    {
+                        this.error=' ایمیل تکراری است'
+                    }
+
                 }
             })
             }

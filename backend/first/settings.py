@@ -145,3 +145,12 @@ AUTH_USER_MODEL = 'post.CustomUser'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+#from first import mail_info
+
+#EMAIL_BACKEND = mail_info.email_backend
+#EMAIL_USE_SSL = mail_info.email_use_ssl
+#EMAIL_HOST = mail_info.email_host
+#EMAIL_PORT = mail_info.email_port
+#EMAIL_HOST_PASSWORD = mail_info.email_host_password
+#EMAIL_HOST_USER = mail_info.email_host_user
