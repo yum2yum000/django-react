@@ -1,6 +1,8 @@
 
 
-./backend/db.sqlite3
+backend/db.sqlite3
+
+logs.md
 
 remaining.md
 
