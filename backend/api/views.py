@@ -335,7 +335,14 @@ class PasswordRecovery(APIView):
             payload, settings.JWT_SECRET, settings.JWT_ALGORITHM)
         return encoded_data.decode('utf-8')
 
+    def decode_reset_token(reset_token):
+        try:
+            decoded_data = jwt.decode(reset_token, settings.JWT_SECRET,
+                                      algorithms=[settings.JWT_ALGORITHM])
+        except (jwt.DecodeError, jwt.ExpiredSignatureError):
+            return None  # means expired token
 
+        return decoded_data['user_id']
 
     #
     # def password_generator(self):
