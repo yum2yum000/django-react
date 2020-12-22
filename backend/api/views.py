@@ -1,4 +1,5 @@
 import re
+from datetime import datetime, timedelta
 from random import random
 
 from django.core.mail import send_mail
@@ -8,7 +9,9 @@ from django.db.utils import IntegrityError
 from django.contrib.auth import authenticate, password_validation
 from django.contrib.auth.models import update_last_login
 from django.core.validators import EmailValidator, validate_email
+from django.http import HttpResponseRedirect
 from django.template.loader import get_template
+from jwt import jwt
 from rest_framework import viewsets, status, serializers
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
@@ -324,13 +327,13 @@ class PostSearch(APIView):
 
 class PasswordRecovery(APIView):
 
-    def password_generator(self):
-        s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
-        length = random.randrange(8, 12)
-        passowrd = ''
-        for p in range(length):
-            passowrd += random.choice(s)
-        return passowrd
+    # def password_generator(self):
+    #     s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
+    #     length = random.randrange(8, 12)
+    #     passowrd = ''
+    #     for p in range(length):
+    #         passowrd += random.choice(s)
+    #     return passowrd
 
     def get(self, request):
         data = request.data
@@ -340,11 +343,14 @@ class PasswordRecovery(APIView):
             user = CustomUser.objects.get(email=email)
             # send email
             # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
-            password = self.password_generator()
-            user.set_password(password)
+            # password = self.password_generator()
+            # user.set_password(password)
+
+            url = 'http://localhost:8000/reset/%s/' % {self.encoded_reset_token(user.id)}
             rendered_message = get_template('password_recovery.html').render({
-                'password': password, 'username': user.username
+                'url': url, 'username': user.username
             })
+
             # fail_silently=True
             # پیش فرض False
             # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
@@ -360,3 +366,36 @@ class PasswordRecovery(APIView):
             return Response({'email': 'sent'}, status=status.HTTP_200_OK)
         except:
             return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)
+
+    # ورودی را انکد می کند و زمان انقضا 24 ساعت می باشد
+    def encoded_reset_token(user_id):
+        payload = {
+            'user_id': user_id,
+            'exp': datetime.now() + timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS)
+        }
+        encoded_data = jwt.encode(
+            payload, settings.JWT_SECRET, settings.JWT_ALGORITHM)
+        return encoded_data.decode('utf-8')
+
+    # دی کد می کند. اگر زمان انقضا گذشته باشد، None می دهد.
+
+
+class RedirectTest(APIView):
+    def get(self, request):
+        return Response(status=status.HTTP_200_OK), HttpResponseRedirect(redirect_to='http://localhost:8080/register')
+
+
+class ResetPassword(APIView):
+
+    def get(self, request, user_token):
+        user_id = self.decode_reset_token(user_token) if user_token else user_token
+        # user=
+
+    def decode_reset_token(reset_token):
+        try:
+            decoded_data = jwt.decode(reset_token, settings.JWT_SECRET,
+                                      algorithms=[settings.JWT_ALGORITHM])
+        except (jwt.DecodeError, jwt.ExpiredSignatureError):
+            return None  # means expired token
+
+        return decoded_data['user_id']

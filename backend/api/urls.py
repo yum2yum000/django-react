@@ -1,8 +1,8 @@
-from django.urls import path, include
+from django.urls import path, include, re_path
 from rest_framework import routers
 
 from api.views import (Posts, CreateUser,
-                       AllPostList, UserSearch, PostSearch, LoginOrUpdateProfile, PasswordRecovery, )
+                       AllPostList, UserSearch, PostSearch, LoginOrUpdateProfile, ResetPassword, PasswordRecovery, RedirectTest, )
 
 # router = routers.DefaultRouter()
 # router.register('users', UserViewSets)
@@ -18,10 +18,14 @@ urlpatterns = [
     # جستوجو در نام کاربری، نام و نام خانوادگی
     # بدون نیاز به احراز هویت
     path('users/search/', UserSearch.as_view()),
-    path('users/password-recovery/',PasswordRecovery.as_view()),
-
+    #GET ایمیلی برای بازیابی رمز دریافت می شود
+    path('users/reset-password/',PasswordRecovery.as_view()),
+    path('redirect/',RedirectTest.as_view()),
+    #لینکی که در ایمیل ریست پسورد قرار داده می شود
+    re_path(r'reset/{user-token}/',ResetPassword.as_view() ),
     #post لاگین کردن
-    #put اپدیت کردن پروفایل
+    #put اپدیت کردن پروفایلcmd
+
     path('users/login/', LoginOrUpdateProfile.as_view(), name='user_login'),
 
     # ------------------------------------------------------------------------
