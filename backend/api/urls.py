@@ -1,8 +1,9 @@
-from django.urls import path, include
+from django.conf.urls import url
+from django.urls import path, include, re_path
 from rest_framework import routers
 from django.contrib.admin.templates import admin
-from api.views import (Posts, CreateUser,
-                       AllPostList, UserSearch, PostSearch, LoginOrUpdateProfile, PasswordRecovery, )
+from api.views import (Posts, CreateUser, AllPostList, UserSearch,
+                       PostSearch, LoginOrUpdateProfile, PasswordRecovery, reset_password, )
 
 # router = routers.DefaultRouter()
 # router.register('users', UserViewSets)
@@ -18,9 +19,10 @@ urlpatterns = [
     # جستوجو در نام کاربری، نام و نام خانوادگی
     # بدون نیاز به احراز هویت
     path('users/search/', UserSearch.as_view()),
-    path('reset-password/', PasswordRecovery.as_view()),
-    #post لاگین کردن
-    #put اپدیت کردن پروفایل
+    path('password-recovery/', PasswordRecovery.as_view()),
+    url('reset-password/([a-zA-z0-9-_.])+/', reset_password),
+    # post لاگین کردن
+    # put اپدیت کردن پروفایل
     path('users/login/', LoginOrUpdateProfile.as_view(), name='user_login'),
 
     # ------------------------------------------------------------------------

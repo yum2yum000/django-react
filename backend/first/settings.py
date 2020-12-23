@@ -40,6 +40,9 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+
+    # داکیومنت سازی ای پی ای ها
+    'rest_framework_swagger',
     # برای دادن دسترسی به دامینهای دیگر
     'corsheaders',
 
@@ -56,7 +59,12 @@ REST_FRAMEWORK = {
     ),
     'DEFAUKT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.JSONParser',
+    ),
 }
 
 MIDDLEWARE = [
@@ -94,9 +102,6 @@ TEMPLATES = [
         },
     },
 ]
-
-
-
 
 WSGI_APPLICATION = 'first.wsgi.application'
 
@@ -162,7 +167,6 @@ EMAIL_PORT = mail_info.email_port
 EMAIL_HOST_PASSWORD = mail_info.email_host_password
 EMAIL_HOST_USER = mail_info.email_host_user
 
-
-JWT_SECRET = 'hEHGOng%y!gUzgS%6mYz' #secret key
-JWT_ALGORITHM = 'HS256' #algorithm
-JWT_EXP_DELTA_SECONDS =86400 #expire time
+JWT_SECRET = 'hEHGOng%y!gUzgS%6mYz'  # secret key
+JWT_ALGORITHM = 'HS256'  # algorithm
+JWT_EXP_DELTA_SECONDS = 86400  # expire time

@@ -15,6 +15,7 @@ from rest_framework import viewsets, status, serializers
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -362,8 +363,8 @@ class PasswordRecovery(APIView):
         user = CustomUser.objects.get(email=email)
         # send email
         # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
-        base_url = 'http://localhost:8000/'
-        url = self.encoded_reset_token(user_id=user.id)
+        base_url = 'http://localhost:8000/reset-password/'
+        url = base_url + self.encoded_reset_token(user_id=user.id) + '/'
         rendered_message = get_template('password_recovery.html').render({
             'url': url, 'username': user.username
         })
@@ -384,3 +385,12 @@ class PasswordRecovery(APIView):
 
     # except:
     #     return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)
+
+#
+# class ResetPassword(APIView):
+#     def get(self, request, q):
+#         return Response({'password': 'reset', 'user': request}, status=status.HTTP_200_OK)
+
+@api_view(['GET', ])
+def reset_password(request, q):
+    return Response({'password': 'reset', 'user': request}, status=status.HTTP_200_OK)
