@@ -18,7 +18,7 @@
                                     <div v-if="$v.user.password.$error">
                                         <p class="text-right error" v-if="!$v.user.password.required"> رمز عبور باید وارد شود</p>
                                         <p class="text-right error" v-if="!$v.user.password.minLength"> رمز عبور باید حداقل 8 حرف باشد</p>
-                                        <p class="text-right error" v-if="!$v.user.password.containsNumberLetter"> رمز عبور باید شامل حرف و  عدد باشد</p>
+                                        <p class="text-right error" v-if="!$v.user.password.valid"> رمز عبور باید شامل حرف و  عدد باشد</p>
                                     </div>
                                 </div>
                             </div>
@@ -65,7 +65,7 @@
                                  {{error}}
                              </div>
                             <div class="p-t-15 text-center ">
-                                <BaseButton buttonClass="btn btn--radius-2 submit" type="submit" :disabled="$v.$anyError"  >ثبت نام</BaseButton>
+                                <BaseButton buttonClass="btn btn--radius-2 submit" type="submit" :disabled="$v.$anyError || buttonClick"  >ثبت نام</BaseButton>
                             </div>
                             <div class="text-center mt-4 home">
                                 <router-link to="/">بازگشت به صفحه اصلی</router-link>
@@ -89,9 +89,7 @@
                 password: { required,minLength:minLength(8),
                     valid: function(value) {
                         const containsLetter = /[A-Za-z]/.test(value)
-                        const containsNumber = /(?=.*\d)/.test(value)
-                        console.log(containsNumber && containsLetter)
-                        return containsNumber && containsLetter
+                        return containsLetter
                     }
                 },
                 email:{required,email}
@@ -102,6 +100,7 @@
             return{
                 user:{},
                 error:'',
+                buttonClick:false
 
             }
         },
@@ -109,8 +108,9 @@
             register(){
             this.$v.$touch()
             if(!this.$v.$invalid){
-
+            this.buttonClick=true;
             Service.createUser(this.user).then((res)=>{
+                console.log('register success',res)
                 if (res.status === 200){
                     this.error='ثبت نام با موفقیت انجام شد'
                     setTimeout(()=>{
@@ -119,9 +119,18 @@
                 }
 
             }).catch((e)=>{
+                console.log('register failed',e.response)
+                this.buttonClick=false;
                 if (e.response && e.response.status === 400) {
-                    console.log(e.response.data)
-                    this.error='لطفا ورودی ها را کنترل نمایید.'
+                    if(e.response.data.password)
+                    {
+                        this.error='رمز عبور قوی انتخاب نمایید'
+                    }
+                    else
+                    {
+                        this.error='لطفا ورودی ها را کنترل نمایید.'
+                    }
+
                 }
                 else if (e.response && e.response.status === 406) {
                     if(e.response.data.username)

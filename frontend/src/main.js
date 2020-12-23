@@ -9,11 +9,11 @@ Vue.component('BaseInput', BaseInput)
 Vue.component('BaseButton',BaseButton)
 import BaseInput from '@/components/BaseInput'
 import BaseButton from '@/components/BaseButton'
-import axios from 'axios'
 import './assets/css/bootstrap.min.css';
 import './assets/css/style.css';
 import '@fortawesome/fontawesome-free/css/all.css'
 import '@fortawesome/fontawesome-free/js/all.js'
+import apiClient from '@/services/config.js'
 new Vue({
     router,
     store,
@@ -34,10 +34,11 @@ new Vue({
             console.log(credentials)
             this.$store.commit('login/SET_USER_DATA',credentials)
         }
-        axios.interceptors.response.use(
+        apiClient.interceptors.response.use(
             response=>response,
             error=>{
                 if(error.response.status===401){
+                    console.log('ffjjf')
                     console.log(error)
                     this.$store.dispatch('login/logout')
                 }

@@ -11,12 +11,12 @@
                 </ul>
                 <div class="row">
                     <div class=" half col-6">
-                    <router-link to="/">
+                    <router-link :to="{name:'profileEdit'}">
                         ویرایش پروفایل
                     </router-link>
                   </div>
                     <div class=" half col-6">
-                        <router-link to="/">
+                        <router-link :to="{name:'profileChangepassword'}">
                            تغییر رمز عبور
                         </router-link>
                     </div>
@@ -25,15 +25,15 @@
 
             <div class="dashCard menu">
                 <ul>
-                    <li class="showmenu2 active">
-                        <i class="lnr lnr-menu header-icons"></i>     منوی حساب کاربری
+                    <li @click="meh" class="showmenu2 active" >
+                            منوی حساب کاربری
                       </li>
-                    <div class="menu2" style="display: block;">
+                    <div class="menu" v-show="show">
                         <li>
-                            <a href="https://hotlymall.com/panel">
-                                <i class="lnr lnr-home header-icons"></i>
-                         داشبورد
-                          </a></li>
+                            <router-link :to="{name:'postCreate'}">
+                         ایجاد پست
+                            </router-link>
+                        </li>
 
                     </div>
                 </ul>
@@ -47,6 +47,17 @@
     import {mapGetters} from 'vuex'
     export default {
         name: "Sidebar",
+        data(){
+            return{
+                show:true
+            }
+        },
+        methods:{
+            meh(){
+                this.show=!this.show
+                console.log(this.show)
+            }
+        },
         computed:{
             ...mapGetters('login', ['username'])
         }

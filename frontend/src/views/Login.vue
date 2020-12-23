@@ -29,8 +29,8 @@
                             <div class="p-t-15 text-center">
                                 <button class="btn btn--radius-2 submit">ورود</button>
                             </div>
-                            <div class="text-center mt-4 home">
-                                <router-link to="/">بازگشت به صفحه اصلی</router-link>
+                            <div v-if="error" class="text-right error mt-3">
+                                {{error}}
                             </div>
                         </form>
                     </div>
@@ -56,7 +56,9 @@
         data(){
             return{
                 user:{},
-                saveLog:false
+                saveLog:false,
+                error:'',
+                buttonClick:false
             }
         },
         methods:{
@@ -65,9 +67,15 @@
                    user:this.user,
                    saveLog:this.saveLog
                }).then((res)=>{
-                   console.log('hhhhh',res)
+                   console.log('login success',res)
                    this.$router.push({name:'home'})
-               }).catch((e)=>console.log(e.response))
+               }).catch((e)=>{
+                   console.log('login failed',e.response)
+                   if (e.response && e.response.status === 400) {
+                           this.error='رمز عبور یا نام کاربری صحیح نمی باشد'
+
+                   }
+               })
            }
 
         }

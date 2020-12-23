@@ -14,7 +14,10 @@ export const mutations = {
             localStorage.setItem('user', JSON.stringify(credentials.userData))
         }
         else{
-            sessionStorage.setItem('user', JSON.stringify(credentials.userData))
+                if(!localStorage.getItem('user'))
+                {
+                    sessionStorage.setItem('user', JSON.stringify(credentials.userData))
+                }
         }
         // axios.defaults.headers.common['Authorization'] = `Token ${
         //     credentials.userData.token

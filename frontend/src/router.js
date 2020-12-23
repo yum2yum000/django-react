@@ -5,7 +5,8 @@ import Home from './views/Home.vue'
 import Register from './views/Register.vue'
 import Login from './views/Login.vue'
 import ProfileEdit from './views/profile/ProfileEdit.vue'
-import ProfileUser from './views/profile/ProfileUser.vue'
+import ProfileChangepassword from './views/profile/ProfileChangepassword.vue'
+import PostCreate from './views/profile/PostCreate.vue'
 import Profile from './views/profile/Profile.vue'
 //
 // import Loading from 'vue-loading-overlay';
@@ -40,21 +41,28 @@ const router = new Router({
             path: '/profile/',
             name: 'profile',
             component: Profile,
-            redirect: "profile/user",
+            redirect: "profile/edit",
             meta: { requiresAuth: true },
             children:[
                 {
-                    path: 'edit/:id',
+                    path: 'edit',
                     name: 'profileEdit',
                     component: ProfileEdit,
                     props:true,
                 },
                 {
-                    path: 'user',
-                    name: 'profileUser',
-                    component: ProfileUser,
+                    path: 'changepassword',
+                    name: 'profileChangepassword',
+                    component: ProfileChangepassword,
                     props:true,
                 },
+                {
+                    path: 'create',
+                    name: 'postCreate',
+                    component: PostCreate,
+                    props:true,
+                }
+
 
 
             ]
