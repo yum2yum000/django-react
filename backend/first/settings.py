@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
 
     # داکیومنت سازی ای پی ای ها
-    'rest_framework_swagger',
+    # 'rest_framework_swagger',
     # برای دادن دسترسی به دامینهای دیگر
     'corsheaders',
 

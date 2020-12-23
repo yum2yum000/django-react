@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html dir="rtl">
 <head>
@@ -10,19 +11,18 @@
 <div id="swagger-ui"></div>
 <script src="//unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
 <script>
-    const ui = SwaggerUIBundle({
-        url: "{% url schema_url %}",
-        dom_id: '#swagger-ui',
-        presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIBundle.SwaggerUIStandalonePreset
-        ],
-        layout: "BaseLayout"
-      })
-
-
+const ui = SwaggerUIBundle({
+    url: "{% url schema_url %}",
+    dom_id: '#swagger-ui',
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIBundle.SwaggerUIStandalonePreset
+    ],
+    layout: "BaseLayout"
+  });
 
 </script>
+{#<script src="../static/js/js.js"></script>#}
 </body>
 </html>
 </html>
