@@ -5,7 +5,7 @@
                 <div class="card card-4">
                     <div class="card-body">
                         <h2 class="title text-right">فرم ورود</h2>
-                        <form @submit.prevent="add">
+                        <form @submit.prevent="login">
                             <div class="row row-space">
                                 <div class="input-container">
                                     <div class="input-group">
@@ -20,7 +20,7 @@
                                     </div>
                                 </div>
                                 <label >
-                                    <input type="checkbox" name="rememberme" value="1" style="width:20px">
+                                    <input type="checkbox" name="rememberme" v-model="saveLog" style="width:20px">
                                     <span class="um-field-checkbox-option"> مرا به خاطر بسپار</span>
                                 </label>
                             </div>
@@ -29,8 +29,8 @@
                             <div class="p-t-15 text-center">
                                 <button class="btn btn--radius-2 submit">ورود</button>
                             </div>
-                            <div class="text-center mt-4 home">
-                                <router-link to="/">بازگشت به صفحه اصلی</router-link>
+                            <div v-if="error" class="text-right error mt-3">
+                                {{error}}
                             </div>
                         </form>
                     </div>
@@ -41,10 +41,11 @@
 </template>
 
 <script>
-    import Service from '@/services/Service.js'
+
     import { required } from 'vuelidate/lib/validators'
+    import store from '@/store/store'
     export default {
-        name: "Register",
+        name: "Login",
         validations:{
             user:{
                 username: { required },
@@ -54,14 +55,29 @@
         },
         data(){
             return{
-                user:{}
+                user:{},
+                saveLog:false,
+                error:'',
+                buttonClick:false
             }
         },
         methods:{
-            add(){
-                Service.createUser(this.user)
+           login(){
+               store.dispatch('login/login',{
+                   user:this.user,
+                   saveLog:this.saveLog
+               }).then((res)=>{
+                   console.log('login success',res)
+                   this.$router.push({name:'home'})
+               }).catch((e)=>{
+                   console.log('login failed',e.response)
+                   if (e.response && e.response.status === 400) {
+                           this.error='رمز عبور یا نام کاربری صحیح نمی باشد'
 
-            }
+                   }
+               })
+           }
+
         }
     }
 </script>

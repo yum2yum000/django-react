@@ -173,3 +173,4 @@ except:
 JWT_SECRET = 'hEHGOng%y!gUzgS%6mYz'  # secret key
 JWT_ALGORITHM = 'HS256'  # algorithm
 JWT_EXP_DELTA_SECONDS = 86400  # expire time
+

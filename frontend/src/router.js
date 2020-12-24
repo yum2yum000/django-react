@@ -4,6 +4,10 @@ import Home from './views/Home.vue'
 //
 import Register from './views/Register.vue'
 import Login from './views/Login.vue'
+import ProfileEdit from './views/profile/ProfileEdit.vue'
+import ProfileChangepassword from './views/profile/ProfileChangepassword.vue'
+import PostCreate from './views/profile/PostCreate.vue'
+import Profile from './views/profile/Profile.vue'
 //
 // import Loading from 'vue-loading-overlay';
 import NotFound from './views/NotFound'
@@ -30,7 +34,39 @@ const router = new Router({
         {
             path: '/login',
             name: 'login',
-            component: Login
+            component: Login,
+            meta: { requiresVisitor: true }
+        },
+        {
+            path: '/profile/',
+            name: 'profile',
+            component: Profile,
+            redirect: "profile/edit",
+            meta: { requiresAuth: true },
+            children:[
+                {
+                    path: 'edit',
+                    name: 'profileEdit',
+                    component: ProfileEdit,
+                    props:true,
+                },
+                {
+                    path: 'changepassword',
+                    name: 'profileChangepassword',
+                    component: ProfileChangepassword,
+                    props:true,
+                },
+                {
+                    path: 'create',
+                    name: 'postCreate',
+                    component: PostCreate,
+                    props:true,
+                }
+
+
+
+            ]
+
         },
 
         {
@@ -48,6 +84,31 @@ const router = new Router({
     ]
 })
 
+router.beforeEach((to, from, next) => {
+    let loggedIn;
+    if(localStorage.getItem('user')){
+        loggedIn = localStorage.getItem('user')
+    }
+    else if(sessionStorage.getItem('user')){
+        loggedIn = sessionStorage.getItem('user')
+    }
 
+    if (to.matched.some(record => record.meta.requiresAuth) && !loggedIn) {
+        next('/')
+    }
+    else if (to.matched.some(record => record.meta.requiresVisitor)) {
+        if (loggedIn) {
+            next({
+                path: '/',
+            })
+        }
+       else{
+            next()
+       }
+    }
+    else{
+        next()
+    }
+})
 
 export default router

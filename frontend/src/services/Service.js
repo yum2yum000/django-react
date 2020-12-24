@@ -1,26 +1,38 @@
-import axios from 'axios'
+import apiClient from '@/services/config.js'
 
-const apiClient = axios.create({
-    baseURL: `http://127.0.0.1:8000/`,
-    withCredentials: false, // This is the default
-    headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-    },
-
-})
 
 export default {
-
+    setToken (token) {
+        apiClient.defaults.headers.common['Authorization'] = `Token ${token}`;
+    },
     createUser(user) {
        return apiClient.post('/users/', user)
+    },
+    loginUser(user) {
+        return apiClient.post('/users/login/', user)
+    },
+    getUser() {
+        return apiClient.put('/users/login/',{update:''})
+
+    },
+    updateUser(data){
+        return apiClient.put('/users/login/',{update:'data',...data
+        })
+
+    },
+    updatePassword(data){
+        console.log('899999',data)
+        return apiClient.put('/users/login/',{update:'password',...data
+        })
+
     },
     getProducts(perPage, page) {
         return apiClient.get('/products?_limit='+ perPage + '&_page=' + page)
     },
-    getUser(id) {
-        return apiClient.get('/users/'+ id)
+    createPost(post){
+        return apiClient.post('/posts/user/',post)
     },
+
     removeProduct(id) {
           console.log(id)
         return apiClient.delete('/products/'+id)
