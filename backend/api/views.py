@@ -1,55 +1,24 @@
 import re
 from datetime import timedelta, datetime
-
-import coreapi
-import coreschema
 from django.core.mail import send_mail
 from django.db.models import Q
-
 from django.contrib.auth import authenticate, password_validation
 from django.contrib.auth.models import update_last_login
-from django.core.validators import EmailValidator, validate_email
+from django.core.validators import validate_email
 from django.template.loader import get_template
 import jwt
 from hyperlink._url import NoneType
-from rest_framework import viewsets, status, serializers
+from rest_framework import status
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from rest_framework.decorators import api_view
+from django.core.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import schemas
 from rest_framework.views import APIView
-
 from api._serializer import UserSerializer, PostSerializer
 from first import settings
 from post.models import CustomUser, Post
-
-
-# class UserList(ListAPIView):
-#     serializer_class = UserSerializer
-#     queryset = CustomUser.objects.all()
-#
-# def user_detail(pk):
-#     user=get_object_or_404(CustomUser, pk=pk)
-#     return user
-
-# class UserViewSets(viewsets.ModelViewSet):
-#     queryset = CustomUser.objects.all()
-#     serializer_class = UserSerializer
-
-
-# class PostList(ListAPIView):
-#     permission_classes = (IsAuthenticated,)
-#
-#     serializer_class = PostSerializer
-#     queryset = Post.objects.all()
-#
-#     class Meta:
-#         model = Post
-#         fields = '__all__'
 
 
 class CreateUser(generics.CreateAPIView):
@@ -367,23 +336,12 @@ class PostSearch(APIView):
 
 
 class PasswordRecovery(APIView):
-    #
-    # def password_generator(self):
-    #     s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
-    #     length = random.randrange(8, 12)
-    #     passowrd = ''
-    #     for p in range(length):
-    #         passowrd += random.choice(s)
-    #     return passowrd
-
     '''
-
-    :param user_id: user number for account.
+    این بخش زمانی که کاربر لاگین نیست اجرا خواهد شد.
     '''
 
     def get(self, request):
         data = request.data
-
         try:
             email = data.get('email').lower()
             user = CustomUser.objects.get(email=email)
@@ -392,11 +350,11 @@ class PasswordRecovery(APIView):
             return Response({'email': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'email': 'sent'}, status=status.HTTP_200_OK)
 
-    # except:
-    #     return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)
-
 
 class SendMail:
+    '''
+    ارسال ایمیل برای تایید ایمیل و بازیابی رمز عبور
+    '''
 
     def encoded_reset_token(self, data):
         payload = {
@@ -453,12 +411,19 @@ def decode_reset_token(self, reset_token):
 
 
 class ResetPassword(APIView):
+    '''
+    بازیابی رمز عبور
+    '''
 
     def get(self, request, decoded_str):
         id = decode_reset_token(decoded_str)
-        # باید به یک صفحه ی پسورد جدید ریدایرکت شود
-        return Response({'id': id, 'token': Token.objects.get(user_id=id).key},
-                        status=status.HTTP_200_OK if id else status.HTTP_400_BAD_REQUEST)
+        if id:
+
+            # باید به یک صفحه ی پسورد جدید ریدایرکت شود
+            return Response({'id': id, 'token': Token.objects.get(user_id=id).key},
+                            status=status.HTTP_200_OK)
+        else:
+            return Response({}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VerifyMail(APIView):
@@ -468,16 +433,15 @@ class VerifyMail(APIView):
         زمانی که کاربر ایمیل دریافتی را کلیک می کند، در حالت پیش فرض دو مقدار ایدی و ایمیل از این کیلک دریافت می شود
         ایمیل در رکورد مربوط به ای دی ذخیره می شود
         در صورتی که دریافت نشود، یا لینک دستکاری شده، یا تاریخ انقضای لینک تمام شده است.
-
         '''
         data = decode_reset_token(decoded_str)
         if data:
             user_id = int(data['id'])
             user_mail = data['email']
-            # باید به صفحه ی ایمیل تایید شد، ریدایرکت شود
             user = CustomUser.objects.get(user_id=user_id)
             user.email = user_mail
             user.save()
+            # باید به صفحه ی ایمیل تایید شد، ریدایرکت شود
             return Response({})
         # لینک دستکاری یا منقضی شده
         return Response({}, status=status.HTTP_404_NOT_FOUND)
