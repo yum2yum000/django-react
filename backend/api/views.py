@@ -11,6 +11,7 @@ from django.contrib.auth.models import update_last_login
 from django.core.validators import EmailValidator, validate_email
 from django.template.loader import get_template
 import jwt
+from hyperlink._url import NoneType
 from rest_framework import viewsets, status, serializers
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
@@ -52,7 +53,6 @@ from post.models import CustomUser, Post
 
 
 class CreateUser(generics.CreateAPIView):
-    # این دو کلاس به صورت پیش فرش در فایل settings.py تعریف شده است
     '''
     post:
     توضیحات برای داکیومنت
@@ -60,26 +60,27 @@ class CreateUser(generics.CreateAPIView):
         برای get
 
     '''
+    # این دو کلاس به صورت پیش فرش در فایل settings.py تعریف شده است
     authentication_classes = ()
     permission_classes = ()
     serializer_class = UserSerializer
 
     def validate(self, data):
         if data.get('username') is None or data.get('password') is None:
-            return Response({'username or password': 'Not valid'}, status=status.HTTP_400_BAD_REQUEST)
+            return ({'username or password': 'Not valid'}, status.HTTP_400_BAD_REQUEST)
         user = CustomUser()
         # username validate
         try:
             # اگر نام وارد شده وجود داشته باشد خط return اجرا خواهد شد. و اگر نداشته باشد خط return اجرا نشده و ثبت نام کابر به صورت عادی طی خواهد شد.
             user = CustomUser.objects.get(username=data.get('username'))
-            return Response({'username': 'user name does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            return ({'username': 'user name does exists'}, status.HTTP_406_NOT_ACCEPTABLE)
         except:
             pass
 
         # phone validate
         if data.get('phone'):
             if re.match('^09[0-9]{9}$', data.get('phone')) is None:
-                return Response({'phone': 'Not valid'}, status=status.HTTP_400_BAD_REQUEST)
+                return ({'phone': 'Not valid'}, status.HTTP_400_BAD_REQUEST)
 
         # email validate
         email = data.get('email')
@@ -89,7 +90,7 @@ class CreateUser(generics.CreateAPIView):
             try:
                 # ایمیل تکراری است
                 CustomUser.objects.get(email=email)
-                return Response({'email': 'email does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                return ({'email': 'email does exists'}, status.HTTP_406_NOT_ACCEPTABLE)
             except:
                 pass
             try:
@@ -97,32 +98,35 @@ class CreateUser(generics.CreateAPIView):
                 user.email = email
             except Exception as err:
                 # فرمت ایمیل درست نیست
-                return Response({'email': err}, status=status.HTTP_400_BAD_REQUEST)
+                return ({'email': err}, status.HTTP_400_BAD_REQUEST)
         else:
             # فیلد ایمیل لازم است
-            return Response({'email': 'Required'}, status=status.HTTP_411_LENGTH_REQUIRED)
+            return ({'email': 'Required'}, status.HTTP_411_LENGTH_REQUIRED)
         # password validate
         try:
             password_validation.validate_password(data.get('password'))
         except ValidationError as err:
-            return Response({'password': err}, status=status.HTTP_400_BAD_REQUEST)
+            return ({'password': err}, status.HTTP_400_BAD_REQUEST)
+        return True
 
     def create(self, request, *args, **kwargs):
 
         data = request.data
-        if self.validate(data):
-            return self.validate(data)
+        # اگر دیتا صحیح نباشد، کد زیر خودش پاسخ مناسب را ارسال خواهد کرد
+        error = self.validate(data)
+        if error is not True:
+            return Response(error)
 
         user = CustomUser(
             username=data.get('username').lower(),
             first_name=data.get('first_name'),
             last_name=data.get('last_name'),
-            email=data.get('email').lower(),
             adres=data.get('adres'),
             bio=data.get('bio'),
             avatar=data.get('avatar'),
             phone=data.get('phone'),
         )
+
         user.set_password(data.get('password'))
         user.save()
         Token.objects.create(user=user)
@@ -132,7 +136,7 @@ class CreateUser(generics.CreateAPIView):
     # def post(self, request):
 
 
-class LoginOrUpdateProfile(APIView):
+class LoginUser(APIView):
     serializer_class = UserSerializer
 
     # لاگین شدن
@@ -146,14 +150,21 @@ class LoginOrUpdateProfile(APIView):
         else:
             return Response({'error': 'Wrong Credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
+
+class ProfileUser(APIView):
+    serializer_class = UserSerializer
+    # دسترسی توسط توکن
+    permission_classes = (IsAuthenticated,)
+
     # اپدیت پروفایل
     def put(self, request):
-        # توکن ارسالی مربوط به ای دی ارسالی می باشد و این کاربر مجاز به تغییرات در پروفایل است
+        # توکن ارسالی مربوط به ایدی ارسالی می باشد و این کاربر مجاز به تغییرات در پروفایل است
         # if request.data.get('phone').isdigit() is not True:
         #     raise serializers.ValidationError({'error': 'Phone is not digit'})
-        id = request.user.id
-        if id:
-            user = CustomUser.objects.get(id=id)
+        # با استفاده از توکن ارسالی کاربر تشخیص داده شده است.
+        # پس امکان ندارد کاربری وجود نداشته باشد
+        try:
+            user = CustomUser.objects.get(id=request.user.id)
             update = request.data.get('update').lower()
             if update == "data":
                 return self.update_data(request, user)
@@ -161,6 +172,9 @@ class LoginOrUpdateProfile(APIView):
                 return self.update_password(request, user)
             else:
                 return Response({'user': UserSerializer(user).data}, status=status.HTTP_200_OK)
+        except:
+            # خطای غیر قابل پیش بینی
+            return Response(data={}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(data={'user': 'Forbiden', 'detail': 'This user not matched with token string'},
                         status=status.HTTP_403_FORBIDDEN)
@@ -169,16 +183,24 @@ class LoginOrUpdateProfile(APIView):
         # update all data except the password
         # update all infoes
         data = request.data
+
+        # تغییر نام کاربری
+        # درخواست تغییر نام کاربری
         if data.get('username'):
-            # اگر نام درخواستی برای تغییر در دیتابیس باشد، تغییر امکان پذیر نیست
             try:
                 # اگر خط زیر دست اجرا شود، پس نمیتوان نام  کاربری درخواستی را به یوزر نسبت داد. چون همچین نامی وجود دارد
                 CustomUser.objects.get(username=data.get('username').lower())
                 return Response(data={'username': 'user name does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            except NoneType:
+                # اگر نام کاربری وارد نشود.
+                # نام کاربری درصورتی که درخواست تغییر داده باشد، مهم است در غیر این صورت مهم نیست
+                pass
             except:
-                # اگر نام کاربری درخواستی در دیتابیس نباشد، می توان تغییرداد
-                user.username = data.get('username').lower()
+                # اگر درخواست نام کاربری داده شود، و نام انتخابی در دیتابیس موجود نباشد، ادامه ی کد ها اجرا شود
+                pass
+            # درصورتی که درخواست تغییر نام کاربری داده شود، و نام انتخابی در دیتابیس موجود نباشد خط زیر اجرا خواهد شد
 
+            user.username = data.get('username').lower()
         # phone validate
         if data.get('phone'):
             if re.match('^09[0-9]{9}$', data.get('phone')) is None:
@@ -226,12 +248,6 @@ class LoginOrUpdateProfile(APIView):
         return Response({'password': 'updated'}, status=status.HTTP_200_OK)
 
 
-# class PostList1(generics.ListAPIView):
-#     permission_classes = (IsAuthenticated,)
-#     serializer_class = PostSerializer
-#     queryset = Post.objects.all()
-
-
 class AllPostList(generics.ListAPIView):
     serializer_class = PostSerializer
     queryset = Post.objects.all()
@@ -240,10 +256,6 @@ class AllPostList(generics.ListAPIView):
 class Posts(APIView):
     '''
     تست تشریح
-
-    return: str
-
-
     '''
     permission_classes = (IsAuthenticated,)
 
@@ -276,19 +288,13 @@ class Posts(APIView):
         # request.user
         # در دسترس قرار می گیرد.
 
-        # اگر ای دی کاربر با ای دی توکن یکسان باشد
-        if request.user.id:
-            objs = Post.objects.filter(user_id=request.user.id)
-
-            if post_pk:
-                # اگر پست خاصی مد نظر باشد.
-                objs = get_object_or_404(objs, pk=post_pk)
-                # اگر پست خاص پیدا نشود.
-            data = PostSerializer(objs, many=not post_pk).data
-            return Response(data, status=status.HTTP_200_OK)
-        else:
-            # همه ی پست های یک کاربر داده می شود
-            return Response({'user': 'Token or user id invalid'}, status=status.HTTP_404_NOT_FOUND)
+        objs = Post.objects.filter(user_id=request.user.id)
+        if post_pk:
+            # اگر پست خاصی مد نظر باشد.
+            objs = get_object_or_404(objs, pk=post_pk)
+            # اگر پست خاص پیدا نشود.
+        data = PostSerializer(objs, many=not post_pk).data
+        return Response(data, status=status.HTTP_200_OK)
 
     def post(self, request):
         """
@@ -299,47 +305,38 @@ class Posts(APIView):
         :param request:
         :return:
         """
-        # اگر توکن وارد شده در صحیح باشد
-        if request.user.id:
-            # create post
-            title = request.data.get('title')
-            content = request.data.get('content')
-            # فیلدهای title و content هم باید ارسال شوند و هم باید مقدار داشته باشند.
-            if title is None or content is None or title.strip() == "" or content.strip() == "":
-                return Response({'post': 'title or content is empty'}, status=status.HTTP_400_BAD_REQUEST)
+        # اگر توکن صحیح نباشد، اصلا به این قسمت از کد نخواهیم رسید
+        title = request.data.get('title')
+        content = request.data.get('content')
+        # فیلدهای title و content هم باید ارسال شوند و هم باید مقدار داشته باشند.
+        if title is None or content is None or title.strip() == "" or content.strip() == "":
+            return Response({'post': 'title or content is empty'}, status=status.HTTP_400_BAD_REQUEST)
 
-            user = request.user
-            title = request.data.get('title')
-            content = request.data.get('content')
-            try:
-                post = Post(user=user, title=title, content=content)
-                post.save()
-            except:
-                return Response({'post': 'post title is duplicated'}, status=status.HTTP_400_BAD_REQUEST)
-            return Response(data={'id': post.pk, 'save': 'Ok'}, status=status.HTTP_201_CREATED)
-        else:
-            return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+        user = request.user
+        title = request.data.get('title')
+        content = request.data.get('content')
+        try:
+            post = Post(user=user, title=title, content=content)
+            post.save()
+        except:
+            return Response({'post': 'post title is duplicated'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data={'id': post.pk, 'save': 'Ok'}, status=status.HTTP_201_CREATED)
 
     # update post
-    def put(self, request, post_pk):
-        if request.user.id:
-            post = get_object_or_404(Post, pk=post_pk)
-            post.title = request.data.get('title') or post.title
-            post.content = request.data.get('content') or post.content
-            post.save()
-            data = PostSerializer(post).data
-            return Response(data, status=status.HTTP_200_OK)
-        else:
-            return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request, post_pk=None):
+        # اگر توکن تایید نشود اصلا به این قسمت وارد نخواهد شد
+        post = get_object_or_404(Post, pk=post_pk)
+        post.title = request.data.get('title') or post.title
+        post.content = request.data.get('content') or post.content
+        post.save()
+        data = PostSerializer(post).data
+        return Response(data, status=status.HTTP_200_OK)
 
     # delete post
-    def delete(self, request, post_pk):
-        if request.user.id:
-            post = get_object_or_404(Post, pk=post_pk)
-            post.delete()
-            return Response({'post': 'deleted'}, status=status.HTTP_200_OK)
-        else:
-            return Response(data={'user': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+    def delete(self, request, post_pk=None):
+        post = get_object_or_404(Post, pk=post_pk)
+        post.delete()
+        return Response({'post': 'deleted'}, status=status.HTTP_200_OK)
 
 
 class UserSearch(APIView):
@@ -384,9 +381,26 @@ class PasswordRecovery(APIView):
     :param user_id: user number for account.
     '''
 
-    def encoded_reset_token(self, user_id):
+    def get(self, request):
+        data = request.data
+
+        try:
+            email = data.get('email').lower()
+            user = CustomUser.objects.get(email=email)
+            SendMail.send(user=user, mail_type='recovery')
+        except:
+            return Response({'email': 'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'email': 'sent'}, status=status.HTTP_200_OK)
+
+    # except:
+    #     return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class SendMail:
+
+    def encoded_reset_token(self, data):
         payload = {
-            'user_id': user_id,
+            'user_id': data,
             'exp': datetime.utcnow() + timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS)
         }
 
@@ -394,19 +408,24 @@ class PasswordRecovery(APIView):
             payload, settings.JWT_SECRET, settings.JWT_ALGORITHM)
         return encoded_data.decode('utf-8')
 
-    def get(self, request):
-        data = request.data
-
-        # try:
-        email = data.get('email').lower()
-        user = CustomUser.objects.get(email=email)
+    @staticmethod
+    def send(user, mail_type='verify'):
         # send email
         # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
-        base_url = 'http://localhost:8000/reset-password/'
-        url = base_url + self.encoded_reset_token(user_id=user.id)
-        rendered_message = get_template('password_recovery.html').render({
-            'url': url, 'username': user.username
-        })
+        if mail_type == 'recovery':
+            base_url = 'http://localhost:8000/reset-password/'
+            url = base_url + SendMail.encoded_reset_token(data=user.id)
+            rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
+                'url': url, 'username': user.username, 'mail_type': mail_type
+            })
+        else:
+            # verify
+            base_url = 'http:localhost:8000/mail-verify/'
+            # ایدی و ایمیل برای تایید ایمیل لازم است. زمانی که کاربر لاگین نباشد و بخواهید ایمیلش را تایید کند، ایدی به کار می آید
+            url = base_url + SendMail.encoded_reset_token(data={'id': user.id, 'email': user.email})
+            rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
+                'url': url, 'username': user.username, 'mail_type': mail_type
+            })
 
         # fail_silently=True
         # پیش فرض False
@@ -416,28 +435,49 @@ class PasswordRecovery(APIView):
         # hmtl_message
         # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
         # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
-        send_mail(subject='بازیابی رمز عبور', message='', from_email=settings.EMAIL_HOST_USER,
-                  recipient_list=(email,),
+        send_mail(subject='بازیابی رمز عبور' if mail_type == 'recovery' else 'تایید ایمیل', message='',
+                  from_email=settings.EMAIL_HOST_USER,
+                  recipient_list=(user.email,),
                   fail_silently=True,
                   html_message=rendered_message)
-        return Response({'email': 'sent'}, status=status.HTTP_200_OK)
 
-    # except:
-    #     return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)
+
+def decode_reset_token(self, reset_token):
+    try:
+        decoded_data = jwt.decode(reset_token, settings.JWT_SECRET,
+                                  algorithms=[settings.JWT_ALGORITHM])
+    except (jwt.DecodeError, jwt.ExpiredSignatureError):
+        return None  # means expired token
+
+    return decoded_data['user_id']
 
 
 class ResetPassword(APIView):
 
-    def decode_reset_token(self, reset_token):
-        try:
-            decoded_data = jwt.decode(reset_token, settings.JWT_SECRET,
-                                      algorithms=[settings.JWT_ALGORITHM])
-        except (jwt.DecodeError, jwt.ExpiredSignatureError):
-            return None  # means expired token
-
-        return decoded_data['user_id']
-
-    def get(self, request, decoded_id):
-        id = self.decode_reset_token(decoded_id)
+    def get(self, request, decoded_str):
+        id = decode_reset_token(decoded_str)
+        # باید به یک صفحه ی پسورد جدید ریدایرکت شود
         return Response({'id': id, 'token': Token.objects.get(user_id=id).key},
                         status=status.HTTP_200_OK if id else status.HTTP_400_BAD_REQUEST)
+
+
+class VerifyMail(APIView):
+
+    def get(self, request, decoded_str):
+        '''
+        زمانی که کاربر ایمیل دریافتی را کلیک می کند، در حالت پیش فرض دو مقدار ایدی و ایمیل از این کیلک دریافت می شود
+        ایمیل در رکورد مربوط به ای دی ذخیره می شود
+        در صورتی که دریافت نشود، یا لینک دستکاری شده، یا تاریخ انقضای لینک تمام شده است.
+
+        '''
+        data = decode_reset_token(decoded_str)
+        if data:
+            user_id = int(data['id'])
+            user_mail = data['email']
+            # باید به صفحه ی ایمیل تایید شد، ریدایرکت شود
+            user = CustomUser.objects.get(user_id=user_id)
+            user.email = user_mail
+            user.save()
+            return Response({})
+        # لینک دستکاری یا منقضی شده
+        return Response({}, status=status.HTTP_404_NOT_FOUND)

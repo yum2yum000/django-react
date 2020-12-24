@@ -3,7 +3,7 @@ from django.urls import path, include, re_path
 from rest_framework import routers
 from django.contrib.admin.templates import admin
 from api.views import (Posts, CreateUser, AllPostList, UserSearch,
-                       PostSearch, LoginOrUpdateProfile, PasswordRecovery, ResetPassword)
+                       PostSearch, PasswordRecovery, ResetPassword, VerifyMail, LoginUser, ProfileUser)
 
 # router = routers.DefaultRouter()
 # router.register('users', UserViewSets)
@@ -20,10 +20,14 @@ urlpatterns = [
     # بدون نیاز به احراز هویت
     path('users/search/', UserSearch.as_view()),
     path('password-recovery/', PasswordRecovery.as_view()),
-    path('reset-password/<decoded_id>/', ResetPassword.as_view()),
+    # لینک ارسالی به کاربر برای ریست پسورد
+    path('reset-password/<decoded_id>', ResetPassword.as_view()),
+    # لینک ارسالی به کاربر برای تایید ایمیل
+    path('mail-verify/<decoded_id>', VerifyMail.as_view()),
     # post لاگین کردن
     # put اپدیت کردن پروفایل
-    path('users/login/', LoginOrUpdateProfile.as_view(), name='user_login'),
+    path('users/login/', LoginUser.as_view(), name='user_login'),
+    path('users/profile/', ProfileUser.as_view(), name='user_login'),
 
     # ------------------------------------------------------------------------
 
