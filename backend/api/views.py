@@ -70,9 +70,9 @@ class CreateUser(generics.CreateAPIView):
             user.set_password(data.get('password'))
             user.save()
             Token.objects.create(user=user)
-            #ایمیل آدرس فعلا ذخیره نمی شود
-            #فقط برای ارسال ایمیل خط زیر نوشته شده است
-            user.email=email
+            # ایمیل آدرس فعلا ذخیره نمی شود
+            # فقط برای ارسال ایمیل خط زیر نوشته شده است
+            user.email = email
             # ارسال ایمیل برای تایید آدرس ایمیل
             SendMail.send(user=user, mail_type='verify')
             data = self.get_serializer(user).data
@@ -379,7 +379,7 @@ class SendMail:
                   html_message=rendered_message)
 
 
-def decode_reset_token(self, reset_token):
+def decode_reset_token(reset_token):
     try:
         decoded_data = jwt.decode(reset_token, settings.JWT_SECRET,
                                   algorithms=[settings.JWT_ALGORITHM])
@@ -415,9 +415,16 @@ class VerifyMail(APIView):
         '''
         data = decode_reset_token(decoded_str)
         if data:
-            user_id = int(data['id'])
+            user_id = data['id']
             user_mail = data['email']
-            user = CustomUser.objects.get(user_id=user_id)
+            user = CustomUser.objects.get(id=user_id)
+            try:
+                CustomUser.objects.get(email=user_mail)
+            except:
+                #اگر برای یک ادرس دو کاربر درخواست شود و قبل از اینکه کاربر اول ایمیل را ثبت کند کاربر دوم درخواست دهد
+                #به همریختگی ایجاد می شود
+                #در اینحالت هر کاربری که ایمیل را زودتر ثبت کند، به نام آن است
+                return Response(data={'emial': 'This email is registred'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             user.email = user_mail
             user.save()
             # باید به صفحه ی ایمیل تایید شد، ریدایرکت شود
