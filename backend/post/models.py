@@ -1,32 +1,8 @@
 import re
-
-from django.contrib.auth import password_validation
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from django.db import models
-
-# Create your models here.
 from django.utils.html import format_html
-from django.utils.safestring import mark_safe
-
-
-def phone_validate(value):
-    # phone validate
-    if value is not None and re.match('^09[0-9]{9}$', value) is None:
-        raise ValidationError('phone format is invalid')
-    else:
-        return value
-
-
-def mail_validator(value):
-    user = ''
-    try:
-        user = CustomUser.objects.get(email=value)
-    except:
-        pass
-    if user:
-        raise ValidationError('Email is duplicate')
 
 
 class LowercaseEmailField(models.EmailField):
@@ -45,12 +21,27 @@ class CustomUser(AbstractUser):
     # AbstractUser._meta.get_field('first_name)._unique=False
     AbstractUser._meta.get_field('first_name').null = True
     AbstractUser._meta.get_field('last_name').null = True
-    email = LowercaseEmailField(null=True, unique=False, blank=True, validators=[mail_validator, ])
+    email = LowercaseEmailField(null=True, unique=False, default=None, blank=True, )
     phone = models.CharField('شماره تلفن', max_length=11, null=True,
-                             blank=True, validators=[phone_validate])
+                             blank=True, )
     adres = models.TextField('آدرس', null=True, blank=True)
     bio = models.TextField('توضیحات', null=True, blank=True)
     avatar = models.ImageField('تصویر', upload_to='images', null=True, blank=True)
+
+    def clean(self):
+        # phone validate
+        if self.phone is not None and re.match('^09[0-9]{9}$', self.phone) is None:
+            raise ValidationError('phone format is invalid')
+
+        # email validate
+        user = ''
+        try:
+            user = CustomUser.objects.get(email=self.email)
+            # اگر ایمیل وارد شده در دیتابیس وجود داشته باشد
+        except:
+            pass
+        if user:
+            raise ValidationError('Email is duplicate')
 
     # USERNAME_FIELD = 'username'
     # REQUIRED_FIELDS = ['password']

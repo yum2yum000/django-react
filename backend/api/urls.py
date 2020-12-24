@@ -21,9 +21,9 @@ urlpatterns = [
     path('users/search/', UserSearch.as_view()),
     path('password-recovery/', PasswordRecovery.as_view()),
     # لینک ارسالی به کاربر برای ریست پسورد
-    path('reset-password/<decoded_id>', ResetPassword.as_view()),
+    path('reset-password/<decoded_id>/', ResetPassword.as_view()),
     # لینک ارسالی به کاربر برای تایید ایمیل
-    path('mail-verify/<decoded_id>', VerifyMail.as_view()),
+    path('mail-verify/<decoded_id>/', VerifyMail.as_view()),
     # post لاگین کردن
     # put اپدیت کردن پروفایل
     path('users/login/', LoginUser.as_view(), name='user_login'),

@@ -11,7 +11,6 @@ from hyperlink._url import NoneType
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
-from django.core.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -37,7 +36,27 @@ class CreateUser(generics.CreateAPIView):
     def create(self, request, *args, **kwargs):
 
         data = request.data
+
+        # phone validate
+        phone = request.data.get('phone')
+        if phone is not None and re.match('^09[0-9]{9}$', phone) is None:
+            return Response(data={'phone': 'phone format is invalid'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # email validate
+        email = request.data.get('email')
+        if email.strip():
+            try:
+                user = CustomUser.objects.get(email=email)
+                # اگر ایمیل ارسالی در حافظه باشد
+                return Response(data={'email': 'Duplicate'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            except:
+                pass
+        else:
+            # اگر ایمیل ارسال نشود
+            return Response(data={'email': 'required'}, status=status.HTTP_400_BAD_REQUEST)
         try:
+            # ایمیل ذخیره نمی شود
+            # بعد از تایید ایمیل، در دیتابیس ذخیره می شود
             user = CustomUser(
                 username=data.get('username'),
                 first_name=data.get('first_name'),
@@ -51,11 +70,15 @@ class CreateUser(generics.CreateAPIView):
             user.set_password(data.get('password'))
             user.save()
             Token.objects.create(user=user)
+            #ایمیل آدرس فعلا ذخیره نمی شود
+            #فقط برای ارسال ایمیل خط زیر نوشته شده است
+            user.email=email
+            # ارسال ایمیل برای تایید آدرس ایمیل
+            SendMail.send(user=user, mail_type='verify')
             data = self.get_serializer(user).data
             return Response({'user': data})
         except:
             return Response({'format': 'enter valid data'}, status=status.HTTP_400_BAD_REQUEST)
-    # def post(self, request):
 
 
 class LoginUser(APIView):
@@ -309,10 +332,13 @@ class SendMail:
     ارسال ایمیل برای تایید ایمیل و بازیابی رمز عبور
     '''
 
-    def encoded_reset_token(self, data):
+    @staticmethod
+    def encoded_reset_token(data, mail_type='verify'):
+        # فرصت برای تایید ایمیل هفت روز و برای بازیابی رمز عبور یک روز
+        delta_seconds = settings.JWT_EXP_DELTA_SECONDS * (1 if mail_type == 'recovery' else 7)
         payload = {
             'user_id': data,
-            'exp': datetime.utcnow() + timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS)
+            'exp': datetime.utcnow() + timedelta(seconds=delta_seconds)
         }
 
         encoded_data = jwt.encode(
@@ -325,15 +351,15 @@ class SendMail:
         # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
         if mail_type == 'recovery':
             base_url = 'http://localhost:8000/reset-password/'
-            url = base_url + SendMail.encoded_reset_token(data=user.id)
+            url = base_url + SendMail.encoded_reset_token(data=user.id, mail_type='recovery')
             rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
                 'url': url, 'username': user.username, 'mail_type': mail_type
             })
         else:
             # verify
-            base_url = 'http:localhost:8000/mail-verify/'
+            base_url = 'http://localhost:8000/mail-verify/'
             # ایدی و ایمیل برای تایید ایمیل لازم است. زمانی که کاربر لاگین نباشد و بخواهید ایمیلش را تایید کند، ایدی به کار می آید
-            url = base_url + SendMail.encoded_reset_token(data={'id': user.id, 'email': user.email})
+            url = base_url + SendMail.encoded_reset_token(data={'id': user.id, 'email': user.email}, mail_type='verify')
             rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
                 'url': url, 'username': user.username, 'mail_type': mail_type
             })
