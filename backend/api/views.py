@@ -34,74 +34,27 @@ class CreateUser(generics.CreateAPIView):
     permission_classes = ()
     serializer_class = UserSerializer
 
-    def validate(self, data):
-        if data.get('username') is None or data.get('password') is None:
-            return ({'username or password': 'Not valid'}, status.HTTP_400_BAD_REQUEST)
-        user = CustomUser()
-        # username validate
-        try:
-            # اگر نام وارد شده وجود داشته باشد خط return اجرا خواهد شد. و اگر نداشته باشد خط return اجرا نشده و ثبت نام کابر به صورت عادی طی خواهد شد.
-            user = CustomUser.objects.get(username=data.get('username'))
-            return ({'username': 'user name does exists'}, status.HTTP_406_NOT_ACCEPTABLE)
-        except:
-            pass
-
-        # phone validate
-        if data.get('phone'):
-            if re.match('^09[0-9]{9}$', data.get('phone')) is None:
-                return ({'phone': 'Not valid'}, status.HTTP_400_BAD_REQUEST)
-
-        # email validate
-        email = data.get('email')
-        if email:
-            email = email.lower()
-            # چک کردن اینکه ایمیل تکراری وارد نشود
-            try:
-                # ایمیل تکراری است
-                CustomUser.objects.get(email=email)
-                return ({'email': 'email does exists'}, status.HTTP_406_NOT_ACCEPTABLE)
-            except:
-                pass
-            try:
-                validate_email(email)
-                user.email = email
-            except Exception as err:
-                # فرمت ایمیل درست نیست
-                return ({'email': err}, status.HTTP_400_BAD_REQUEST)
-        else:
-            # فیلد ایمیل لازم است
-            return ({'email': 'Required'}, status.HTTP_411_LENGTH_REQUIRED)
-        # password validate
-        try:
-            password_validation.validate_password(data.get('password'))
-        except ValidationError as err:
-            return ({'password': err}, status.HTTP_400_BAD_REQUEST)
-        return True
-
     def create(self, request, *args, **kwargs):
 
         data = request.data
-        # اگر دیتا صحیح نباشد، کد زیر خودش پاسخ مناسب را ارسال خواهد کرد
-        error = self.validate(data)
-        if error is not True:
-            return Response(error)
+        try:
+            user = CustomUser(
+                username=data.get('username'),
+                first_name=data.get('first_name'),
+                last_name=data.get('last_name'),
+                adres=data.get('adres'),
+                bio=data.get('bio'),
+                avatar=data.get('avatar'),
+                phone=data.get('phone'),
+            )
 
-        user = CustomUser(
-            username=data.get('username').lower(),
-            first_name=data.get('first_name'),
-            last_name=data.get('last_name'),
-            adres=data.get('adres'),
-            bio=data.get('bio'),
-            avatar=data.get('avatar'),
-            phone=data.get('phone'),
-        )
-
-        user.set_password(data.get('password'))
-        user.save()
-        Token.objects.create(user=user)
-        data = self.get_serializer(user).data
-        return Response({'user': data})
-
+            user.set_password(data.get('password'))
+            user.save()
+            Token.objects.create(user=user)
+            data = self.get_serializer(user).data
+            return Response({'user': data})
+        except:
+            return Response({'format': 'enter valid data'}, status=status.HTTP_400_BAD_REQUEST)
     # def post(self, request):
 
 
@@ -110,7 +63,7 @@ class LoginUser(APIView):
 
     # لاگین شدن
     def post(self, request):
-        username = request.data.get('username').lower()
+        username = request.data.get('username'),
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
         if user:
@@ -158,7 +111,7 @@ class ProfileUser(APIView):
         if data.get('username'):
             try:
                 # اگر خط زیر دست اجرا شود، پس نمیتوان نام  کاربری درخواستی را به یوزر نسبت داد. چون همچین نامی وجود دارد
-                CustomUser.objects.get(username=data.get('username').lower())
+                CustomUser.objects.get(username=data.get('username'))
                 return Response(data={'username': 'user name does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             except NoneType:
                 # اگر نام کاربری وارد نشود.
@@ -169,7 +122,7 @@ class ProfileUser(APIView):
                 pass
             # درصورتی که درخواست تغییر نام کاربری داده شود، و نام انتخابی در دیتابیس موجود نباشد خط زیر اجرا خواهد شد
 
-            user.username = data.get('username').lower()
+            user.username = data.get('username')
         # phone validate
         if data.get('phone'):
             if re.match('^09[0-9]{9}$', data.get('phone')) is None:
