@@ -1,23 +1,26 @@
 
 
+
+#دیتا بیس
 backend/db.sqlite3
 
+
+#لاگهای گیت
 logs.md
 
+#کارهای باقی مانده
 remaining.md
 
 #اطلاعات ارسال کننده ی ایمیل ها
 backend/first/mail_info.py
 
+#محیط مجازی
 backend/venv/
 
-<<<<<<< HEAD
 
+#فایل های pycharm
 .idea/
 
-=======
-.idea/
->>>>>>> browser_error
 
-
+#تصاویر پروفایل
 backend/media/

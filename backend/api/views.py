@@ -60,7 +60,6 @@ class CreateUser(generics.CreateAPIView):
         برای get
 
     '''
-
     authentication_classes = ()
     permission_classes = ()
     serializer_class = UserSerializer
@@ -180,6 +179,11 @@ class LoginOrUpdateProfile(APIView):
                 # اگر نام کاربری درخواستی در دیتابیس نباشد، می توان تغییرداد
                 user.username = data.get('username').lower()
 
+        # phone validate
+        if data.get('phone'):
+            if re.match('^09[0-9]{9}$', data.get('phone')) is None:
+                return Response({'phone': 'Not valid'}, status=status.HTTP_400_BAD_REQUEST)
+
         # email validate
         email = data.get('email').lower()
         if email:
@@ -218,6 +222,7 @@ class LoginOrUpdateProfile(APIView):
         except Exception as err:
             return Response({'password': err}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(request.data.get('password'))
+        user.save()
         return Response({'password': 'updated'}, status=status.HTTP_200_OK)
 
 
