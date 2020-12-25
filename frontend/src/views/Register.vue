@@ -13,8 +13,9 @@
                                         <p class="text-right error" v-if="!$v.user.username.required">نام کاربری باید وارد شود</p>
                                     </div>
                                 </div>
-                                <div class="input-container">
-                                    <BaseInput type="password" inputClass="input--style-4" label=" رمز عبور" v-model="user.password"  @blur="$v.user.password.$touch()"></BaseInput>
+                                <div class="input-container" style="position:relative">
+                                    <BaseInput :type="passwordFieldType" inputClass="input--style-4" label=" رمز عبور" v-model="user.password"  @blur="$v.user.password.$touch()"></BaseInput>
+                                    <span @mouseover="showText" @mouseleave="showPassword"> <i class="fas fa-eye eye-password" ></i></span>
                                     <div v-if="$v.user.password.$error">
                                         <p class="text-right error" v-if="!$v.user.password.required"> رمز عبور باید وارد شود</p>
                                         <p class="text-right error" v-if="!$v.user.password.minLength"> رمز عبور باید حداقل 8 حرف باشد</p>
@@ -50,7 +51,7 @@
                             <div class="row row-space">
                                 <div class="input-container">
                                     <div class="input-group">
-                                        <BaseInput   type="text" inputClass="input--style-4" label="شماره موبایل" v-model="user.phone" ></BaseInput>
+                                        <BaseInput  type="text" inputClass="input--style-4" label="شماره موبایل" v-model="user.phone" ></BaseInput>
                                     </div>
 
 
@@ -108,11 +109,18 @@
             return{
                 user:{},
                 error:'',
-                buttonClick:false
+                buttonClick:false,
+                passwordFieldType:'password'
 
             }
         },
         methods:{
+            showText(){
+            this.passwordFieldType='text'
+            },
+            showPassword(){
+            this.passwordFieldType='password'
+            },
             register(){
             this.$v.$touch()
             if(!this.$v.$invalid){
@@ -121,14 +129,14 @@
                 console.log('register success',res)
                 if (res.status === 200){
                     this.error='ثبت نام با موفقیت انجام شد'
-                    setTimeout(()=>{
+
                         console.log('233',res)
                         store.dispatch('login/login',{
                             user:{
                                 username:this.user.username,
                                 password:this.user.password
                             },
-                            saveLog:null
+                            saveLog:false
                         }).then((res)=>{
                             console.log('login success',res)
                             this.$router.push({name:'home'})
@@ -139,7 +147,7 @@
 
                             }
                         })
-                    },1000)
+
                 }
 
             }).catch((e)=>{
@@ -183,4 +191,9 @@
 .input-container{
     width:45%;
 }
+    .eye-password{
+        position: absolute;
+        top: 46px;
+        left: 11px;
+    }
 </style>

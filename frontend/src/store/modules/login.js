@@ -1,10 +1,14 @@
 import Service from '@/services/Service.js'
+import router from'@/router'
 export const namespaced = true
 
 export const state = {
+    user: null,
     username:'',
     posts:[],
-    userInfo:''
+    userInfo:'',
+    mailConfirm:'',
+    confirmDay:-1
 
 }
 export const mutations = {
@@ -27,6 +31,9 @@ export const mutations = {
         sessionStorage.removeItem('user')
         location.reload()
     },
+    SET_USERNAME(state,username){
+        state.username=username
+    },
     SET_POSTS(state,posts){
         state.posts=posts
     },
@@ -34,23 +41,38 @@ export const mutations = {
        let index= state.posts.findIndex(item=>item.id==id)
         state.posts.splice(index,1)
     },
-    GET_USER(state,user){
-        state.userInfo=user
-    }
-
+    SET_USERINFO(state,userInfo){
+        state.userInfo=userInfo.user
+        if(userInfo.user.email){
+            state.mailConfirm=true
+        }
+        else{
+            state.mailConfirm=false
+        }
+    },
+    UPDATE_USERINFO(state,data){
+        state.userInfo=data.user
+    },
+    SET_CONFIRMDAY(state,day){
+        state.confirmDay=7-day
+    },
+    CLEAR_CONFIRMDAY(state){
+        state.confirmDay=-1
+    },
 
 }
 export const actions= {
     login({commit},credentials){
-        console.log('333333',credentials)
        return Service.loginUser(credentials.user).then((res)=>{
-           console.log('55',res)
             commit('SET_USER_DATA', {userData:res.data,saveLog:credentials.saveLog})
         })
 
     },
     logout ({ commit }) {
         commit('CLEAR_USER_DATA')
+    },
+    setUsername({commit},username){
+        commit('SET_USERNAME',username)
     },
      deletePost({commit},id){
          return Service.deletePost(id)
@@ -70,9 +92,33 @@ export const actions= {
     },
     getUser ({ commit }) {
         return Service.getUser().then((res)=>{
-            commit('GET_USER',res.data)
+            commit('SET_USERINFO',res.data)
+            console.log('ll',res)
+            if(!res.data.user.email)
+            {
+                let end =new Date(res.data.user.date_joined)
+                const now=new Date()
+                const distance=now.getTime()-end.getTime()
+                const convertToDay=(24 * 60 * 60 *1000)
+                const day=Math.floor(distance/convertToDay)
+                console.log('day',day)
+                if(day<=7){
+                    commit('SET_CONFIRMDAY',day)
+                }
+                else{
+                    commit('CLEAR_CONFIRMDAY')
+                    router.push({name:'newEmail'})
+                }
+            }
+
         })
-    }
+    },
+    updateUser ({ commit },user) {
+        return Service.updateUser(user).then((res)=>{
+            commit('UPDATE_USERINFO',res.data)
+            return res;
+        })
+    },
 
 
 }
@@ -80,10 +126,19 @@ export const getters= {
     loggedIn (state) {
         return !!state.user
     },
-    userInfo(state){
-        return state.userInfo
+   mailConfirm (state) {
+        return !!state.mailConfirm
+    },
+    username(state){
+        return state.username
+    },
+    confirmDay(state){
+        return state.confirmDay
     },
     posts(state){
         return state.posts
+    },
+    userInfo(state){
+        return state.userInfo
     }
 }

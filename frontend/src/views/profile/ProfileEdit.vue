@@ -68,8 +68,9 @@
 
 <script>
     import { required,email } from 'vuelidate/lib/validators'
-    import Service from '@/services/Service.js'
+    import {mapGetters} from 'vuex'
     import store from '@/store/store'
+
     export default {
         name: "ProfileEdit",
         validations:{
@@ -90,42 +91,53 @@
                 error:''
             }
         },
+        computed: {
+            ...mapGetters('login', ['userInfo'])
+        },
         created(){
             this.getUser()
         },
         methods:{
             getUser(){
-                Service.getUser().then((res)=>{
-                    let user=res.data.user
-                    this.user.last_name=user.last_name
-                    this.user.first_name=user.first_name
-                    this.user.email=user.email
-                    this.user.bio=user.bio
-                    this.user.adres=user.adres
-                    this.user.phone=user.phone
-                    console.log('this/user',this.user)
-                    store.dispatch('login/setUsername',this.user.username)
-                }).catch((e)=>{
-                    console.log(e.response)
-                })
+                  if(this.userInfo)
+                  {
+                      this.setInfUser()
+                  }
+                  else{
+                      store.dispatch('login/getUser').then(()=>{
+                          this.setInfUser()
+                      })
+                  }
+
+            },
+            setInfUser(){
+                let user=this.userInfo
+                this.user.last_name=user.last_name
+                this.user.first_name=user.first_name
+                this.user.email=user.email
+                this.user.bio=user.bio
+                this.user.adres=user.adres
+                this.user.phone=user.phone
             },
             update(){
                 this.$v.$touch()
                 if(!this.$v.$invalid){
-                Service.updateUser(this.user).then((res)=>{
-                    if (res.status === 200){
-                        this.error='اطلاعات با موفقیت ویرایش شد'
-                    }
-                }).catch((e)=>{
-                if (e.response && e.response.status === 406) {
-                        if(e.response.data.email)
-                        {
-                            this.error='ایمیل  تکراری است'
+                    store.dispatch('login/updateUser',this.user).then((res)=>{
+                        if (res.status === 200){
+                            this.error='اطلاعات با موفقیت ویرایش شد'
                         }
+                    }).catch((e)=>{
+                        console.log(e.response)
+                        if (e.response && e.response.status === 406) {
+                            if(e.response.data.email)
+                            {
+                                this.error='ایمیل  تکراری است'
+                            }
 
 
-                    }
-                })
+                        }
+                    })
+
             }
             }
         }

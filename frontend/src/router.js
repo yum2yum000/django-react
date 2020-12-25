@@ -4,6 +4,8 @@ import Home from './views/Home.vue'
 //
 import Register from './views/Register.vue'
 import Login from './views/Login.vue'
+import EmailConfirm from './views/email/EmailConfirm.vue'
+import NewEmail from './views/email/NewEmail.vue'
 import ProfileEdit from './views/profile/ProfileEdit.vue'
 import ProfileChangepassword from './views/profile/ProfileChangepassword.vue'
 import PostCreate from './views/profile/post/PostCreate.vue'
@@ -37,6 +39,24 @@ const router = new Router({
             name: 'login',
             component: Login,
             meta: { requiresVisitor: true }
+        },
+        {
+            path: '/newemail',
+            name: 'newEmail',
+            component: NewEmail,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/emailConfirm',
+            name: 'emailConfirm',
+            component: EmailConfirm,
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/email',
+            name: 'NewEmail',
+            component: NewEmail,
+            meta: { requiresAuth: true }
         },
         {
             path: '/profile/',
@@ -105,6 +125,7 @@ router.beforeEach((to, from, next) => {
     }
     else if (to.matched.some(record => record.meta.requiresVisitor)) {
         if (loggedIn) {
+            console.log('ddddddd')
             next({
                 path: '/',
             })
