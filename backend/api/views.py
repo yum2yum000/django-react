@@ -82,6 +82,8 @@ class CreateUser(generics.CreateAPIView):
 class LoginUser(APIView):
     '''
     با دادن نام کاربری و رمز عبور، توکن مربوطه دریافت می شود
+    برای لاگین یوزر استفاده می شود
+    نام کاربری و رمز عبور ارسال شده، توکن مربوطه دریافت می شود
     '''
     serializer_class = UserSerializer
 
@@ -357,7 +359,9 @@ class SendMail:
         try:
             if mail_type == 'recovery':
                 base_url = 'http://localhost:8000/reset-password/'
+
                 url = base_url + SendMail.encoded_reset_token(data=user.username, mail_type='recovery')
+
                 rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
                     'url': url, 'username': user.username, 'mail_type': mail_type
                 })
@@ -369,23 +373,23 @@ class SendMail:
                 rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
                     'url': url, 'username': user.username, 'mail_type': mail_type
                 })
+
+            # fail_silently=True
+            # پیش فرض False
+            # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
+            # smtplib.SMTPException
+            #
+            # hmtl_message
+            # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
+            # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
+
+            send_mail(subject='بازیابی رمز عبور' if mail_type == 'recovery' else 'تایید ایمیل', message='',
+                      from_email=settings.EMAIL_HOST_USER,
+                      recipient_list=(user.email,),
+                      fail_silently=True,
+                      html_message=rendered_message)
         except:
             pass
-        # fail_silently=True
-        # پیش فرض False
-        # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
-        # smtplib.SMTPException
-        #
-        # hmtl_message
-        # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
-        # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
-
-        send_mail(subject='بازیابی رمز عبور' if mail_type == 'recovery' else 'تایید ایمیل', message='',
-                  from_email=settings.EMAIL_HOST_USER,
-                  recipient_list=(user.email,),
-                  fail_silently=True,
-                  html_message=rendered_message)
-
 
 def decode_reset_token(reset_token):
     try:
@@ -412,6 +416,7 @@ class ResetPassword(APIView):
                 status=status.HTTP_200_OK)
         else:
             return Response({'token': 'لینک خراب می باشد'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class VerifyMail(APIView):
@@ -441,6 +446,6 @@ class VerifyMail(APIView):
             user.email = user_mail
             user.save()
             # باید به صفحه ی ایمیل تایید شد، ریدایرکت شود
-            return Response({'email': 'باید به صفحه ی تایید ایمیل ریدایرکت کنم'}, status=status.HTTP_200_OK)
+            return Response({'email': 'ایمیل ثبت شد. باید به صفحه ی تایید ایمیل ریدایرکت کنم'}, status=status.HTTP_200_OK)
         # لینک دستکاری یا منقضی شده
         return Response({'email': 'لینک تایید ایمیل خراب می باشد'}, status=status.HTTP_404_NOT_FOUND)
