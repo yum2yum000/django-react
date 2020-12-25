@@ -81,7 +81,12 @@ class CreateUser(generics.CreateAPIView):
 
 class LoginUser(APIView):
     '''
+<<<<<<< HEAD
     با دادن نام کاربری و رمز عبور، توکن مربوطه دریافت می شود
+=======
+    برای لاگین یوزر استفاده می شود
+    نام کاربری و رمز عبور ارسال شده، توکن مربوطه دریافت می شود
+>>>>>>> 96c76faec91153b715a445805d07d5021ee689cf
     '''
     serializer_class = UserSerializer
 
@@ -357,7 +362,9 @@ class SendMail:
         try:
             if mail_type == 'recovery':
                 base_url = 'http://localhost:8000/reset-password/'
+
                 url = base_url + SendMail.encoded_reset_token(data=user.username, mail_type='recovery')
+
                 rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
                     'url': url, 'username': user.username, 'mail_type': mail_type
                 })
@@ -414,6 +421,7 @@ class ResetPassword(APIView):
             return Response({'token': 'لینک خراب می باشد'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class VerifyMail(APIView):
 
     def get(self, request, decoded_str):
@@ -441,6 +449,6 @@ class VerifyMail(APIView):
             user.email = user_mail
             user.save()
             # باید به صفحه ی ایمیل تایید شد، ریدایرکت شود
-            return Response({'email': 'باید به صفحه ی تایید ایمیل ریدایرکت کنم'}, status=status.HTTP_200_OK)
+            return Response({'email': 'ایمیل ثبت شد. باید به صفحه ی تایید ایمیل ریدایرکت کنم'}, status=status.HTTP_200_OK)
         # لینک دستکاری یا منقضی شده
         return Response({'email': 'لینک تایید ایمیل خراب می باشد'}, status=status.HTTP_404_NOT_FOUND)
