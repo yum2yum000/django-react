@@ -12,20 +12,20 @@ export default {
         return apiClient.post('/users/login/', user)
     },
     getUser() {
-        return apiClient.put('/users/login/',{update:''})
+        return apiClient.put('/users/profile/',{update:''})
 
     },
     getPosts(){
         return apiClient.get('/posts/user/')
     },
     updateUser(data){
-        return apiClient.put('/users/login/',{update:'data',...data
+        return apiClient.put('/users/profile/',{update:'data',...data
         })
 
     },
     updatePassword(data){
         console.log('899999',data)
-        return apiClient.put('/users/login/',{update:'password',...data
+        return apiClient.put('/users/profile/',{update:'password',...data
         })
 
     },
