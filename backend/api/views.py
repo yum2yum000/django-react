@@ -29,8 +29,8 @@ class CreateUser(generics.CreateAPIView):
 
     '''
     # این دو کلاس به صورت پیش فرش در فایل settings.py تعریف شده است
-    authentication_classes = ()
-    permission_classes = ()
+    # authentication_classes = ()
+    # permission_classes = ()
     serializer_class = UserSerializer
 
     def create(self, request, *args, **kwargs):
@@ -75,6 +75,8 @@ class CreateUser(generics.CreateAPIView):
             user.email = email
             # ارسال ایمیل برای تایید آدرس ایمیل
             SendMail.send(user=user, mail_type='verify')
+            # ایمیل نشان داده نشود. چون تصور می شود ثبت شده است
+            user.email = ''
             data = self.get_serializer(user).data
             return Response({'user': data})
         except:
@@ -86,7 +88,7 @@ class LoginUser(APIView):
 
     # لاگین شدن
     def post(self, request):
-        username = request.data.get('username'),
+        username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
         if user:
@@ -119,10 +121,7 @@ class ProfileUser(APIView):
                 return Response({'user': UserSerializer(user).data}, status=status.HTTP_200_OK)
         except:
             # خطای غیر قابل پیش بینی
-            return Response(data={}, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response(data={'user': 'Forbiden', 'detail': 'This user not matched with token string'},
-                        status=status.HTTP_403_FORBIDDEN)
+            return Response(data={'update': 'please send update field'}, status=status.HTTP_400_BAD_REQUEST)
 
     def update_data(self, request, user):
         # update all data except the password
@@ -136,25 +135,28 @@ class ProfileUser(APIView):
                 # اگر خط زیر دست اجرا شود، پس نمیتوان نام  کاربری درخواستی را به یوزر نسبت داد. چون همچین نامی وجود دارد
                 CustomUser.objects.get(username=data.get('username'))
                 return Response(data={'username': 'user name does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            except NoneType:
+            except:
                 # اگر نام کاربری وارد نشود.
                 # نام کاربری درصورتی که درخواست تغییر داده باشد، مهم است در غیر این صورت مهم نیست
                 pass
-            except:
                 # اگر درخواست نام کاربری داده شود، و نام انتخابی در دیتابیس موجود نباشد، ادامه ی کد ها اجرا شود
-                pass
             # درصورتی که درخواست تغییر نام کاربری داده شود، و نام انتخابی در دیتابیس موجود نباشد خط زیر اجرا خواهد شد
-
             user.username = data.get('username')
+
         # phone validate
         if data.get('phone'):
             if re.match('^09[0-9]{9}$', data.get('phone')) is None:
-                return Response({'phone': 'Not valid'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'phone': 'شماره ی وارد شده صحیح نیست'}, status=status.HTTP_400_BAD_REQUEST)
 
         # email validate
-        email = data.get('email').lower()
+        email = data.get('email')
+        # درخواست تغییر ایمیل
         if email:
-            # چک کردن اینکه ایمیل تکراری وارد نشود
+            # کاربر هنوز ایمیلش را تایید نکرده است
+            if not user.email:
+                return Response(data={'emial': 'ایمیل شما هنوز تایید نشده است'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+            # ایمیل تکراری وارد نشود
             try:
                 # ایمیل تکراری است
                 # اگر ایمیل وارد شده مربوط به کاربر حاضر نباشد. نمی توان این ایمیل را به کاربر دیگر تخصیص داد پس
@@ -169,9 +171,9 @@ class ProfileUser(APIView):
             except Exception as err:
                 # فرمت ایمیل درست نیست
                 return Response({'email': err}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            # فیلد ایمیل لازم است
-            return Response({'email': 'Required'}, status=status.HTTP_411_LENGTH_REQUIRED)
+            # else:
+            #     # فیلد ایمیل لازم است
+            #     return Response({'email': 'Required'}, status=status.HTTP_411_LENGTH_REQUIRED)
 
         user.first_name = data.get('first_name') or user.first_name
         user.last_name = data.get('last_name') or user.last_name
@@ -179,7 +181,7 @@ class ProfileUser(APIView):
         user.bio = data.get('bio') or user.bio
         user.avatar = data.get('avatar') or user.avatar
         user.phone = data.get('phone') or user.phone
-
+        user.email = data.get('email') or user.email
         user.save()
         return Response(data={'data': 'updated', "user": UserSerializer(user).data}, status=status.HTTP_200_OK)
 
@@ -319,7 +321,7 @@ class PasswordRecovery(APIView):
     def get(self, request):
         data = request.data
         try:
-            email = data.get('email').lower()
+            email = data.get('email')
             user = CustomUser.objects.get(email=email)
             SendMail.send(user=user, mail_type='recovery')
         except:
@@ -420,11 +422,16 @@ class VerifyMail(APIView):
             user = CustomUser.objects.get(id=user_id)
             try:
                 CustomUser.objects.get(email=user_mail)
-            except:
-                #اگر برای یک ادرس دو کاربر درخواست شود و قبل از اینکه کاربر اول ایمیل را ثبت کند کاربر دوم درخواست دهد
-                #به همریختگی ایجاد می شود
-                #در اینحالت هر کاربری که ایمیل را زودتر ثبت کند، به نام آن است
+                # اگر برای یک ایمیل دو کاربر درخواست کند و قبل از اینکه کاربر اول ایمیل را ثبت کند کاربر دوم درخواست دهد
+                # به همریختگی ایجاد می شود
+                # در اینحالت هر کاربری که ایمیل را زودتر ثبت کند، به نام آن است
+                #اگر فقط یک بار ثبت شده باشد خطا را نشان بده
                 return Response(data={'emial': 'This email is registred'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            except:
+                #زمانی که صفر بار یا بیش از یک بار ثبت شده باشد این بخش اجرا می شود
+                #امکان ثبت بیش از یک بار وجود ندارد
+                #مگر دستکاری دستی دیتابیس
+                pass
             user.email = user_mail
             user.save()
             # باید به صفحه ی ایمیل تایید شد، ریدایرکت شود
