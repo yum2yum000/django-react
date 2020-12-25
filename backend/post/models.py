@@ -41,7 +41,7 @@ class CustomUser(AbstractUser):
         except:
             pass
         if user:
-            raise ValidationError('Email is duplicate')
+            raise ValidationError('ایمیل تکراری است')
 
     # USERNAME_FIELD = 'username'
     # REQUIRED_FIELDS = ['password']
