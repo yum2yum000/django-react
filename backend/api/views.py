@@ -1,6 +1,7 @@
 import re
 from datetime import timedelta, datetime
 from django.core.mail import send_mail
+from django.db import IntegrityError
 from django.db.models import Q
 from django.contrib.auth import authenticate, password_validation
 from django.contrib.auth.models import update_last_login
@@ -30,6 +31,10 @@ class CreateUser(generics.CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         data = request.data
+        # username validate
+        if not data.get('username'):
+            return Response(data={'username': 'نام کاربری الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
+
         # phone validate
         phone = request.data.get('phone')
         if phone is not None and re.match('^09[0-9]{9}$', phone) is None:
@@ -64,19 +69,24 @@ class CreateUser(generics.CreateAPIView):
 
             user.set_password(data.get('password'))
             user.save()
+
             Token.objects.create(user=user)
             # ایمیل آدرس فعلا ذخیره نمی شود
             # فقط برای ارسال ایمیل خط زیر نوشته شده است
             user.email = email
             # ارسال ایمیل برای تایید آدرس ایمیل
-            SendMail.send(user=user, mail_type='verify')
+            #SendMail.send(user=user, mail_type='verify')
             # ایمیل نشان داده نشود. چون تصور می شود ثبت شده است
             user.email = ''
             data = self.get_serializer(user).data
             return Response({'user': data})
-        except:
-            # احتمالا نام کاربری وارد نشده است
-            return Response({'format': 'نام کاربری و رمز عبور الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except IntegrityError:
+            # نام کاربری تکراری است
+            return Response({'username': 'نام کاربری تکراری است'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except AttributeError:
+            return Response({'email': 'ارسال ایمیل با مشکل مواجه شده است'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginUser(APIView):
@@ -356,40 +366,39 @@ class SendMail:
         # send email
         # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
         # خط زیر برای تست فرانت اند کار قرار داده شده است
-        try:
-            if mail_type == 'recovery':
-                base_url = 'http://localhost:8000/reset-password/'
+        if mail_type == 'recovery':
+            base_url = 'http://localhost:8000/reset-password/'
 
-                url = base_url + SendMail.encoded_reset_token(data=user.username, mail_type='recovery')
+            url = base_url + SendMail.encoded_reset_token(data=user.username, mail_type='recovery')
 
-                rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
-                    'url': url, 'username': user.username, 'mail_type': mail_type
-                })
-            else:
-                # verify
-                base_url = 'http://localhost:8000/mail-verify/'
-                # ایدی و ایمیل برای تایید ایمیل لازم است. زمانی که کاربر لاگین نباشد و بخواهید ایمیلش را تایید کند، ایدی به کار می آید
-                url = base_url + SendMail.encoded_reset_token(data={'username': user.username, 'email': user.email}, mail_type='verify')
-                rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
-                    'url': url, 'username': user.username, 'mail_type': mail_type
-                })
+            rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
+                'url': url, 'username': user.username, 'mail_type': mail_type
+            })
+        else:
+            # verify
+            base_url = 'http://localhost:8000/mail-verify/'
+            # ایدی و ایمیل برای تایید ایمیل لازم است. زمانی که کاربر لاگین نباشد و بخواهید ایمیلش را تایید کند، ایدی به کار می آید
+            url = base_url + SendMail.encoded_reset_token(data={'username': user.username, 'email': user.email},
+                                                          mail_type='verify')
+            rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
+                'url': url, 'username': user.username, 'mail_type': mail_type
+            })
 
-            # fail_silently=True
-            # پیش فرض False
-            # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
-            # smtplib.SMTPException
-            #
-            # hmtl_message
-            # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
-            # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
+        # fail_silently=True
+        # پیش فرض False
+        # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
+        # smtplib.SMTPException
+        #
+        # hmtl_message
+        # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
+        # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
 
-            send_mail(subject='بازیابی رمز عبور' if mail_type == 'recovery' else 'تایید ایمیل', message='',
-                      from_email=settings.EMAIL_HOST_USER,
-                      recipient_list=(user.email,),
-                      fail_silently=True,
-                      html_message=rendered_message)
-        except:
-            pass
+        send_mail(subject='بازیابی رمز عبور' if mail_type == 'recovery' else 'تایید ایمیل', message='',
+                  from_email=settings.EMAIL_HOST_USER,
+                  recipient_list=(user.email,),
+                  fail_silently=True,
+                  html_message=rendered_message)
+
 
 def decode_reset_token(reset_token):
     try:
@@ -416,7 +425,6 @@ class ResetPassword(APIView):
                 status=status.HTTP_200_OK)
         else:
             return Response({'token': 'لینک خراب می باشد'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class VerifyMail(APIView):
