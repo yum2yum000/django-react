@@ -41,6 +41,7 @@ export const mutations = {
 }
 export const actions= {
     login({commit},credentials){
+        console.log('333333',credentials)
        return Service.loginUser(credentials.user).then((res)=>{
             commit('SET_USER_DATA', {userData:res.data,saveLog:credentials.saveLog})
         })

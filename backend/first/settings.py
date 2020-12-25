@@ -40,9 +40,14 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework.authtoken',
+
+    # داکیومنت سازی ای پی ای ها
+    # 'rest_framework_swagger',
     # برای دادن دسترسی به دامینهای دیگر
     'corsheaders',
 
+    # ارسال داده به کلاینت بدون اینکه درخواست کند
+    # 'channels',
     # local
     'post',
 ]
@@ -54,7 +59,12 @@ REST_FRAMEWORK = {
     ),
     'DEFAUKT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    )
+    ),
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.JSONParser',
+    ),
 }
 
 MIDDLEWARE = [
@@ -143,14 +153,24 @@ STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'post.CustomUser'
 
+# SESSION_COOKIE_KEY
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-#from first import mail_info
+try:
+    from first import mail_info
 
-#EMAIL_BACKEND = mail_info.email_backend
-#EMAIL_USE_SSL = mail_info.email_use_ssl
-#EMAIL_HOST = mail_info.email_host
-#EMAIL_PORT = mail_info.email_port
-#EMAIL_HOST_PASSWORD = mail_info.email_host_password
-#EMAIL_HOST_USER = mail_info.email_host_user
+    EMAIL_BACKEND = mail_info.email_backend
+    EMAIL_USE_SSL = mail_info.email_use_ssl
+    EMAIL_HOST = mail_info.email_host
+    EMAIL_PORT = mail_info.email_port
+    EMAIL_HOST_PASSWORD = mail_info.email_host_password
+    EMAIL_HOST_USER = mail_info.email_host_user
+except:
+    pass
+
+JWT_SECRET = 'hEHGOng%y!gUzgS%6mYz'  # secret key
+JWT_ALGORITHM = 'HS256'  # algorithm
+JWT_EXP_DELTA_SECONDS = 86400  # expire time
+

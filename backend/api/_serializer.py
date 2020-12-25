@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
         # fields = '__all__'
         extra_kwargs = {'password': {'write_only': True}, }
         # exclude=['password',]
-        read_only_fields = ('date_joined',)
+        # read_only_fields = ('date_joined',)
         # URL_FIELD_NAME='newurl'
 
     # def create(self, validated_data):

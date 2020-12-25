@@ -28,6 +28,7 @@
                                     <div v-if="$v.user.email.$error">
                                         <p class="text-right error" v-if="!$v.user.email.required"> ایمیل باید وارد شود</p>
                                         <p class="text-right error" v-if="!$v.user.email.email"> ایمیل باید فرمت معتبر باشد</p>
+                                        <p class="text-right error" v-if="!$v.user.email.valid"> ایمیل نمی تواند شامل حروف بزرگ باشد </p>
                                     </div>
                                 </div>
                                 <div class="input-container">
@@ -49,8 +50,10 @@
                             <div class="row row-space">
                                 <div class="input-container">
                                     <div class="input-group">
-                                        <label class="label">شماره تلفن</label>
-                                        <input v-model="user.phone" class="input--style-4" type="text" >
+                                        <BaseInput @blur="$v.user.phone.$touch()"  type="text" inputClass="input--style-4" label="شماره موبایل" v-model="user.phone" ></BaseInput>
+                                    </div>
+                                    <div v-if="$v.user.phone.$error" >
+                                        <p class="text-right error" v-if="!$v.user.phone.valid"> شماره موبایل باید معتبر باشد</p>
                                     </div>
                                 </div>
                                 <div class="input-container">
@@ -80,6 +83,7 @@
 
 <script>
     import Service from '@/services/Service.js'
+    import store from '@/store/store'
     import { required,minLength,email } from 'vuelidate/lib/validators'
     export default {
         name: "Register",
@@ -92,7 +96,18 @@
                         return containsLetter
                     }
                 },
-                email:{required,email}
+                email:{required,email,
+                    valid: function(value) {
+                        const containsLetter = /[A-Z]/.test(value)
+                        return !containsLetter
+                    }
+                },
+                phone:{
+                    valid: function(value) {
+                        const containsLetter = /^09\d{9}$/.test(value)
+                        return containsLetter
+                    }
+                }
 
             }
         },
@@ -114,7 +129,23 @@
                 if (res.status === 200){
                     this.error='ثبت نام با موفقیت انجام شد'
                     setTimeout(()=>{
-                        this.$router.push({name:'login'})
+                        console.log('233',res)
+                        store.dispatch('login/login',{
+                            user:{
+                                username:this.user.username,
+                                password:this.user.password
+                            },
+                            saveLog:null
+                        }).then((res)=>{
+                            console.log('login success',res)
+                            this.$router.push({name:'home'})
+                        }).catch((e)=>{
+                            console.log('login failed',e.response)
+                            if (e.response && e.response.status === 400) {
+                                this.error='رمز عبور یا نام کاربری صحیح نمی باشد'
+
+                            }
+                        })
                     },1000)
                 }
 
@@ -125,6 +156,10 @@
                     if(e.response.data.password)
                     {
                         this.error='رمز عبور قوی انتخاب نمایید'
+                    }
+                    else if(e.response.data.phone)
+                    {
+                        this.error='موبایل باید به طور صحیح وارد شود'
                     }
                     else
                     {

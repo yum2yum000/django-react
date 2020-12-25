@@ -63,6 +63,7 @@
         },
         methods:{
            login(){
+               console.log('45',this.user)
                store.dispatch('login/login',{
                    user:this.user,
                    saveLog:this.saveLog

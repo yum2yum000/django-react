@@ -1,21 +1,25 @@
 import re
-from random import random
+from datetime import timedelta, datetime
 
+import coreapi
+import coreschema
 from django.core.mail import send_mail
 from django.db.models import Q
-from django.db.utils import IntegrityError
 
 from django.contrib.auth import authenticate, password_validation
 from django.contrib.auth.models import update_last_login
 from django.core.validators import EmailValidator, validate_email
 from django.template.loader import get_template
+import jwt
 from rest_framework import viewsets, status, serializers
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework import schemas
 from rest_framework.views import APIView
 
 from api._serializer import UserSerializer, PostSerializer
@@ -49,6 +53,13 @@ from post.models import CustomUser, Post
 
 class CreateUser(generics.CreateAPIView):
     # این دو کلاس به صورت پیش فرش در فایل settings.py تعریف شده است
+    '''
+    post:
+    توضیحات برای داکیومنت
+    get:
+        برای get
+
+    '''
     authentication_classes = ()
     permission_classes = ()
     serializer_class = UserSerializer
@@ -97,8 +108,8 @@ class CreateUser(generics.CreateAPIView):
             return Response({'password': err}, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
-        data = request.data
 
+        data = request.data
         if self.validate(data):
             return self.validate(data)
 
@@ -168,6 +179,11 @@ class LoginOrUpdateProfile(APIView):
                 # اگر نام کاربری درخواستی در دیتابیس نباشد، می توان تغییرداد
                 user.username = data.get('username').lower()
 
+        # phone validate
+        if data.get('phone'):
+            if re.match('^09[0-9]{9}$', data.get('phone')) is None:
+                return Response({'phone': 'Not valid'}, status=status.HTTP_400_BAD_REQUEST)
+
         # email validate
         email = data.get('email').lower()
         if email:
@@ -206,6 +222,7 @@ class LoginOrUpdateProfile(APIView):
         except Exception as err:
             return Response({'password': err}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(request.data.get('password'))
+        user.save()
         return Response({'password': 'updated'}, status=status.HTTP_200_OK)
 
 
@@ -221,10 +238,40 @@ class AllPostList(generics.ListAPIView):
 
 
 class Posts(APIView):
+    '''
+    تست تشریح
+
+    return: str
+
+
+    '''
     permission_classes = (IsAuthenticated,)
+
+    # serializer = PostSerializer
+    # schema = schemas.ManualSchema(fields=[
+    #     coreapi.Field(
+    #         name='title',
+    #         required=True,
+    #         location='form',
+    #         description='new user',
+    #         schema=coreschema.Array(
+    #             description='This is a test description'
+    #         )
+    #     )]
+    # )
 
     # درخواست لیست پست ها
     def get(self, request, post_pk=None):
+        """
+        get document of posts
+        parameters
+        -----
+        request : str
+                *request of client
+        post_pk : int
+                **post primary key
+        return : 200
+        """
         # زمانی که این متد فراخوانی شود یعنی توکن تایید شده است و
         # request.user
         # در دسترس قرار می گیرد.
@@ -323,40 +370,74 @@ class PostSearch(APIView):
 
 
 class PasswordRecovery(APIView):
+    #
+    # def password_generator(self):
+    #     s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
+    #     length = random.randrange(8, 12)
+    #     passowrd = ''
+    #     for p in range(length):
+    #         passowrd += random.choice(s)
+    #     return passowrd
 
-    def password_generator(self):
-        s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
-        length = random.randrange(8, 12)
-        passowrd = ''
-        for p in range(length):
-            passowrd += random.choice(s)
-        return passowrd
+    '''
+
+    :param user_id: user number for account.
+    '''
+
+    def encoded_reset_token(self, user_id):
+        payload = {
+            'user_id': user_id,
+            'exp': datetime.utcnow() + timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS)
+        }
+
+        encoded_data = jwt.encode(
+            payload, settings.JWT_SECRET, settings.JWT_ALGORITHM)
+        return encoded_data.decode('utf-8')
 
     def get(self, request):
         data = request.data
 
+        # try:
+        email = data.get('email').lower()
+        user = CustomUser.objects.get(email=email)
+        # send email
+        # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
+        base_url = 'http://localhost:8000/reset-password/'
+        url = base_url + self.encoded_reset_token(user_id=user.id)
+        rendered_message = get_template('password_recovery.html').render({
+            'url': url, 'username': user.username
+        })
+
+        # fail_silently=True
+        # پیش فرض False
+        # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
+        # smtplib.SMTPException
+        #
+        # hmtl_message
+        # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
+        # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
+        send_mail(subject='بازیابی رمز عبور', message='', from_email=settings.EMAIL_HOST_USER,
+                  recipient_list=(email,),
+                  fail_silently=True,
+                  html_message=rendered_message)
+        return Response({'email': 'sent'}, status=status.HTTP_200_OK)
+
+    # except:
+    #     return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class ResetPassword(APIView):
+
+    def decode_reset_token(self, reset_token):
         try:
-            email = data.get('email').lower()
-            user = CustomUser.objects.get(email=email)
-            # send email
-            # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
-            password = self.password_generator()
-            user.set_password(password)
-            rendered_message = get_template('password_recovery.html').render({
-                'password': password, 'username': user.username
-            })
-            # fail_silently=True
-            # پیش فرض False
-            # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
-            # smtplib.SMTPException
-            #
-            # hmtl_message
-            # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
-            # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
-            send_mail(subject='بازیابی رمز عبور', message='', from_email=settings.EMAIL_HOST_USER,
-                      recipient_list=(email,),
-                      fail_silently=True,
-                      html_message=rendered_message)
-            return Response({'email': 'sent'}, status=status.HTTP_200_OK)
-        except:
-            return Response({'email': 'email does not exists'}, status=status.HTTP_404_NOT_FOUND)
+            decoded_data = jwt.decode(reset_token, settings.JWT_SECRET,
+                                      algorithms=[settings.JWT_ALGORITHM])
+        except (jwt.DecodeError, jwt.ExpiredSignatureError):
+            return None  # means expired token
+
+        return decoded_data['user_id']
+
+    def get(self, request, decoded_id):
+        id = self.decode_reset_token(decoded_id)
+        return Response({'id': id, 'token': Token.objects.get(user_id=id).key},
+                        status=status.HTTP_200_OK if id else status.HTTP_400_BAD_REQUEST)
