@@ -6,7 +6,8 @@ import Register from './views/Register.vue'
 import Login from './views/Login.vue'
 import ProfileEdit from './views/profile/ProfileEdit.vue'
 import ProfileChangepassword from './views/profile/ProfileChangepassword.vue'
-import PostCreate from './views/profile/PostCreate.vue'
+import PostCreate from './views/profile/post/PostCreate.vue'
+import PostLists from './views/profile/post/PostLists.vue'
 import Profile from './views/profile/Profile.vue'
 //
 // import Loading from 'vue-loading-overlay';
@@ -60,6 +61,12 @@ const router = new Router({
                     path: 'create',
                     name: 'postCreate',
                     component: PostCreate,
+                    props:true,
+                },
+                {
+                    path: 'list',
+                    name: 'postLists',
+                    component: PostLists,
                     props:true,
                 }
 

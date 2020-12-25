@@ -10,13 +10,13 @@
                         <p class="firstname d-inline-block">{{username}}</p></li>
                 </ul>
                 <div class="row">
-                    <div class=" half col-6">
-                    <router-link :to="{name:'profileEdit'}">
+                    <div class=" half col-6" >
+                    <router-link  :to="{name:'profileEdit'}">
                         ویرایش پروفایل
                     </router-link>
                   </div>
-                    <div class=" half col-6">
-                        <router-link :to="{name:'profileChangepassword'}">
+                    <div  class=" half col-6">
+                        <router-link  :to="{name:'profileChangepassword'}">
                            تغییر رمز عبور
                         </router-link>
                     </div>
@@ -25,13 +25,18 @@
 
             <div class="dashCard menu">
                 <ul>
-                    <li @click="meh" class="showmenu2 active" >
+                    <li @click="this.show=!this.show" class="showmenu2 active" >
                             منوی حساب کاربری
                       </li>
                     <div class="menu" v-show="show">
-                        <li>
+                        <li  :class="[currentPage.includes('/profile/create')?'active':'']">
                             <router-link :to="{name:'postCreate'}">
                          ایجاد پست
+                            </router-link>
+                        </li>
+                        <li :class="[currentPage.includes('/profile/list')?'active':'']">
+                            <router-link :to="{name:'postLists'}" >
+                         لیست پست ها
                             </router-link>
                         </li>
 
@@ -49,17 +54,21 @@
         name: "Sidebar",
         data(){
             return{
-                show:true
+                show:true,
+
             }
         },
         methods:{
-            meh(){
-                this.show=!this.show
-                console.log(this.show)
-            }
+
+        },
+        mounted(){
+            this.currentPage
         },
         computed:{
-            ...mapGetters('login', ['username'])
+            ...mapGetters('login', ['username']),
+            currentPage () {
+                return this.$route.path
+            }
         }
     }
 </script>

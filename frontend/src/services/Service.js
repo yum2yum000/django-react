@@ -15,6 +15,9 @@ export default {
         return apiClient.put('/users/login/',{update:''})
 
     },
+    getPosts(){
+        return apiClient.get('/posts/user/')
+    },
     updateUser(data){
         return apiClient.put('/users/login/',{update:'data',...data
         })
@@ -31,6 +34,9 @@ export default {
     },
     createPost(post){
         return apiClient.post('/posts/user/',post)
+    },
+    deletePost(id){
+        return apiClient.delete('posts/user/'+id)
     },
 
     removeProduct(id) {

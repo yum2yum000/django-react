@@ -2,20 +2,18 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fa73f143-4358-47db-b59f-bbd41808a43b" name="Default Changelist" comment="Merge branch 'master' of https://github.com/yum2yum000/django-react&#10;# Please enter a commit message to explain why this merge is necessary,&#10;# especially if it merges an updated upstream into a topic branch.&#10;#&#10;# Lines starting with '#' will be ignored, and an empty message aborts&#10;# the commit.">
-      <change afterPath="$PROJECT_DIR$/frontend/src/services/config.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/views/profile/PostCreate.vue" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/views/profile/ProfileChangepassword.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/Modal/DeleteModal.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/post/PostList.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/post/PostPreview.vue" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/views/profile/post/PostLists.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/assets/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/assets/css/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/profile/Sidebar.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/profile/Sidebar.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/main.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/router.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/router.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/services/Service.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/services/Service.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/store/modules/login.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/store/modules/login.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/Login.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Login.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/Register.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/Register.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/profile/ProfileEdit.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/profile/ProfileEdit.vue" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/profile/ProfileUser.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/profile/PostCreate.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/profile/post/PostCreate.vue" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -40,44 +38,28 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/ProfileEdit.vue">
+        <entry file="file://$PROJECT_DIR$/frontend/src/store/modules/login.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2054">
-              <caret line="129" column="12" selection-start-line="129" selection-start-column="12" selection-end-line="129" selection-end-column="12" />
-              <folding>
-                <element signature="e#3095#3152#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="224">
+              <caret line="34" column="6" selection-start-line="34" selection-start-column="6" selection-end-line="34" selection-end-column="6" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/frontend/src/components/profile/Sidebar.vue">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="63">
-              <caret line="31" column="28" lean-forward="true" selection-start-line="31" selection-start-column="28" selection-end-line="31" selection-end-column="28" />
+            <state relative-caret-position="192">
+              <caret line="68" column="28" selection-start-line="68" selection-start-column="28" selection-end-line="68" selection-end-column="28" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/PostCreate.vue">
+        <entry file="file://$PROJECT_DIR$/frontend/src/components/Modal/DeleteModal.vue">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="283">
-              <caret line="73" column="47" selection-start-line="73" selection-start-column="47" selection-end-line="73" selection-end-column="47" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/ProfileChangepassword.vue">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="588">
-              <caret line="80" column="12" selection-start-line="80" selection-start-column="12" selection-end-line="80" selection-end-column="12" />
-              <folding>
-                <element signature="n#div#0;n#template#0;n#!!top" />
-                <element signature="e#1216#1267#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="105">
+              <caret line="5" column="15" lean-forward="true" selection-start-line="5" selection-start-column="15" selection-end-line="5" selection-end-column="15" />
             </state>
           </provider>
         </entry>
@@ -85,8 +67,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/frontend/src/views/Login.vue">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="207">
-              <caret line="60" column="33" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="33" />
+            <state relative-caret-position="-192">
+              <caret line="45" column="3" lean-forward="true" selection-start-line="45" selection-start-column="3" selection-end-line="45" selection-end-column="37" />
             </state>
           </provider>
         </entry>
@@ -94,8 +76,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/frontend/src/router.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="515">
-              <caret line="60" column="37" lean-forward="true" selection-start-line="60" selection-start-column="27" selection-end-line="60" selection-end-column="37" />
+            <state relative-caret-position="393">
+              <caret line="70" column="17" lean-forward="true" selection-start-line="70" selection-start-column="17" selection-end-line="70" selection-end-column="17" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
                 <element signature="e#93#136#0" expanded="true" />
@@ -105,34 +87,19 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/frontend/src/views/Register.vue">
+        <entry file="file://$PROJECT_DIR$/frontend/src/components/post/PostList.vue">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="177">
-              <caret line="57" column="73" lean-forward="true" selection-start-line="57" selection-start-column="39" selection-end-line="57" selection-end-column="73" />
-              <folding>
-                <element signature="e#4953#4996#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="172">
+              <caret line="11" column="59" selection-start-line="11" selection-start-column="59" selection-end-line="11" selection-end-column="59" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/Profile.vue">
+        <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/post/PostCreate.vue">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="483">
-              <caret line="24" column="10" lean-forward="true" selection-start-line="24" selection-start-column="10" selection-end-line="24" selection-end-column="10" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/frontend/src/components/Navbar.vue">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="923">
-              <caret line="49" column="12" selection-start-line="49" selection-start-column="12" selection-end-line="49" selection-end-column="48" />
-              <folding>
-                <element signature="e#2923#2954#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="317">
+              <caret line="50" column="47" lean-forward="true" selection-start-line="50" selection-start-column="3" selection-end-line="50" selection-end-column="47" />
             </state>
           </provider>
         </entry>
@@ -140,8 +107,32 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/frontend/src/services/Service.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="453">
-              <caret line="32" column="49" selection-start-line="32" selection-start-column="49" selection-end-line="32" selection-end-column="49" />
+            <state relative-caret-position="395">
+              <caret line="37" column="14" selection-start-line="37" selection-start-column="4" selection-end-line="37" selection-end-column="14" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/post/PostLists.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="40">
+              <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
+              <folding>
+                <element signature="e#432#475#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/frontend/src/components/post/PostPreview.vue">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="46">
+              <caret line="12" column="74" lean-forward="true" selection-start-line="12" selection-start-column="32" selection-end-line="12" selection-end-column="74" />
+              <folding>
+                <element signature="n#style#0;n#i#0;n#div#0;n#div#0;n#template#0;n#!!top" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -169,7 +160,6 @@
       <find>input-g</find>
       <find>navbar</find>
       <find>absolute</find>
-      <find>dashCard</find>
       <find>dashCard:be</find>
       <find>home</find>
       <find>.dashCard .firstname</find>
@@ -178,7 +168,9 @@
       <find>data</find>
       <find>username</find>
       <find>ge</find>
+      <find>dashCard</find>
       <find>body</find>
+      <find>menu2</find>
     </findStrings>
     <replaceStrings>
       <replace>input-container</replace>
@@ -208,26 +200,31 @@
         <option value="$PROJECT_DIR$/frontend/src/views/Home.vue" />
         <option value="$PROJECT_DIR$/frontend/src/App.vue" />
         <option value="$PROJECT_DIR$/frontend/src/components/Navbar.vue" />
-        <option value="$PROJECT_DIR$/frontend/src/assets/css/style.css" />
         <option value="$PROJECT_DIR$/backend/first/urls.py" />
         <option value="$PROJECT_DIR$/backend/first/settings.py" />
         <option value="$PROJECT_DIR$/frontend/src/components/profile/ContentSide.vue" />
         <option value="$PROJECT_DIR$/frontend/src/views/profile/Profile.vue" />
         <option value="$PROJECT_DIR$/frontend/src/views/profile/ProfileUser.vue" />
-        <option value="$PROJECT_DIR$/frontend/src/store/modules/login.js" />
         <option value="$PROJECT_DIR$/frontend/src/services/axiosConfig.js" />
         <option value="$PROJECT_DIR$/frontend/src/main.js" />
         <option value="$PROJECT_DIR$/frontend/src/views/profile/ChangePassword.vue" />
         <option value="$PROJECT_DIR$/frontend/src/views/Register.vue" />
         <option value="$PROJECT_DIR$/frontend/src/views/profile/ProfilePostCreate.vue" />
         <option value="$PROJECT_DIR$/frontend/src/views/profile/PosteCreate.vue" />
-        <option value="$PROJECT_DIR$/frontend/src/router.js" />
-        <option value="$PROJECT_DIR$/frontend/src/services/Service.js" />
         <option value="$PROJECT_DIR$/frontend/src/views/Login.vue" />
         <option value="$PROJECT_DIR$/frontend/src/views/profile/ProfileChangepassword.vue" />
         <option value="$PROJECT_DIR$/frontend/src/views/profile/ProfileEdit.vue" />
         <option value="$PROJECT_DIR$/frontend/src/views/profile/PostCreate.vue" />
+        <option value="$PROJECT_DIR$/frontend/src/router.js" />
+        <option value="$PROJECT_DIR$/frontend/src/assets/css/style.css" />
+        <option value="$PROJECT_DIR$/frontend/src/components/post/PostPreview.js" />
+        <option value="$PROJECT_DIR$/frontend/src/services/Service.js" />
+        <option value="$PROJECT_DIR$/frontend/src/components/post/PostList.vue" />
+        <option value="$PROJECT_DIR$/frontend/src/views/profile/post/PostLists.vue" />
+        <option value="$PROJECT_DIR$/frontend/src/store/modules/login.js" />
         <option value="$PROJECT_DIR$/frontend/src/components/profile/Sidebar.vue" />
+        <option value="$PROJECT_DIR$/frontend/src/components/Modal/DeleteModal.vue" />
+        <option value="$PROJECT_DIR$/frontend/src/components/post/PostPreview.vue" />
       </list>
     </option>
   </component>
@@ -271,13 +268,6 @@
               <item name="python" type="462c0819:PsiDirectoryNode" />
               <item name="frontend" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="python" type="b2602c69:ProjectViewProjectNode" />
-              <item name="python" type="462c0819:PsiDirectoryNode" />
-              <item name="frontend" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="components" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -286,21 +276,7 @@
               <item name="frontend" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="components" type="462c0819:PsiDirectoryNode" />
-              <item name="profile" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="python" type="b2602c69:ProjectViewProjectNode" />
-              <item name="python" type="462c0819:PsiDirectoryNode" />
-              <item name="frontend" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="mixins" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="python" type="b2602c69:ProjectViewProjectNode" />
-              <item name="python" type="462c0819:PsiDirectoryNode" />
-              <item name="frontend" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="services" type="462c0819:PsiDirectoryNode" />
+              <item name="Modal" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="python" type="b2602c69:ProjectViewProjectNode" />
@@ -332,6 +308,15 @@
               <item name="views" type="462c0819:PsiDirectoryNode" />
               <item name="profile" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="python" type="b2602c69:ProjectViewProjectNode" />
+              <item name="python" type="462c0819:PsiDirectoryNode" />
+              <item name="frontend" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="views" type="462c0819:PsiDirectoryNode" />
+              <item name="profile" type="462c0819:PsiDirectoryNode" />
+              <item name="post" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
@@ -348,16 +333,17 @@
     <property name="settings.editor.selected.configurable" value="settings.github" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src\assets\images" />
-      <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src\store" />
-      <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src\components" />
-      <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src" />
-      <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src\assets" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src\views\profile\post" />
       <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src\views\profile" />
       <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src\components" />
+      <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src\assets\images" />
+      <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src\store" />
+      <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src" />
+      <recent name="C:\Users\HAMED\Desktop\Vue\python\frontend\src\assets" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -388,7 +374,7 @@
       <workItem from="1608371398567" duration="151000" />
       <workItem from="1608393201635" duration="25277000" />
       <workItem from="1608462121859" duration="78661000" />
-      <workItem from="1608734814055" duration="21464000" />
+      <workItem from="1608734814055" duration="46611000" />
     </task>
     <task id="LOCAL-00001" summary="Merge branch 'master' of https://github.com/yum2yum000/django-react&#10;# Please enter a commit message to explain why this merge is necessary,&#10;# especially if it merges an updated upstream into a topic branch.&#10;#&#10;# Lines starting with '#' will be ignored, and an empty message aborts&#10;# the commit.">
       <created>1608325993026</created>
@@ -415,7 +401,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="184821000" />
+    <option name="totallyTimeSpent" value="209968000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -430,7 +416,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21140939" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20872483" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -442,8 +428,8 @@
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3286119" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
-      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.49932885" weight="0.26487252" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50067115" side_tool="true" weight="0.3286119" />
+      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.4986577" weight="0.37252125" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5013423" side_tool="true" weight="0.37252125" />
       <window_info anchor="bottom" id="Messages" order="11" />
       <window_info anchor="bottom" id="Version Control" order="12" sideWeight="0.49932885" weight="0.3286119" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -452,7 +438,7 @@
       <window_info anchor="right" id="Database" order="3" weight="0.3295302" />
     </layout>
     <layout-to-restore>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.21140939" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20872483" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -464,8 +450,8 @@
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3286119" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="8" />
-      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.49932885" weight="0.26487252" />
-      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50067115" side_tool="true" weight="0.3286119" />
+      <window_info anchor="bottom" id="Terminal" order="9" sideWeight="0.4986577" visible="true" weight="0.37252125" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5013423" side_tool="true" weight="0.37252125" />
       <window_info anchor="bottom" id="Messages" order="11" />
       <window_info anchor="bottom" id="Version Control" order="12" sideWeight="0.49932885" weight="0.3286119" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -522,16 +508,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="Merge branch 'master' of https://github.com/yum2yum000/django-react&#10;# Please enter a commit message to explain why this merge is necessary,&#10;# especially if it merges an updated upstream into a topic branch.&#10;#&#10;# Lines starting with '#' will be ignored, and an empty message aborts&#10;# the commit." />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/backend/static/index.html" />
-    <entry file="file://$PROJECT_DIR$/backend/static/main.js" />
-    <entry file="file://$PROJECT_DIR$/backend/static/js/app.js" />
-    <entry file="file://$PROJECT_DIR$/frontend/vue.config.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="42">
-          <caret line="2" column="1" lean-forward="true" selection-start-line="2" selection-start-column="1" selection-end-line="2" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/AppData/Local/Temp/Rar$DRa0.234/django-react-master/backend/first/urls.py" />
     <entry file="file://$USER_HOME$/AppData/Local/Temp/Rar$DRa0.748/django-react-master/backend/first/settings.py" />
     <entry file="file://$PROJECT_DIR$/backend/templates/base.html" />
@@ -660,13 +636,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/src/assets/css/style.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="1660" column="32" selection-start-line="1660" selection-start-column="32" selection-end-line="1660" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/frontend/src/store/store.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="210">
@@ -712,13 +681,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/src/store/modules/login.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="329">
-          <caret line="18" column="20" selection-start-line="18" selection-start-column="20" selection-end-line="18" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/frontend/src/services/config.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="273">
@@ -743,16 +705,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/src/components/Navbar.vue">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="923">
-          <caret line="49" column="12" selection-start-line="49" selection-start-column="12" selection-end-line="49" selection-end-column="48" />
-          <folding>
-            <element signature="e#2923#2954#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/ProfilePostCreate.vue">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="21">
@@ -767,31 +719,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/src/router.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="515">
-          <caret line="60" column="37" lean-forward="true" selection-start-line="60" selection-start-column="27" selection-end-line="60" selection-end-column="37" />
-          <folding>
-            <element signature="e#0#21#0" expanded="true" />
-            <element signature="e#93#136#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/src/services/Service.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="453">
-          <caret line="32" column="49" selection-start-line="32" selection-start-column="49" selection-end-line="32" selection-end-column="49" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/src/views/Login.vue">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="207">
-          <caret line="60" column="33" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/ProfileChangepassword.vue">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="588">
@@ -799,16 +726,6 @@
           <folding>
             <element signature="n#div#0;n#template#0;n#!!top" />
             <element signature="e#1216#1267#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/ProfileEdit.vue">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2054">
-          <caret line="129" column="12" selection-start-line="129" selection-start-column="12" selection-end-line="129" selection-end-column="12" />
-          <folding>
-            <element signature="e#3095#3152#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -823,17 +740,111 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/PostCreate.vue">
+    <entry file="file://$PROJECT_DIR$/frontend/src/assets/css/style.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="283">
-          <caret line="73" column="47" selection-start-line="73" selection-start-column="47" selection-end-line="73" selection-end-column="47" />
+        <state relative-caret-position="399">
+          <caret line="1698" lean-forward="true" selection-start-line="1698" selection-end-line="1698" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/ProfileEdit.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="21">
+          <caret line="1" column="23" selection-start-line="1" selection-start-column="23" selection-end-line="1" selection-end-column="23" />
+          <folding>
+            <element signature="n#div#0;n#template#0;n#!!top" />
+            <element signature="e#3095#3152#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/src/components/Navbar.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="48" column="8" selection-start-line="48" selection-start-column="8" selection-end-line="50" selection-end-column="10" />
+          <folding>
+            <element signature="e#2923#2954#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/src/services/Service.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="395">
+          <caret line="37" column="14" selection-start-line="37" selection-start-column="4" selection-end-line="37" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/src/store/modules/login.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="34" column="6" selection-start-line="34" selection-start-column="6" selection-end-line="34" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/post/PostCreate.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="317">
+          <caret line="50" column="47" lean-forward="true" selection-start-line="50" selection-start-column="3" selection-end-line="50" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/src/router.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="393">
+          <caret line="70" column="17" lean-forward="true" selection-start-line="70" selection-start-column="17" selection-end-line="70" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#21#0" expanded="true" />
+            <element signature="e#93#136#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/src/views/Login.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-192">
+          <caret line="45" column="3" lean-forward="true" selection-start-line="45" selection-start-column="3" selection-end-line="45" selection-end-column="37" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/frontend/src/components/profile/Sidebar.vue">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="63">
-          <caret line="31" column="28" lean-forward="true" selection-start-line="31" selection-start-column="28" selection-end-line="31" selection-end-column="28" />
+        <state relative-caret-position="192">
+          <caret line="68" column="28" selection-start-line="68" selection-start-column="28" selection-end-line="68" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/src/views/profile/post/PostLists.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="40">
+          <caret line="17" column="8" selection-start-line="17" selection-start-column="8" selection-end-line="17" selection-end-column="8" />
+          <folding>
+            <element signature="e#432#475#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/src/components/Modal/DeleteModal.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="5" column="15" lean-forward="true" selection-start-line="5" selection-start-column="15" selection-end-line="5" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/src/components/post/PostList.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="172">
+          <caret line="11" column="59" selection-start-line="11" selection-start-column="59" selection-end-line="11" selection-end-column="59" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/src/components/post/PostPreview.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="46">
+          <caret line="12" column="74" lean-forward="true" selection-start-line="12" selection-start-column="32" selection-end-line="12" selection-end-column="74" />
+          <folding>
+            <element signature="n#style#0;n#i#0;n#div#0;n#div#0;n#template#0;n#!!top" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

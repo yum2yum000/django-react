@@ -4,6 +4,7 @@ export const namespaced = true
 export const state = {
     user: null,
     username:'',
+    posts:[]
 
 }
 export const mutations = {
@@ -19,9 +20,6 @@ export const mutations = {
                     sessionStorage.setItem('user', JSON.stringify(credentials.userData))
                 }
         }
-        // axios.defaults.headers.common['Authorization'] = `Token ${
-        //     credentials.userData.token
-        //     }`
         Service.setToken(credentials.userData.token)
     },
     CLEAR_USER_DATA () {
@@ -31,13 +29,19 @@ export const mutations = {
     },
     SET_USERNAME(state,username){
         state.username=username
+    },
+    SET_POSTS(state,posts){
+        state.posts=posts
+    },
+    DELETE_POST(state,id){
+       let index= state.posts.findIndex(item=>item.id==id)
+        state.posts.splice(index,1)
     }
 
 }
 export const actions= {
     login({commit},credentials){
        return Service.loginUser(credentials.user).then((res)=>{
-           console.log('455',res)
             commit('SET_USER_DATA', {userData:res.data,saveLog:credentials.saveLog})
         })
 
@@ -46,9 +50,25 @@ export const actions= {
         commit('CLEAR_USER_DATA')
     },
     setUsername({commit},username){
-        console.log('kkkkl',username)
         commit('SET_USERNAME',username)
+    },
+     deletePost({commit},id){
+         return Service.deletePost(id)
+             .then(() => {
+
+                 commit('DELETE_POST', id)
+             })
+             .catch(error => {
+                 console.log(error)
+
+             })
+    },
+    getPosts ({ commit }) {
+        return Service.getPosts().then((res)=>{
+            commit('SET_POSTS',res.data)
+        })
     }
+
 }
 export const getters= {
     loggedIn (state) {
@@ -56,5 +76,8 @@ export const getters= {
     },
     username(state){
         return state.username
+    },
+    posts(state){
+        return state.posts
     }
 }
