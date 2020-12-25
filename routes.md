@@ -38,7 +38,6 @@ user:{
             password:'password',
         },
         receive:{
-            id:'user id',
             token:'token string',
             status:200,
             error_status:400
@@ -47,7 +46,7 @@ user:{
     //edit profile
     //login_required
     profile:{
-        uri:'users/login/',
+        uri:'users/profile/',
         method:'PUT',
         send:{
             update:'password','data', None

@@ -41,6 +41,7 @@ schema_view = get_schema_view(
     urlconf='api.urls',
 )
 
+
 urlpatterns = [
     path('', include('api.urls'), name='apies'),
     path('admin/', admin.site.urls),

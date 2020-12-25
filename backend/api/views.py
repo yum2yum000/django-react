@@ -22,11 +22,6 @@ from post.models import CustomUser, Post
 
 class CreateUser(generics.CreateAPIView):
     '''
-    post:
-    توضیحات برای داکیومنت
-    get:
-        برای get
-
     '''
     # این دو کلاس به صورت پیش فرش در فایل settings.py تعریف شده است
     # authentication_classes = ()
@@ -34,13 +29,11 @@ class CreateUser(generics.CreateAPIView):
     serializer_class = UserSerializer
 
     def create(self, request, *args, **kwargs):
-
         data = request.data
-
         # phone validate
         phone = request.data.get('phone')
         if phone is not None and re.match('^09[0-9]{9}$', phone) is None:
-            return Response(data={'phone': 'phone format is invalid'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'phone': 'شماره تلفن صحیح نمی باشد'}, status=status.HTTP_400_BAD_REQUEST)
 
         # email validate
         email = request.data.get('email')
@@ -48,15 +41,17 @@ class CreateUser(generics.CreateAPIView):
             try:
                 user = CustomUser.objects.get(email=email)
                 # اگر ایمیل ارسالی در حافظه باشد
-                return Response(data={'email': 'Duplicate'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                return Response(data={'email': 'این ایمیل ثبت شده است.'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             except:
+                # ایمیل نباشد یا بیش از یک بار تکرار شده باشد این بخش اجرا می شود
+                # تکرار بیش از یک بار امکان ندارد مگر با دستکاری دستی دیتابیس
                 pass
         else:
             # اگر ایمیل ارسال نشود
-            return Response(data={'email': 'required'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(data={'email': 'ایمیل الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            # ایمیل ذخیره نمی شود
-            # بعد از تایید ایمیل، در دیتابیس ذخیره می شود
+            # ایمیل بعد از تایید در دیتابیس ذخیره می شود
             user = CustomUser(
                 username=data.get('username'),
                 first_name=data.get('first_name'),
@@ -80,34 +75,43 @@ class CreateUser(generics.CreateAPIView):
             data = self.get_serializer(user).data
             return Response({'user': data})
         except:
-            return Response({'format': 'enter valid data'}, status=status.HTTP_400_BAD_REQUEST)
+            # احتمالا نام کاربری وارد نشده است
+            return Response({'format': 'نام کاربری و رمز عبور الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginUser(APIView):
+    '''
+    با دادن نام کاربری و رمز عبور، توکن مربوطه دریافت می شود
+    '''
     serializer_class = UserSerializer
 
     # لاگین شدن
     def post(self, request):
+        '''
+        ارسال نام کاربری و رمز عبور
+        '''
         username = request.data.get('username')
         password = request.data.get('password')
         user = authenticate(username=username, password=password)
         if user:
             update_last_login(None, user)
-            return Response({'token': user.auth_token.key, 'id': user.id}, status=status.HTTP_200_OK)
+            return Response({'token': user.auth_token.key}, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'Wrong Credentials'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'نام کاربری یا رمز عبور اشتباه می باشد'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProfileUser(APIView):
+    '''
+    استفاده و ویرایش پروفایل کاربر
+    --------
+    به لاگین نیاز دارد
+    '''
     serializer_class = UserSerializer
     # دسترسی توسط توکن
     permission_classes = (IsAuthenticated,)
 
     # اپدیت پروفایل
     def put(self, request):
-        # توکن ارسالی مربوط به ایدی ارسالی می باشد و این کاربر مجاز به تغییرات در پروفایل است
-        # if request.data.get('phone').isdigit() is not True:
-        #     raise serializers.ValidationError({'error': 'Phone is not digit'})
         # با استفاده از توکن ارسالی کاربر تشخیص داده شده است.
         # پس امکان ندارد کاربری وجود نداشته باشد
         try:
@@ -160,6 +164,7 @@ class ProfileUser(APIView):
             try:
                 # ایمیل تکراری است
                 # اگر ایمیل وارد شده مربوط به کاربر حاضر نباشد. نمی توان این ایمیل را به کاربر دیگر تخصیص داد پس
+                email = email.strip()
                 if CustomUser.objects.get(email=email).id != user.id:
                     return Response({'email': 'email does exists'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             except:
@@ -167,7 +172,6 @@ class ProfileUser(APIView):
                 pass
             try:
                 validate_email(email)
-                user.email = email
             except Exception as err:
                 # فرمت ایمیل درست نیست
                 return Response({'email': err}, status=status.HTTP_400_BAD_REQUEST)
@@ -181,7 +185,12 @@ class ProfileUser(APIView):
         user.bio = data.get('bio') or user.bio
         user.avatar = data.get('avatar') or user.avatar
         user.phone = data.get('phone') or user.phone
-        user.email = data.get('email') or user.email
+        # ایمیل تغییر یافته باید دوباره تایید شود
+        if email and (user.email != email):
+            # ایمیل مقداری پر و خالی می تواند داشته باشد
+            user.email = email
+            SendMail.send(user, mail_type='veify')
+            user.email = ''
         user.save()
         return Response(data={'data': 'updated', "user": UserSerializer(user).data}, status=status.HTTP_200_OK)
 
@@ -196,28 +205,20 @@ class ProfileUser(APIView):
 
 
 class AllPostList(generics.ListAPIView):
+    '''
+    لیست همه ی پست ها
+    ---
+    بدون نیاز به لاگین
+    '''
     serializer_class = PostSerializer
     queryset = Post.objects.all()
 
 
 class Posts(APIView):
     '''
-    تست تشریح
+    کار با پستهای یوزر خاص
     '''
     permission_classes = (IsAuthenticated,)
-
-    # serializer = PostSerializer
-    # schema = schemas.ManualSchema(fields=[
-    #     coreapi.Field(
-    #         name='title',
-    #         required=True,
-    #         location='form',
-    #         description='new user',
-    #         schema=coreschema.Array(
-    #             description='This is a test description'
-    #         )
-    #     )]
-    # )
 
     # درخواست لیست پست ها
     def get(self, request, post_pk=None):
@@ -321,6 +322,7 @@ class PasswordRecovery(APIView):
     def get(self, request):
         data = request.data
         try:
+            # اگر ایمیل ثبت شده باشد
             email = data.get('email')
             user = CustomUser.objects.get(email=email)
             SendMail.send(user=user, mail_type='recovery')
@@ -351,21 +353,24 @@ class SendMail:
     def send(user, mail_type='verify'):
         # send email
         # مقادیر ارسالی مانند رمز عبور جدید و... را در قالب template قرار می دهد.
-        if mail_type == 'recovery':
-            base_url = 'http://localhost:8000/reset-password/'
-            url = base_url + SendMail.encoded_reset_token(data=user.id, mail_type='recovery')
-            rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
-                'url': url, 'username': user.username, 'mail_type': mail_type
-            })
-        else:
-            # verify
-            base_url = 'http://localhost:8000/mail-verify/'
-            # ایدی و ایمیل برای تایید ایمیل لازم است. زمانی که کاربر لاگین نباشد و بخواهید ایمیلش را تایید کند، ایدی به کار می آید
-            url = base_url + SendMail.encoded_reset_token(data={'id': user.id, 'email': user.email}, mail_type='verify')
-            rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
-                'url': url, 'username': user.username, 'mail_type': mail_type
-            })
-
+        # خط زیر برای تست فرانت اند کار قرار داده شده است
+        try:
+            if mail_type == 'recovery':
+                base_url = 'http://localhost:8000/reset-password/'
+                url = base_url + SendMail.encoded_reset_token(data=user.username, mail_type='recovery')
+                rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
+                    'url': url, 'username': user.username, 'mail_type': mail_type
+                })
+            else:
+                # verify
+                base_url = 'http://localhost:8000/mail-verify/'
+                # ایدی و ایمیل برای تایید ایمیل لازم است. زمانی که کاربر لاگین نباشد و بخواهید ایمیلش را تایید کند، ایدی به کار می آید
+                url = base_url + SendMail.encoded_reset_token(data={'username': user.username, 'email': user.email}, mail_type='verify')
+                rendered_message = get_template('verify_pass_or_recovery_mail.html').render({
+                    'url': url, 'username': user.username, 'mail_type': mail_type
+                })
+        except:
+            pass
         # fail_silently=True
         # پیش فرض False
         # اگر مقدار این False باشد، خطاهایی که هنگام ارسال ایمیل می تواند رخ دهد را نشان می دهد.
@@ -374,6 +379,7 @@ class SendMail:
         # hmtl_message
         # اگر متن پیام از طریق این ارسال شود، به صورت یک سند html فرض شده، و تگهای html و کدهای css در ایمیل اجرا خواهند شد
         # اگر از طریق این ارسال نشود، تگها و کدها خود جزوی از متن پیام اسلی تلقی می شود.
+
         send_mail(subject='بازیابی رمز عبور' if mail_type == 'recovery' else 'تایید ایمیل', message='',
                   from_email=settings.EMAIL_HOST_USER,
                   recipient_list=(user.email,),
@@ -397,14 +403,15 @@ class ResetPassword(APIView):
     '''
 
     def get(self, request, decoded_str):
-        id = decode_reset_token(decoded_str)
+        username = decode_reset_token(decoded_str)
         if id:
 
             # باید به یک صفحه ی پسورد جدید ریدایرکت شود
-            return Response({'id': id, 'token': Token.objects.get(user_id=id).key},
-                            status=status.HTTP_200_OK)
+            return Response(
+                {'username': username, 'token': Token.objects.get(user_id=CustomUser.objects.get(username=username).id).key},
+                status=status.HTTP_200_OK)
         else:
-            return Response({}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'token': 'لینک خراب می باشد'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class VerifyMail(APIView):
@@ -417,24 +424,23 @@ class VerifyMail(APIView):
         '''
         data = decode_reset_token(decoded_str)
         if data:
-            user_id = data['id']
+            user_username = data['username']
             user_mail = data['email']
-            user = CustomUser.objects.get(id=user_id)
+            user = CustomUser.objects.get(username=user_username)
             try:
                 CustomUser.objects.get(email=user_mail)
                 # اگر برای یک ایمیل دو کاربر درخواست کند و قبل از اینکه کاربر اول ایمیل را ثبت کند کاربر دوم درخواست دهد
                 # به همریختگی ایجاد می شود
                 # در اینحالت هر کاربری که ایمیل را زودتر ثبت کند، به نام آن است
-                #اگر فقط یک بار ثبت شده باشد خطا را نشان بده
-                return Response(data={'emial': 'This email is registred'}, status=status.HTTP_406_NOT_ACCEPTABLE)
+                # اگر فقط یک بار ثبت شده باشد خطا را نشان بده
+                return Response(data={'emial': 'این ایمیل ثبت شده است.'}, status=status.HTTP_406_NOT_ACCEPTABLE)
             except:
-                #زمانی که صفر بار یا بیش از یک بار ثبت شده باشد این بخش اجرا می شود
-                #امکان ثبت بیش از یک بار وجود ندارد
-                #مگر دستکاری دستی دیتابیس
+                # اگر ایمیل ارسال شده برای تایید ایمیل دوبار اجرا شود یا کس دیگری این ایمیل را ثبت کرده باشد
+                # دیگر قابل اجرا نخواهد بود
                 pass
             user.email = user_mail
             user.save()
             # باید به صفحه ی ایمیل تایید شد، ریدایرکت شود
-            return Response({})
+            return Response({'email': 'باید به صفحه ی تایید ایمیل ریدایرکت کنم'}, status=status.HTTP_200_OK)
         # لینک دستکاری یا منقضی شده
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'email': 'لینک تایید ایمیل خراب می باشد'}, status=status.HTTP_404_NOT_FOUND)
