@@ -91,8 +91,6 @@ class CreateUser(generics.CreateAPIView):
 
 class LoginUser(APIView):
     '''
-    با دادن نام کاربری و رمز عبور، توکن مربوطه دریافت می شود
-    برای لاگین یوزر استفاده می شود
     نام کاربری و رمز عبور ارسال شده، توکن مربوطه دریافت می شود
     '''
     serializer_class = UserSerializer
@@ -425,6 +423,7 @@ class ResetPassword(APIView):
                 status=status.HTTP_200_OK)
         else:
             return Response({'token': 'لینک خراب می باشد'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class VerifyMail(APIView):
