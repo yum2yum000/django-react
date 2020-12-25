@@ -12,7 +12,9 @@ from hyperlink._url import NoneType
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view
 from rest_framework.generics import get_object_or_404
+from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -66,16 +68,16 @@ class CreateUser(generics.CreateAPIView):
                 avatar=data.get('avatar'),
                 phone=data.get('phone'),
             )
-
             user.set_password(data.get('password'))
-            user.save()
-
-            Token.objects.create(user=user)
             # ایمیل آدرس فعلا ذخیره نمی شود
             # فقط برای ارسال ایمیل خط زیر نوشته شده است
             user.email = email
             # ارسال ایمیل برای تایید آدرس ایمیل
-            #SendMail.send(user=user, mail_type='verify')
+            #اول ایمیل فرستاده شود، اگر فرستاده نشد کاربر ثبت نشود
+            SendMail.send(user=user, mail_type='verify')
+            user.save()
+            Token.objects.create(user=user)
+
             # ایمیل نشان داده نشود. چون تصور می شود ثبت شده است
             user.email = ''
             data = self.get_serializer(user).data
@@ -425,7 +427,6 @@ class ResetPassword(APIView):
             return Response({'token': 'لینک خراب می باشد'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class VerifyMail(APIView):
 
     def get(self, request, decoded_str):
@@ -456,3 +457,11 @@ class VerifyMail(APIView):
             return Response({'email': 'ایمیل ثبت شد. باید به صفحه ی تایید ایمیل ریدایرکت کنم'}, status=status.HTTP_200_OK)
         # لینک دستکاری یا منقضی شده
         return Response({'email': 'لینک تایید ایمیل خراب می باشد'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class UploadTest(APIView):
+    parser_classes = (MultiPartParser,)
+
+    def get(self, request):
+        print(request.data)
+        return Response({'data': request.FILES}, 200)

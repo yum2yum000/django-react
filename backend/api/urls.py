@@ -1,18 +1,25 @@
 from django.conf.urls import url
-from django.urls import path, include, re_path
+from django.urls import path, include, re_path, register_converter
 from rest_framework import routers
 from django.contrib.admin.templates import admin
+
+from api.converters import EncodeTokenPathConverter
 from api.views import (Posts, CreateUser, AllPostList, UserSearch,
-                       PostSearch, PasswordRecovery, ResetPassword, VerifyMail, LoginUser, ProfileUser)
+                       PostSearch, PasswordRecovery, ResetPassword, VerifyMail, LoginUser, ProfileUser, UploadTest)
 
 # router = routers.DefaultRouter()
 # router.register('users', UserViewSets)
+
+# خط زیر با استفاده از کلاسی که معرفی کردیم دیتای دریافتی از یو ار ال را چک می کند
+register_converter(EncodeTokenPathConverter, 'token')
 
 urlpatterns = [
     # path('user/list/', UserList.as_view(), name='user_list'),
     # path('user/<pk>/', user_detail, name='user_detail'),
     # path('', include(router.urls)),
     # -----------------------------------------------------------------------
+
+    path('test/', UploadTest.as_view()),
 
     path('users/', CreateUser.as_view(), name='create_user'),
     # ([a-zA-z0-9-_.])+
