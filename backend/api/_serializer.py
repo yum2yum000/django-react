@@ -21,7 +21,9 @@ from post.models import CustomUser, Post
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
+
         model = CustomUser
         exclude = ['is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions']
         # fields = '__all__'

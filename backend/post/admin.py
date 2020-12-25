@@ -25,9 +25,9 @@ class CustomUserAdmin(UserAdmin):
             'Custom Field Heading',  # group heading of your choice; set to None for a blank space instead of a header
             {
                 'fields': (
-                    #این فیلد جایی هست که خود عکس نمایش داده می شود
+                    # این فیلد جایی هست که خود عکس نمایش داده می شود
                     'avatar_tag',
-                    #این فیلد آدرس عکس و انتخاب عکس می باشد.
+                    # این فیلد آدرس عکس و انتخاب عکس می باشد.
                     'avatar',
 
                 ),
@@ -36,17 +36,17 @@ class CustomUserAdmin(UserAdmin):
         (
             'My fields',
             {
-                'fields': ('phone',
-                           'desc')
+                'fields': ('phone',)
             }
         )
     )
     # list_display = [..., 'image_tag', ]
     readonly_fields = ('avatar_tag',)
 
+
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['pk','title', 'user', 'send_date']
+    list_display = ['pk', 'title', 'user', 'send_date']
     list_filter = ('send_date',)
-    #برای سرچ با استفاده از فیلدهای ارتباطی به طریق زیر عمل می کنیم.
-    search_fields = ('title','pk','user__username')
+    # برای سرچ با استفاده از فیلدهای ارتباطی به طریق زیر عمل می کنیم.
+    search_fields = ('title', 'pk', 'user__username')
