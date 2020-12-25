@@ -2,9 +2,9 @@ import Service from '@/services/Service.js'
 export const namespaced = true
 
 export const state = {
-    user: null,
     username:'',
-    posts:[]
+    posts:[],
+    userInfo:''
 
 }
 export const mutations = {
@@ -27,31 +27,30 @@ export const mutations = {
         sessionStorage.removeItem('user')
         location.reload()
     },
-    SET_USERNAME(state,username){
-        state.username=username
-    },
     SET_POSTS(state,posts){
         state.posts=posts
     },
     DELETE_POST(state,id){
        let index= state.posts.findIndex(item=>item.id==id)
         state.posts.splice(index,1)
+    },
+    GET_USER(state,user){
+        state.userInfo=user
     }
+
 
 }
 export const actions= {
     login({commit},credentials){
         console.log('333333',credentials)
        return Service.loginUser(credentials.user).then((res)=>{
+           console.log('55',res)
             commit('SET_USER_DATA', {userData:res.data,saveLog:credentials.saveLog})
         })
 
     },
     logout ({ commit }) {
         commit('CLEAR_USER_DATA')
-    },
-    setUsername({commit},username){
-        commit('SET_USERNAME',username)
     },
      deletePost({commit},id){
          return Service.deletePost(id)
@@ -68,15 +67,21 @@ export const actions= {
         return Service.getPosts().then((res)=>{
             commit('SET_POSTS',res.data)
         })
+    },
+    getUser ({ commit }) {
+        return Service.getUser().then((res)=>{
+            commit('GET_USER',res.data)
+        })
     }
+
 
 }
 export const getters= {
     loggedIn (state) {
         return !!state.user
     },
-    username(state){
-        return state.username
+    userInfo(state){
+        return state.userInfo
     },
     posts(state){
         return state.posts

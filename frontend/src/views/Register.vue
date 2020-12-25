@@ -50,11 +50,10 @@
                             <div class="row row-space">
                                 <div class="input-container">
                                     <div class="input-group">
-                                        <BaseInput @blur="$v.user.phone.$touch()"  type="text" inputClass="input--style-4" label="شماره موبایل" v-model="user.phone" ></BaseInput>
+                                        <BaseInput   type="text" inputClass="input--style-4" label="شماره موبایل" v-model="user.phone" ></BaseInput>
                                     </div>
-                                    <div v-if="$v.user.phone.$error" >
-                                        <p class="text-right error" v-if="!$v.user.phone.valid"> شماره موبایل باید معتبر باشد</p>
-                                    </div>
+
+
                                 </div>
                                 <div class="input-container">
                                     <div class="input-group">
@@ -100,12 +99,6 @@
                     valid: function(value) {
                         const containsLetter = /[A-Z]/.test(value)
                         return !containsLetter
-                    }
-                },
-                phone:{
-                    valid: function(value) {
-                        const containsLetter = /^09\d{9}$/.test(value)
-                        return containsLetter
                     }
                 }
 
