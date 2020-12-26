@@ -8,9 +8,14 @@
                 <div class="content">
                     <div class="info">
                         <div class="job">
-                            <router-link to="/"> <i class="fas fa-edit"></i> </router-link>
-                            <span class="delete" @click="deletePost(id)"><i class="fas fa-trash mr-2" ></i></span>
-                            <!--<DeleteModal class="delete"></DeleteModal>-->
+                            <router-link :to="{ name: 'postEdit', params: { id: id } }"> <i class="fas fa-edit"></i> </router-link>
+
+
+                            <div  class="uk-container uk-container-center uk-margin-top">
+                                <span @click="showModal = true" class="uk-button uk-button-primary delete" ><i class="fas fa-trash mr-2" ></i></span>
+                                <DeleteModal @apply="deletePost(id)" class="delete" @closeModal="showModal=false" :show="showModal">
+                                </DeleteModal>
+                            </div>
 
                         </div>
                     </div>
@@ -24,10 +29,16 @@
 <script>
 
     import store from '@/store/store'
+    import DeleteModal from '@/components/Modal/DeleteModal'
     export default {
         name: "PostPreview",
         components:{
-
+            DeleteModal
+        },
+        data(){
+            return{
+                showModal: false
+            }
         },
         props:{
             id: {
@@ -58,6 +69,11 @@
 </script>
 
 <style scoped>
+    .uk-button-primary {
+        position: absolute;
+        top: 0;
+        left: 26px;
+    }
         .box {
             background: #fff;
             border-radius: 3px;

@@ -2,11 +2,11 @@
     <div class="col-md-12">
         <div class="hasshadow"><div>
             <div class="shadowhead">
-                ایجاد پست
+                ویرایش پست
             </div>
             <div class="row justify-content-center mt-5">
                 <div class="col-lg-12">
-                    <form @submit.prevent="create">
+                    <form @submit.prevent="update">
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="input-container">
@@ -48,7 +48,7 @@
 
 <script>
     import { required} from 'vuelidate/lib/validators'
-    import Service from '@/services/Service.js'
+    import store from '@/store/store'
     export default {
         name: "PostCreate",
         validations:{
@@ -58,9 +58,23 @@
 
             }
         },
+        created(){
+            store.dispatch('login/getPost',
+                this.$route.params.id
+            ).then((res)=>{
+                console.log('44444444444',res)
+                this.post.title=res.title
+                this.post.content=res.content
+                this.post.id=res.id
+                console.log('user',this.post)
+            })
+        },
         data(){
             return{
-                post:{},
+                post:{
+                    title:'',
+                    content:''
+                },
                 error:'',
                 buttonClick:false
             }
@@ -74,30 +88,19 @@
             },
         },
         methods:{
-            create(){
+            update(){
                 this.$v.$touch()
                 if(!this.$v.$invalid){
                 this.buttonClick=true;
-                Service.createPost(this.post).then((res)=>{
-                    console.log('created post',res)
-                    this.buttonClick=false;
-                    if (res.status === 201){
-                        this.error='پست با موفقیت ایجاد شد'
-                    }
-                }).catch((e)=>{
-                    this.buttonClick=false;
-                    console.log(e.response)
-                    if (e.response && e.response.status === 400) {
+                    store.dispatch('login/editPost',this.post).then((res)=>{
+                   console.log(res)
 
-                        if(e.response.data.post)
-                        {
-                            this.error='لطفا ورودی ها خود را کنترل کنید'
-                        }
+                    }).catch((e)=>{
+                        console.log(e.response)
+                    })
+                }
 
 
-                    }
-                })
-            }
             }
         }
     }

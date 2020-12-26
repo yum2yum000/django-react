@@ -635,6 +635,7 @@ ul.location_icon {
 	box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, 0.08);
 	border-radius: 5px;
 	border: 0;
+	padding:17px;
 	height: 100px;}
 
 .textarea--style-4:focus{

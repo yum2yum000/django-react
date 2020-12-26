@@ -97,6 +97,14 @@
         created(){
             this.getUser()
         },
+        watch:{
+            user: {
+                handler() {
+                    this.error=''
+                },
+                deep: true
+            }
+        },
         methods:{
             getUser(){
                   if(this.userInfo)
@@ -128,10 +136,17 @@
                         }
                     }).catch((e)=>{
                         console.log(e.response)
-                        if (e.response && e.response.status === 406) {
+                        if (e.response && e.response.status === 400) {
                             if(e.response.data.email)
                             {
-                                this.error='ایمیل  تکراری است'
+                                this.error=e.response.data.email
+                            }
+                            else if(e.response.data.phone)
+                            {
+                                this.error=e.response.data.phone
+                            }
+                            else{
+                                this.error='لطفا ورودی ها را کنترل نمایید'
                             }
 
 

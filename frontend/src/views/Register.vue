@@ -114,6 +114,14 @@
 
             }
         },
+        watch:{
+            user: {
+                handler() {
+                     this.error=''
+                },
+                deep: true
+            }
+        },
         methods:{
             showText(){
             this.passwordFieldType='text'
@@ -129,8 +137,6 @@
                 console.log('register success',res)
                 if (res.status === 200){
                     this.error='ثبت نام با موفقیت انجام شد'
-
-                        console.log('233',res)
                         store.dispatch('login/login',{
                             user:{
                                 username:this.user.username,
@@ -160,7 +166,11 @@
                     }
                     else if(e.response.data.phone)
                     {
-                        this.error='موبایل باید به طور صحیح وارد شود'
+                        this.error=e.response.data.phone
+                    }
+                    else if(e.response.data.username)
+                    {
+                        this.error=e.response.data.username
                     }
                     else
                     {

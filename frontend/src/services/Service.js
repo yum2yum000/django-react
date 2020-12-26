@@ -18,6 +18,13 @@ export default {
     getPosts(){
         return apiClient.get('/posts/user/')
     },
+    getPost(id){
+        return apiClient.get('/posts/user/'+id)
+    },
+    editPost(post){
+        console.log('c',post)
+        return apiClient.put('/posts/user/'+post.id,{title:post.title,content:post.content})
+    },
     updateUser(data){
         return apiClient.put('/users/profile/',{update:'data',...data
         })
@@ -29,9 +36,9 @@ export default {
         })
 
     },
-    getProducts(perPage, page) {
-        return apiClient.get('/products?_limit='+ perPage + '&_page=' + page)
-    },
+    // getProducts(perPage, page) {
+    //     return apiClient.get('/products?_limit='+ perPage + '&_page=' + page)
+    // },
     createPost(post){
         return apiClient.post('/posts/user/',post)
     },
@@ -39,12 +46,8 @@ export default {
         return apiClient.delete('posts/user/'+id)
     },
 
-    removeProduct(id) {
-          console.log(id)
-        return apiClient.delete('/products/'+id)
-    },
-    editProduct(product) {
-
-        return apiClient.patch('/products/'+product.id,{name:product.name,price:product.price,img:product.img,category:product.category})
+    filterPosts(value){
+        console.log('0',value)
+        return apiClient.get('posts/search/',{search:'jj'})
     }
 }

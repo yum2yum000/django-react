@@ -37,6 +37,10 @@ export const mutations = {
     SET_POSTS(state,posts){
         state.posts=posts
     },
+    SET_POST(state,post){
+        state.product=post
+
+    },
     DELETE_POST(state,id){
        let index= state.posts.findIndex(item=>item.id==id)
         state.posts.splice(index,1)
@@ -58,6 +62,9 @@ export const mutations = {
     },
     CLEAR_CONFIRMDAY(state){
         state.confirmDay=-1
+    },
+    EDIT_POST(state,post){
+        state.posts=[...state.posts.map(item=>item.id !== post.id ?  item:{...post})]
     },
 
 }
@@ -90,6 +97,23 @@ export const actions= {
             commit('SET_POSTS',res.data)
         })
     },
+    getPost({ commit, getters }, id) {
+
+        let post = getters.getPostById(id)
+
+        if (post) {
+            commit('SET_POST', post)
+            return post
+        } else {
+            return Service.getPost(id)
+                .then(response => {
+                    console.log('o',response)
+                    commit('SET_POST', response.data)
+                    return response.data
+                })
+
+        }
+    },
     getUser ({ commit }) {
         return Service.getUser().then((res)=>{
             commit('SET_USERINFO',res.data)
@@ -119,6 +143,19 @@ export const actions= {
             return res;
         })
     },
+    editPost({ commit},post ) {
+
+        return Service.editPost(post)
+            .then((res) => {
+                commit('EDIT_POST',post)
+                return res
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    },
+
+
 
 
 }
@@ -140,5 +177,8 @@ export const getters= {
     },
     userInfo(state){
         return state.userInfo
+    },
+    getPostById:state=>id=>{
+        return state.posts.find(post=>post.id===id)
     }
 }

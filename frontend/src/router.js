@@ -10,6 +10,7 @@ import ProfileEdit from './views/profile/ProfileEdit.vue'
 import ProfileChangepassword from './views/profile/ProfileChangepassword.vue'
 import PostCreate from './views/profile/post/PostCreate.vue'
 import PostLists from './views/profile/post/PostLists.vue'
+import PostEdit from './views/profile/post/PostEdit.vue'
 import Profile from './views/profile/Profile.vue'
 //
 // import Loading from 'vue-loading-overlay';
@@ -59,10 +60,10 @@ const router = new Router({
             meta: { requiresAuth: true }
         },
         {
-            path: '/profile/',
+            path: '/user/profile',
             name: 'profile',
             component: Profile,
-            redirect: "profile/edit",
+            redirect: "user/profile/edit",
             meta: { requiresAuth: true },
             children:[
                 {
@@ -88,7 +89,13 @@ const router = new Router({
                     name: 'postLists',
                     component: PostLists,
                     props:true,
-                }
+                },
+                {
+                    path: 'edit/:id',
+                    name: 'postEdit',
+                    component: PostEdit,
+                    props:true,
+                },
 
 
 
