@@ -46,7 +46,7 @@ urlpatterns = [
     path('posts/user/', Posts.as_view(), name='post_detail'),
 
     # GETیک پست از یک یوزر خاص را بر می گرداند.
-    # POSTویرایش یک پست از یک یوزر خاص
+    # PUTویرایش یک پست از یک یوزر خاص
     # حذف یک پست از یک یوزر خاصِDELETE
     path('posts/user/<post_pk>/', Posts.as_view()),
     # جزئیات یک پست خاص

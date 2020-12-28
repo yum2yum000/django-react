@@ -21,7 +21,7 @@ class CustomUser(AbstractUser):
     # AbstractUser._meta.get_field('first_name)._unique=False
     AbstractUser._meta.get_field('first_name').null = True
     AbstractUser._meta.get_field('last_name').null = True
-    email = LowercaseEmailField(null=True, unique=False, default=None, blank=True, )
+    email = LowercaseEmailField(null=True, unique=True, default=None, blank=True, )
     phone = models.CharField('شماره تلفن', max_length=11, null=True,
                              blank=True, )
     adres = models.TextField('آدرس', null=True, blank=True)
@@ -33,15 +33,6 @@ class CustomUser(AbstractUser):
         if self.phone is not None and re.match('^09[0-9]{9}$', self.phone) is None:
             raise ValidationError('phone format is invalid')
 
-        # email validate
-        user = ''
-        try:
-            user = CustomUser.objects.get(email=self.email)
-            # اگر ایمیل وارد شده در دیتابیس وجود داشته باشد
-        except:
-            pass
-        if user:
-            raise ValidationError('ایمیل تکراری است')
 
     # USERNAME_FIELD = 'username'
     # REQUIRED_FIELDS = ['password']
@@ -69,6 +60,8 @@ class Post(models.Model):
 
     class Meta:
         unique_together = ('user', 'title')
+        #نام جدول مربوط به مدل در دیتابیس
+        # db_table='table_name'
 
     def __str__(self):
         return f'{self.title}-{self.user.username}'

@@ -37,8 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    #داکیومنت سازی ای پی ای ها
     'drf_yasg',
+    #ای پی ای
     'rest_framework',
+    #احراز هویت
     'rest_framework.authtoken',
 
     # داکیومنت سازی ای پی ای ها
