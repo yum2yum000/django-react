@@ -1,13 +1,7 @@
-url:'http://localhost:8000/v1/'
+url:'http://localhost:8000/'
 
-هر ایتمی که بالای آن 
-login_required
-گذاشته باشم. باید در 
-http header
-مقدار زیر را قرار دهید
-Auhtorization: 'Token token_string'
 
-token_string همان مقداری است که در موقع لاگین شدن کاربر از سرور دریافت می شود
+
 
 user:{
     create:{

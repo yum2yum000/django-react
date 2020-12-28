@@ -39,7 +39,7 @@ urlpatterns = [
     # ------------------------------------------------------------------------
 
     path('posts/', AllPostList.as_view(), name='post_list'),
-    path('posts/search/', PostSearch.as_view(), name='post_search'),
+    re_path(r'posts/search/', PostSearch.as_view(), name='post_search'),
 
     # GETهمه ی پست های یک یوزر خاص را بر میگرداند
     # ایجاد پست جدید برای کاربر خاصPOST
