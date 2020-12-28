@@ -61,8 +61,17 @@
                 buttonClick:false
             }
         },
+        watch:{
+            user: {
+                handler() {
+                    this.error=''
+                },
+                deep: true
+            }
+        },
         methods:{
            login(){
+               console.log('45',this.user)
                store.dispatch('login/login',{
                    user:this.user,
                    saveLog:this.saveLog
@@ -72,7 +81,7 @@
                }).catch((e)=>{
                    console.log('login failed',e.response)
                    if (e.response && e.response.status === 400) {
-                           this.error='رمز عبور یا نام کاربری صحیح نمی باشد'
+                           this.error=e.response.data.error
 
                    }
                })

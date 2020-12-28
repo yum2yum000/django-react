@@ -3,12 +3,24 @@
         <div class="bg-slider">
 
         </div>
+
     </div>
 </template>
 
 <script>
+    import {mapGetters} from 'vuex'
+    import store from '@/store/store'
+
     export default {
         name: "Home",
+        computed: {
+            ...mapGetters('login', ['loggedIn','userInfo'])
+        },
+        created(){
+            if(this.loggedIn && !this.userInfo){
+                store.dispatch('login/getUser')
+            }
+        }
 
     }
 </script>

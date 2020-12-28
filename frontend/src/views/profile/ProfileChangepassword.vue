@@ -57,6 +57,14 @@
                 error:''
             }
         },
+        watch:{
+            user: {
+                handler() {
+                    this.error=''
+                },
+                deep: true
+            },
+        },
         methods:{
             update(){
                 this.$v.$touch()
@@ -71,7 +79,7 @@
 
                         if(e.response.data.password)
                         {
-                            this.error='ایمیل  تکراری است'
+                            this.error='رمز عبور قوی انتخاب نمایید'
                         }
 
 
