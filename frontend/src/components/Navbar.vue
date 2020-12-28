@@ -14,7 +14,7 @@
                     <i v-if="loggedIn" data-toggle="tooltip" data-placement="right" title="خروج" class="fas fa-sign-out-alt navbar-brand logout"></i>
                      </span>
                     <router-link  :to="{name:!loggedIn?'login':'profile'}" :class="{order:!show}" class="navbar-brand">
-                        <img  data-toggle="tooltip" data-placement="right" title="پروفایل" class="login-height" src="@/assets/images/top-icon.png" alt="">
+                        <img  data-toggle="tooltip" data-placement="right" :title="!loggedIn?'ورود':'پروفایل'" class="login-height" src="@/assets/images/top-icon.png" alt="">
                     </router-link>
 
                 </div>

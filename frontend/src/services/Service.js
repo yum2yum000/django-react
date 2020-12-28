@@ -1,9 +1,11 @@
 import apiClient from '@/services/config.js'
+import axios from "axios"
 
 
 export default {
     setToken (token) {
         apiClient.defaults.headers.common['Authorization'] = `Token ${token}`;
+        axios.defaults.headers.common['Authorization'] = `Token ${token}`;
     },
     createUser(user) {
        return apiClient.post('/users/', user)
@@ -23,7 +25,7 @@ export default {
     },
     editPost(post){
         console.log('c',post)
-        return apiClient.put('/posts/user/'+post.id,{title:post.title,content:post.content})
+        return apiClient.put('/posts/user/'+post.id+'/',{title:post.title,content:post.content})
     },
     updateUser(data){
         return apiClient.put('/users/profile/',{update:'data',...data
@@ -47,7 +49,10 @@ export default {
     },
 
     filterPosts(value){
-        console.log('0',value)
-        return apiClient.get('posts/search/',{search:'jj'})
+        return apiClient.get('/posts/search',{search:value},{ headers: {
+                'content-length': 134,
+        }}
+
+        )
     }
 }
