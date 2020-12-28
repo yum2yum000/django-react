@@ -13,8 +13,9 @@
                                         <p class="text-right error" v-if="!$v.user.username.required">نام کاربری باید وارد شود</p>
                                     </div>
                                 </div>
-                                <div class="input-container">
-                                    <BaseInput type="password" inputClass="input--style-4" label=" رمز عبور" v-model="user.password"  @blur="$v.user.password.$touch()"></BaseInput>
+                                <div class="input-container" style="position:relative">
+                                    <BaseInput :type="passwordFieldType" inputClass="input--style-4" label=" رمز عبور" v-model="user.password"  @blur="$v.user.password.$touch()"></BaseInput>
+                                    <span @mouseover="showText" @mouseleave="showPassword"> <i class="fas fa-eye eye-password" ></i></span>
                                     <div v-if="$v.user.password.$error">
                                         <p class="text-right error" v-if="!$v.user.password.required"> رمز عبور باید وارد شود</p>
                                         <p class="text-right error" v-if="!$v.user.password.minLength"> رمز عبور باید حداقل 8 حرف باشد</p>
@@ -28,6 +29,7 @@
                                     <div v-if="$v.user.email.$error">
                                         <p class="text-right error" v-if="!$v.user.email.required"> ایمیل باید وارد شود</p>
                                         <p class="text-right error" v-if="!$v.user.email.email"> ایمیل باید فرمت معتبر باشد</p>
+                                        <p class="text-right error" v-if="!$v.user.email.valid"> ایمیل نمی تواند شامل حروف بزرگ باشد </p>
                                     </div>
                                 </div>
                                 <div class="input-container">
@@ -49,9 +51,10 @@
                             <div class="row row-space">
                                 <div class="input-container">
                                     <div class="input-group">
-                                        <label class="label">شماره تلفن</label>
-                                        <input v-model="user.phone" class="input--style-4" type="text" >
+                                        <BaseInput  type="text" inputClass="input--style-4" label="شماره موبایل" v-model="user.phone" ></BaseInput>
                                     </div>
+
+
                                 </div>
                                 <div class="input-container">
                                     <div class="input-group">
@@ -80,6 +83,7 @@
 
 <script>
     import Service from '@/services/Service.js'
+    import store from '@/store/store'
     import { required,minLength,email } from 'vuelidate/lib/validators'
     export default {
         name: "Register",
@@ -92,7 +96,12 @@
                         return containsLetter
                     }
                 },
-                email:{required,email}
+                email:{required,email,
+                    valid: function(value) {
+                        const containsLetter = /[A-Z]/.test(value)
+                        return !containsLetter
+                    }
+                }
 
             }
         },
@@ -100,11 +109,26 @@
             return{
                 user:{},
                 error:'',
-                buttonClick:false
+                buttonClick:false,
+                passwordFieldType:'password'
 
             }
         },
+        watch:{
+            user: {
+                handler() {
+                     this.error=''
+                },
+                deep: true
+            }
+        },
         methods:{
+            showText(){
+            this.passwordFieldType='text'
+            },
+            showPassword(){
+            this.passwordFieldType='password'
+            },
             register(){
             this.$v.$touch()
             if(!this.$v.$invalid){
@@ -113,9 +137,23 @@
                 console.log('register success',res)
                 if (res.status === 200){
                     this.error='ثبت نام با موفقیت انجام شد'
-                    setTimeout(()=>{
-                        this.$router.push({name:'login'})
-                    },1000)
+                        store.dispatch('login/login',{
+                            user:{
+                                username:this.user.username,
+                                password:this.user.password
+                            },
+                            saveLog:false
+                        }).then((res)=>{
+                            console.log('login success',res)
+                            this.$router.push({name:'home'})
+                        }).catch((e)=>{
+                            console.log('login failed',e.response)
+                            if (e.response && e.response.status === 400) {
+                                this.error='رمز عبور یا نام کاربری صحیح نمی باشد'
+
+                            }
+                        })
+
                 }
 
             }).catch((e)=>{
@@ -125,6 +163,14 @@
                     if(e.response.data.password)
                     {
                         this.error='رمز عبور قوی انتخاب نمایید'
+                    }
+                    else if(e.response.data.phone)
+                    {
+                        this.error=e.response.data.phone
+                    }
+                    else if(e.response.data.username)
+                    {
+                        this.error=e.response.data.username
                     }
                     else
                     {
@@ -155,4 +201,9 @@
 .input-container{
     width:45%;
 }
+    .eye-password{
+        position: absolute;
+        top: 46px;
+        left: 11px;
+    }
 </style>

@@ -65,6 +65,14 @@
                 buttonClick:false
             }
         },
+        watch:{
+            post: {
+                handler() {
+                    this.error=''
+                },
+                deep: true
+            },
+        },
         methods:{
             create(){
                 this.$v.$touch()

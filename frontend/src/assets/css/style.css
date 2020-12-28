@@ -635,6 +635,7 @@ ul.location_icon {
 	box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, 0.08);
 	border-radius: 5px;
 	border: 0;
+	padding:17px;
 	height: 100px;}
 
 .textarea--style-4:focus{
@@ -1673,7 +1674,7 @@ li .payment:after {
 }
 
 .dashCard.menu li.active {
-	background: linear-gradient(90deg, #35bbe9 51%, #34c1e7 100%);
+	background-color: #7d58ae;
 	font-weight: 500;
 	color: #fff
 }
@@ -1696,10 +1697,7 @@ li .payment:after {
 	border-radius: 5px;
 	font-size: 18px;
 }
-.dashCard.menu li:hover {
-	background: #e4f6f7;
-	cursor: pointer
-}
+
 
 .dashCard.menu li.active a img {
 	filter: invert(1)

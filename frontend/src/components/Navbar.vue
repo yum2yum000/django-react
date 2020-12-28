@@ -32,22 +32,27 @@
 
             </div>
         </nav>
+        <Notification :confirmShow="mailConfirm" :confirmDay="confirmDay" :loggedIn="loggedIn"></Notification>
     </div>
 </template>
 
 <script>
 
     import {mapGetters} from 'vuex'
+    import Notification from '@/components/Notification'
     import store from '@/store/store'
     export default {
         name: "Navbar",
+        components:{
+            Notification
+        },
         data(){
             return{
                 show:false,
             }
         },
         computed: {
-            ...mapGetters('login', ['loggedIn'])
+            ...mapGetters('login', ['loggedIn','mailConfirm','confirmDay'])
         },
         methods:{
             logout(){
@@ -72,8 +77,9 @@
         color:white!important;
     }
     .navbar{
-        position:absolute!important;
+        position:fixed!important;
         width:100%;
+        z-index:999;
     }
     .login-height{
         height:25px;
