@@ -1,5 +1,7 @@
 import re
 from datetime import timedelta, datetime
+
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.db.models import Q
@@ -8,11 +10,10 @@ from django.contrib.auth.models import update_last_login
 from django.core.validators import validate_email
 from django.template.loader import get_template
 import jwt
-from rest_framework import status
+from rest_framework import status, filters
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
-from rest_framework.generics import get_object_or_404
-from rest_framework.parsers import MultiPartParser
+from rest_framework.generics import get_object_or_404, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -38,7 +39,13 @@ class CreateUser(generics.CreateAPIView):
         data = request.data
         user = CustomUser()
         # username validate
-        if not data.get('username'):
+        if data.get('username'):
+            try:
+                user = CustomUser.objects.get(username=data.get('username'))
+                return Response(data={'username': 'نام کاربری تکراری است'}, status=status.HTTP_200_OK)
+            except:
+                pass
+        else:
             return Response(data={'username': 'نام کاربری الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
 
         # phone validate
@@ -55,9 +62,9 @@ class CreateUser(generics.CreateAPIView):
             return Response(data={'email': 'فیلد ایمیل ارسال نشده است'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            email = CustomUser.objects.get(email=data.get('email'))
+            email = CustomUser.objects.get(email=email)
             return Response({'email': 'آدرس ایمیل تکراری است'}, status=status.HTTP_400_BAD_REQUEST)
-        except:
+        except (IntegrityError, ObjectDoesNotExist):
             pass
 
         user = ''
@@ -76,6 +83,7 @@ class CreateUser(generics.CreateAPIView):
             return Response({'username': 'فیلد نام کاربری ارسال شود'}, status=status.HTTP_400_BAD_REQUEST)
         except IntegrityError:
             return Response({'username': 'نام کاربری تکراری است'}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             user.set_password(data.get('password'))
             # ایمیل آدرس فعلا ذخیره نمی شود
@@ -88,7 +96,9 @@ class CreateUser(generics.CreateAPIView):
             # ارسال ایمیل برای تایید آدرس ایمیل
             # اول ایمیل فرستاده شود، اگر فرستاده نشد کاربر ثبت نشود
             SendMail.send(user=user, mail_type='verify')
-            user.email = ''
+            user.last_date_sent_mail = datetime.now()
+            # برای اینکه مقار null در دیتا بیس بگیرد
+            user.email = None
             user.save()
             Token.objects.create(user=user)
 
@@ -106,7 +116,7 @@ class LoginUser(APIView):
     '''
     serializer_class = UserSerializer
 
-    @swagger_auto_schema(responses=login_user_response,)
+    @swagger_auto_schema(responses=login_user_response, )
     def post(self, request):
         '''
         ارسال نام کاربری و رمز عبور
@@ -172,10 +182,6 @@ class ProfileUser(APIView):
         email = data.get('email')
         # درخواست تغییر ایمیل
         if email:
-            # کاربر هنوز ایمیلش را تایید نکرده است
-            if not user.email:
-                return Response(data={'emial': 'ایمیل شما هنوز تایید نشده است'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-
             # ایمیل تکراری وارد نشود
             try:
                 # ایمیل تکراری است
@@ -203,10 +209,14 @@ class ProfileUser(APIView):
         user.phone = data.get('phone') or user.phone
         # ایمیل تغییر یافته باید دوباره تایید شود
         if email and (user.email != email):
+            # اگر ایمیل اول تایید نشده است، می تواند دوباره ایمیل دیگری ثبت کند.اگر دو ایمیل را پشت سرم هم
+            # فعال کند، ایمیل دوم باقی خواهد ماند.
             # ایمیل مقداری پر و خالی می تواند داشته باشد
             user.email = email
             SendMail.send(user, mail_type='veify')
-            user.email = ''
+            # ذخیره ی مقدار null در دیتابیس
+            user.email = None
+            user.last_date_sent_mail = datetime.now()
         user.save()
         return Response(data={'data': 'updated', "user": UserSerializer(user).data}, status=status.HTTP_200_OK)
 
@@ -239,19 +249,6 @@ class Posts(APIView):
     # @swagger_auto_schema(operation_id='ID', operation_description='operation description',
     #                      responses={200: 'verified', 404: 'Not found item'})
     def get(self, request, post_pk=None):
-        """
-        get document of posts
-        parameters
-        -----
-        request : str
-                *request of client
-        post_pk : int
-                **post primary key
-        return : 200
-        """
-        # زمانی که این متد فراخوانی شود یعنی توکن تایید شده است و
-        # request.user
-        # در دسترس قرار می گیرد.
 
         objs = Post.objects.filter(user_id=request.user.id)
         if post_pk:
@@ -273,12 +270,13 @@ class Posts(APIView):
         content = request.data.get('content')
         # فیلدهای title و content هم باید ارسال شوند و هم باید مقدار داشته باشند.
         if title is None or content is None or title.strip() == "" or content.strip() == "":
-            return Response({'post': 'title or content is empty'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'post': 'صثtitle or content is empty'}, status=status.HTTP_400_BAD_REQUEST)
 
         user = request.user
         try:
             post = Post(user=user, title=title, content=content)
             post.save()
+
         except:
             return Response({'post': 'post title is duplicated'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(data={'id': post.pk, 'save': 'Ok'}, status=status.HTTP_201_CREATED)
@@ -314,17 +312,16 @@ class UserSearch(APIView):
             return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PostSearch(APIView):
-    def get(self, request):
-        data = request.data
-        if data.get('search'):
-            posts = Post.objects.filter(Q(title__contains=data.get('search')) | Q(content__contains=data.get('search')))
-            data_serialized = PostSerializer(posts, many=True).data
-            # اگر چیزی پیدا نشود، 404 ارسال می کند.
-            return Response(data_serialized, status=(status.HTTP_200_OK if posts.count() > 0 else status.HTTP_404_NOT_FOUND))
-        else:
-            # اگر دیتا ارسال نشود 400 ارسال می کند.
-            return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
+class PostSearch(generics.ListAPIView):
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        title = self.request.GET.get('title') or False
+        content = self.request.GET.get('content') or False
+        try:
+            return Post.objects.filter(Q(title__contains=title) | Q(content__contains=content))
+        except:
+            return None
 
 
 class PasswordRecovery(APIView):
@@ -460,11 +457,7 @@ class VerifyMail(APIView):
         return Response({'email': 'لینک تایید ایمیل خراب می باشد'}, status=status.HTTP_404_NOT_FOUND)
 
 
-class UploadTest(APIView):
-    # جلوگیری از دیده شدن در داکیومنت ای پی ای ها
-    swagger_schema = None
-    parser_classes = (MultiPartParser,)
-
-    def get(self, request):
-        print(request.data)
-        return Response({'data': request.FILES}, 200)
+class UploadTest(ListAPIView):
+    serializer_class = PostSerializer
+    filter_backends = (filters.BaseFilterBackend)
+    filter_fields = ['title', ]

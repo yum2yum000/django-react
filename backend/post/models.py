@@ -26,13 +26,14 @@ class CustomUser(AbstractUser):
                              blank=True, )
     adres = models.TextField('آدرس', null=True, blank=True)
     bio = models.TextField('توضیحات', null=True, blank=True)
-    avatar = models.ImageField('تصویر', upload_to='images', null=True, blank=True)
+    avatar = models.ImageField('تصویر', upload_to='images/%Y/%m/%d', null=True,
+                               blank=True)
+    last_date_sent_mail = models.DateTimeField(auto_now_add=True, db_column='sent_date')
 
     def clean(self):
         # phone validate
         if self.phone is not None and re.match('^09[0-9]{9}$', self.phone) is None:
             raise ValidationError('phone format is invalid')
-
 
     # USERNAME_FIELD = 'username'
     # REQUIRED_FIELDS = ['password']
@@ -55,12 +56,12 @@ class Post(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default='deleted')
     title = models.CharField('عنوان', max_length=100, null=False)
     content = models.TextField('محتوا', null=False)
-    send_date = models.DateTimeField('تاریخ ارسال', auto_now_add=True)
+    create_date = models.DateTimeField('تاریخ ارسال', auto_now_add=True)
     last_update = models.DateTimeField('تاریخ آخرین اپدیت', auto_now=True)
 
     class Meta:
         unique_together = ('user', 'title')
-        #نام جدول مربوط به مدل در دیتابیس
+        # نام جدول مربوط به مدل در دیتابیس
         # db_table='table_name'
 
     def __str__(self):

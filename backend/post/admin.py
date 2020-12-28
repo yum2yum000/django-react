@@ -17,6 +17,12 @@ class CustomUserAdmin(UserAdmin):
     اعضا به دو بخش تقسیم می شود، بخش اول نام دسته بندی را مشخص می کند و بخش دوم که یک دیکشنری می باشد فیلد ها را مشخص می کند.
     کلید fields در دیکشنری مربوطه یک تاپل که اعضای آن نام فیلدهایی که در قرار است در این دسته بندی وجود داشته باشند نوشته می شود.
     """
+    #دکمه ی سیو در بالای فرم نیز قرار داده شود
+    save_on_top = True
+
+    #ذخیره یوزر و پرکردن بقه ی اطلاعات آن بعد از ثبت یوزر
+    #اگر مقدار True باشد
+    save_as = False
     fieldsets = (
         *UserAdmin.fieldsets,  # original form fieldsets, expanded
         (  # new fieldset added on to the bottom
@@ -44,7 +50,7 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ['pk', 'title', 'user', 'send_date']
-    list_filter = ('send_date',)
+    list_display = ['pk', 'title', 'user', 'create_date']
+    list_filter = ('create_date',)
     # برای سرچ با استفاده از فیلدهای ارتباطی به طریق زیر عمل می کنیم.
     search_fields = ('title', 'pk', 'user__username')

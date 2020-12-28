@@ -48,6 +48,6 @@ export default {
 
     filterPosts(value){
         console.log('0',value)
-        return apiClient.get('posts/search/',{search:value})
+        return apiClient.get('posts/search/?title='+value+'&'+'content='+value,{search:value})
     }
 }
