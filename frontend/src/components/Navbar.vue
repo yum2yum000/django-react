@@ -70,7 +70,7 @@
     order:2!important;
 }
     .navbar-bg{
-        background: rgba(0,0,0,0.4);
+        background: #212529;
         color:white!important;
     }
     .nav-item a{

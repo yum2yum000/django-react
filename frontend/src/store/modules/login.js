@@ -37,10 +37,7 @@ export const mutations = {
     SET_POSTS(state,posts){
         state.posts=posts
     },
-    SET_POST(state,post){
-        state.product=post
 
-    },
     DELETE_POST(state,id){
        let index= state.posts.findIndex(item=>item.id==id)
         state.posts.splice(index,1)
@@ -66,6 +63,10 @@ export const mutations = {
     EDIT_POST(state,post){
         state.posts=[...state.posts.map(item=>item.id !== post.id ?  item:{...post})]
     },
+    FILTER_POST(state,value){
+        state.posts=value
+        console.log('bnn',state.posts)
+    }
 
 }
 export const actions= {
@@ -154,6 +155,16 @@ export const actions= {
                 console.log(error)
             })
     },
+    filterPosts({ commit},value ) {
+        return Service.filterPosts(value).then((res)=>{
+
+            commit('FILTER_POST',res.data)
+            return res
+        }).catch((e)=>{
+            console.log(e.response)
+        })
+    },
+
 
 
 

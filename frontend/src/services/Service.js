@@ -1,6 +1,6 @@
 import apiClient from '@/services/config.js'
 import axios from "axios"
-
+let source;
 
 export default {
     setToken (token) {
@@ -48,14 +48,26 @@ export default {
         return apiClient.delete('posts/user/'+id)
     },
 
-    filterPosts(value){
+     filterPosts(value){
         console.log('0',value)
-        return axios.get('http://127.0.0.1:8000/posts/search/',{ params: {
+        if(source){
+            console.log('ddddddddddddd')
+            source.cancel()
+        }
+        source= axios.CancelToken.source()
+        console.log('bn',source.token)
+        return  apiClient.get('/posts/search/',{
+            cancelToken:source.token,
+            params: {
+
                 title: value,
                 content: value,
             }}
 
         )
+    },
+    fetchAllPosts(){
+        return  apiClient.get('/posts/')
     }
 
 
