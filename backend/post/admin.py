@@ -2,8 +2,6 @@ from django.contrib import admin
 
 # Register your models here.
 from django.contrib.auth.admin import UserAdmin
-from django.utils.html import format_html
-from django.utils.safestring import mark_safe
 
 from post.models import CustomUser, Post
 
