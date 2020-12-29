@@ -5,7 +5,7 @@ import axios from "axios"
 export default {
     setToken (token) {
         apiClient.defaults.headers.common['Authorization'] = `Token ${token}`;
-        axios.defaults.headers.common['Authorization'] = `Token ${token}`;
+
     },
     createUser(user) {
        return apiClient.post('/users/', user)
@@ -49,10 +49,14 @@ export default {
     },
 
     filterPosts(value){
-        return apiClient.get('/posts/search',{search:value},{ headers: {
-                'content-length': 134,
-        }}
+        console.log('0',value)
+        return axios.get('http://127.0.0.1:8000/posts/search/',{ params: {
+                title: value,
+                content: value,
+            }}
 
         )
     }
+
+
 }
