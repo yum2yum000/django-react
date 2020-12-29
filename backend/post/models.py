@@ -27,7 +27,7 @@ class CustomUser(AbstractUser):
     adres = models.TextField('آدرس', null=True, blank=True)
     bio = models.TextField('توضیحات', null=True, blank=True)
     avatar = models.ImageField('تصویر', upload_to='images/', null=True, blank=True)
-    last_date_sent_mail = models.DateTimeField(auto_now_add=True, db_column='sent_date')
+    date_sent = models.DateTimeField(auto_now_add=True, db_column='last_date_sent_mail')
 
 
     def clean(self):

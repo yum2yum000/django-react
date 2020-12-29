@@ -299,18 +299,19 @@ class Posts(APIView):
         return Response({'post': 'deleted'}, status=status.HTTP_200_OK)
 
 
-class UserSearch(APIView):
+class UserSearch(generics.ListAPIView):
+    serializer_class = UserSerializer
 
-    def get(self, request):
-        data = request.data
-        if data.get('search'):
-            users = CustomUser.objects.filter(Q(username__contains=data.get('search')) |
-                                              Q(first_name__contains=data.get('search')) |
-                                              Q(last_name__contains=data.get('search'))).all()
-            data_serialized = UserSerializer(users, many=True).data
-            return Response(data_serialized, status=(status.HTTP_200_OK if users.count() > 0 else status.HTTP_404_NOT_FOUND))
-        else:
-            return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
+    def get_queryset(self):
+        username = self.request.GET.get('username') or False
+        first_name = self.request.GET.get('firstname') or False
+        last_name = self.request.GET.get('last_name') or False
+        try:
+            return CustomUser.objects.filter(Q(username__contains=username) |
+                                             Q(first_name__contains=first_name) |
+                                             Q(last_name__contains=last_name))
+        except:
+            return None
 
 
 class PostSearch(generics.ListAPIView):

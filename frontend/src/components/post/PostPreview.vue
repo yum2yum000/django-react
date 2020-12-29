@@ -12,7 +12,7 @@
                             <router-link v-if="user.id==userInfo.id" :to="{ name: 'postEdit', params: { id: id } }"> <i class="fas fa-edit"></i> </router-link>
 
 
-                            <div  v-if="user.id==userInfo.id"class="uk-container uk-container-center uk-margin-top" >
+                            <div  v-if="user.id==userInfo.id" class="uk-container uk-container-center uk-margin-top" >
                                 <span @click="showModal = true" class="uk-button uk-button-primary delete" ><i class="fas fa-trash mr-2" ></i></span>
                                 <DeleteModal @apply="deletePost(id)" class="delete" @closeModal="showModal=false" :show="showModal">
                                 </DeleteModal>
