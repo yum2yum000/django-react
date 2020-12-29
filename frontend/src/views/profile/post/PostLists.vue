@@ -4,9 +4,10 @@
             <div class="shadowhead">
                لیست پست ها
             </div>
-            <BaseInput @keyup="fetchPosts" type="text" inputClass="input--style-4" label="جستجو" v-model="value" ></BaseInput>
-            <div class="row justify-content-center mt-5">
-                <div class="col-lg-12">
+            <span>جستجو</span>
+            <input class="input--style-4" label="جستجو" type="text" @input="input">
+           <div class="row justify-content-center mt-5">
+                 <div class="col-lg-12">
                     <PostList :posts="posts"></PostList>
                 </div>
             </div>
@@ -19,7 +20,7 @@
 <script>
     import PostList from '@/components/post/PostList'
     import store from '@/store/store'
-    import Service from '@/services/Service'
+
 
     import {mapGetters} from 'vuex'
     export default {
@@ -28,19 +29,36 @@
             PostList
         },
         methods:{
+            input(e){
+                this.searchValue=e.target.value
+                this.service()
+            },
+
             fetchPosts(){
-                console.log(this.value)
-               Service.filterPosts(this.value).then((res)=>{
+                store.dispatch('login/getPosts').then(()=>{
+
+
+                }).catch(()=>{
+                    this.error='مشکلی در دریافت اطلاعات رخ داده است'
+                })
+            },
+            service(){
+                if(this.searchValue!=='')
+                {
+
+                    store.dispatch('login/filterPosts',this.searchValue).then((res)=>{
                     console.log(res)
-                }).catch((e)=>{
-                    console.log(e.response)
-               })
+                })}
+                else{
+                    this.fetchPosts();
+                }
             }
         },
         data(){
             return{
                 error:'',
-                value:''
+                value:'',
+                searchValue:''
 
             }
         },
@@ -48,12 +66,7 @@
             ...mapGetters('login', ['posts'])
         },
         created(){
-            store.dispatch('login/getPosts').then(()=>{
-
-
-            }).catch(()=>{
-                this.error='مشکلی در دریافت اطلاعات رخ داده است'
-            })
+            this.fetchPosts();
 
         }
     }
