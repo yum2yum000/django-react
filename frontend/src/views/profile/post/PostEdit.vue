@@ -93,10 +93,13 @@
                 if(!this.$v.$invalid){
                 this.buttonClick=true;
                     store.dispatch('login/editPost',this.post).then((res)=>{
-                   console.log(res)
+                        this.buttonClick=false;
+                        if (res.status === 200){
+                            this.error='پست با موفقیت ویرایش شد'
+                        }
 
                     }).catch((e)=>{
-                        console.log(e.response)
+                        console.log('g',e.response)
                     })
                 }
 

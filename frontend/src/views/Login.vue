@@ -16,7 +16,8 @@
                                 <div class="input-container">
                                     <div class="input-group">
                                         <label class="label">رمز عبور</label>
-                                        <input v-model="user.password" class="input--style-4" type="password" >
+                                        <input v-model="user.password" class="input--style-4" :type="passwordFieldType" >
+                                        <span @mouseover="showText" @mouseleave="showPassword"> <i class="fas fa-eye eye-password" ></i></span>
                                     </div>
                                 </div>
                                 <label >
@@ -58,7 +59,8 @@
                 user:{},
                 saveLog:false,
                 error:'',
-                buttonClick:false
+                buttonClick:false,
+                passwordFieldType:'password'
             }
         },
         watch:{
@@ -70,6 +72,12 @@
             }
         },
         methods:{
+            showText(){
+                this.passwordFieldType='text'
+            },
+            showPassword(){
+                this.passwordFieldType='password'
+            },
            login(){
                console.log('45',this.user)
                store.dispatch('login/login',{
@@ -94,6 +102,11 @@
 <style scoped>
     .input-container{
         width:100%;
+    }
+    .eye-password{
+        position: absolute;
+        top: 46px;
+        left: 11px;
     }
 
 </style>

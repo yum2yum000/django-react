@@ -6,12 +6,13 @@
                 <p class="content">{{title}} </p>
                 <p >{{content}}</p>
                 <div class="content">
+                    <span class="writer"> نوشته شده توسط {{user.username}} </span>
                     <div class="info">
-                        <div class="job">
-                            <router-link :to="{ name: 'postEdit', params: { id: id } }"> <i class="fas fa-edit"></i> </router-link>
+                        <div class="job" >
+                            <router-link v-if="user.id==userInfo.id" :to="{ name: 'postEdit', params: { id: id } }"> <i class="fas fa-edit"></i> </router-link>
 
 
-                            <div  class="uk-container uk-container-center uk-margin-top">
+                            <div  v-if="user.id==userInfo.id"class="uk-container uk-container-center uk-margin-top" >
                                 <span @click="showModal = true" class="uk-button uk-button-primary delete" ><i class="fas fa-trash mr-2" ></i></span>
                                 <DeleteModal @apply="deletePost(id)" class="delete" @closeModal="showModal=false" :show="showModal">
                                 </DeleteModal>
@@ -29,6 +30,7 @@
 <script>
 
     import store from '@/store/store'
+    import {mapGetters} from 'vuex'
     import DeleteModal from '@/components/Modal/DeleteModal'
     export default {
         name: "PostPreview",
@@ -52,8 +54,16 @@
             content:{
                 type: String,
                 required: true
-            }
+            },
+            user:{
+                type: Object,
+                required: true
+            },
 
+
+        },
+        computed: {
+            ...mapGetters('login', ['userInfo'])
         },
         methods:{
             deletePost(id){
@@ -104,5 +114,11 @@
         cursor:pointer;
         color:#c5245e;
     }
+    .writer{
+         position: relative;
+         top: 21px;
+        font-size:12px;
+        right:-7px;
+     }
 
 </style>

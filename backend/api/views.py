@@ -98,6 +98,7 @@ class CreateUser(generics.CreateAPIView):
             SendMail.send(user=user, mail_type='verify')
             user.last_date_sent_mail = datetime.now()
             # برای اینکه مقار null در دیتا بیس بگیرد
+
             user.email = None
             user.save()
             Token.objects.create(user=user)

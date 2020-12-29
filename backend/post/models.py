@@ -26,9 +26,9 @@ class CustomUser(AbstractUser):
                              blank=True, )
     adres = models.TextField('آدرس', null=True, blank=True)
     bio = models.TextField('توضیحات', null=True, blank=True)
-    avatar = models.ImageField('تصویر', upload_to='images/%Y/%m/%d', null=True,
-                               blank=True)
+    avatar = models.ImageField('تصویر', upload_to='images/', null=True, blank=True)
     last_date_sent_mail = models.DateTimeField(auto_now_add=True, db_column='sent_date')
+
 
     def clean(self):
         # phone validate
