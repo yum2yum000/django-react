@@ -15,39 +15,32 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-from django.views.generic import TemplateView
-from rest_framework.schemas import get_schema_view, openapi
-
 from first import settings
-
 from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 schema_view = get_schema_view(
-
-    #     .Info(
-    #     title="Snippets API",
-    #     default_version='v1',
-    #     description="Test description",
-    #     terms_of_service="https://www.google.com/policies/terms/",
-    #     contact=openapi.Contact(email="contact@snippets.local"),
-    #     license=openapi.License(name="BSD License"),
-    # ),
-    title="تشریح API",
-    description='برای ارائه می باشد',
+    openapi.Info(
+        title="توضیحات ای پی ای",
+        default_version='v1',
+        url='http:localhost:8000/',
+        description="ای پی ای های مورد نیاز جهت ارتباط",
+        terms_of_service="https://www.Test.com/policies/terms/",
+        contact=openapi.Contact(email=""),
+        license=openapi.License(name="Test License"),
+    ),
     public=True,
     permission_classes=(permissions.AllowAny,),
-    version='1.0.0',
-    url='',
-    urlconf='api.urls',
 )
-
 
 urlpatterns = [
     path('', include('api.urls'), name='apies'),
     path('admin/', admin.site.urls),
-    path('apenapi/', schema_view, name='api_schema'),
-    path('docs/', TemplateView.as_view(template_name='documentation.html',
-                                       extra_context={'schema_url': 'api_schema'}), name='swagger-ui')
+
+    path('swagger/format/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('docs/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 if settings.DEBUG:
     from django.conf.urls.static import static

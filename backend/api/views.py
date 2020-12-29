@@ -1,5 +1,7 @@
 import re
 from datetime import timedelta, datetime
+
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.db.models import Q
@@ -8,17 +10,18 @@ from django.contrib.auth.models import update_last_login
 from django.core.validators import validate_email
 from django.template.loader import get_template
 import jwt
-from hyperlink._url import NoneType
-from rest_framework import status
+from rest_framework import status, filters
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
-from rest_framework.generics import get_object_or_404
+from rest_framework.generics import get_object_or_404, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from api._serializer import UserSerializer, PostSerializer
+from api.customschema import auto_dict, login_user_response
 from first import settings
 from post.models import CustomUser, Post
+from drf_yasg.utils import swagger_auto_schema
 
 
 class CreateUser(generics.CreateAPIView):
@@ -30,7 +33,11 @@ class CreateUser(generics.CreateAPIView):
     serializer_class = UserSerializer
 
     def create(self, request, *args, **kwargs):
+        '''
+        ایجاد کاربر جدید
+        '''
         data = request.data
+        user = CustomUser()
         # username validate
         if not data.get('username'):
             return Response(data={'username': 'نام کاربری الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
@@ -41,20 +48,20 @@ class CreateUser(generics.CreateAPIView):
             return Response(data={'phone': 'شماره تلفن صحیح نمی باشد'}, status=status.HTTP_400_BAD_REQUEST)
 
         # email validate
-        email = request.data.get('email')
-        if email.strip():
-            try:
-                user = CustomUser.objects.get(email=email)
-                # اگر ایمیل ارسالی در حافظه باشد
-                return Response(data={'email': 'این ایمیل ثبت شده است.'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-            except:
-                # ایمیل نباشد یا بیش از یک بار تکرار شده باشد این بخش اجرا می شود
-                # تکرار بیش از یک بار امکان ندارد مگر با دستکاری دستی دیتابیس
-                pass
-        else:
-            # اگر ایمیل ارسال نشود
-            return Response(data={'email': 'ایمیل الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            email = request.data.get('email')
+            if not email.strip():
+                return Response(data={'email': 'ایمیل الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
+        except AttributeError:
+            return Response(data={'email': 'فیلد ایمیل ارسال نشده است'}, status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            email = CustomUser.objects.get(email=email)
+            return Response({'email': 'آدرس ایمیل تکراری است'}, status=status.HTTP_400_BAD_REQUEST)
+        except (IntegrityError, ObjectDoesNotExist):
+            pass
+
+        user = ''
         try:
             # ایمیل بعد از تایید در دیتابیس ذخیره می شود
             user = CustomUser(
@@ -66,27 +73,35 @@ class CreateUser(generics.CreateAPIView):
                 avatar=data.get('avatar'),
                 phone=data.get('phone'),
             )
-
-            user.set_password(data.get('password'))
-            user.save()
-
-            Token.objects.create(user=user)
-            # ایمیل آدرس فعلا ذخیره نمی شود
-            # فقط برای ارسال ایمیل خط زیر نوشته شده است
-            user.email = email
-            # ارسال ایمیل برای تایید آدرس ایمیل
-            #SendMail.send(user=user, mail_type='verify')
-            # ایمیل نشان داده نشود. چون تصور می شود ثبت شده است
-            user.email = ''
-            data = self.get_serializer(user).data
-            return Response({'user': data})
-
+        except AttributeError:
+            return Response({'username': 'فیلد نام کاربری ارسال شود'}, status=status.HTTP_400_BAD_REQUEST)
         except IntegrityError:
-            # نام کاربری تکراری است
             return Response({'username': 'نام کاربری تکراری است'}, status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            user.set_password(data.get('password'))
+            # ایمیل آدرس فعلا ذخیره نمی شود
+            # فقط برای ارسال ایمیل خط زیر نوشته شده است
         except AttributeError:
-            return Response({'email': 'ارسال ایمیل با مشکل مواجه شده است'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'password': 'فیلد پسورد ارسال شود'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user.email = email
+            # ارسال ایمیل برای تایید آدرس ایمیل
+            # اول ایمیل فرستاده شود، اگر فرستاده نشد کاربر ثبت نشود
+            SendMail.send(user=user, mail_type='verify')
+            # برای اینکه مقار null در دیتا بیس بگیرد
+            user.last_date_sent_mail = datetime.now()
+            user.email = None
+            user.save()
+            Token.objects.create(user=user)
+
+            # ایمیل نشان داده نشود. چون تصور می شود ثبت شده است
+            data = self.get_serializer(user).data
+            return Response({'user': data})
+        except AttributeError:
+            return Response({'email': 'مشکلی در سرور ایجاد شده است. لطفا مجدد تلاش کنید و یا به پشتیبانی اطلاع دهید'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginUser(APIView):
@@ -95,7 +110,7 @@ class LoginUser(APIView):
     '''
     serializer_class = UserSerializer
 
-    # لاگین شدن
+    @swagger_auto_schema(responses=login_user_response, )
     def post(self, request):
         '''
         ارسال نام کاربری و رمز عبور
@@ -111,16 +126,11 @@ class LoginUser(APIView):
 
 
 class ProfileUser(APIView):
-    '''
-    استفاده و ویرایش پروفایل کاربر
-    --------
-    به لاگین نیاز دارد
-    '''
     serializer_class = UserSerializer
     # دسترسی توسط توکن
     permission_classes = (IsAuthenticated,)
 
-    # اپدیت پروفایل
+    @swagger_auto_schema(auto_dict)
     def put(self, request):
         # با استفاده از توکن ارسالی کاربر تشخیص داده شده است.
         # پس امکان ندارد کاربری وجود نداشته باشد
@@ -166,10 +176,6 @@ class ProfileUser(APIView):
         email = data.get('email')
         # درخواست تغییر ایمیل
         if email:
-            # کاربر هنوز ایمیلش را تایید نکرده است
-            if not user.email:
-                return Response(data={'emial': 'ایمیل شما هنوز تایید نشده است'}, status=status.HTTP_406_NOT_ACCEPTABLE)
-
             # ایمیل تکراری وارد نشود
             try:
                 # ایمیل تکراری است
@@ -197,10 +203,14 @@ class ProfileUser(APIView):
         user.phone = data.get('phone') or user.phone
         # ایمیل تغییر یافته باید دوباره تایید شود
         if email and (user.email != email):
+            # اگر ایمیل اول تایید نشده است، می تواند دوباره ایمیل دیگری ثبت کند.اگر دو ایمیل را پشت سرم هم
+            # فعال کند، ایمیل دوم باقی خواهد ماند.
             # ایمیل مقداری پر و خالی می تواند داشته باشد
             user.email = email
             SendMail.send(user, mail_type='veify')
-            user.email = ''
+            # ذخیره ی مقدار null در دیتابیس
+            user.email = None
+            user.last_date_sent_mail = datetime.now()
         user.save()
         return Response(data={'data': 'updated', "user": UserSerializer(user).data}, status=status.HTTP_200_OK)
 
@@ -230,7 +240,8 @@ class Posts(APIView):
     '''
     permission_classes = (IsAuthenticated,)
 
-    # درخواست لیست پست ها
+    # @swagger_auto_schema(operation_id='ID', operation_description='operation description',
+    #                      responses={200: 'verified', 404: 'Not found item'})
     def get(self, request, post_pk=None):
         """
         get document of posts
@@ -260,8 +271,6 @@ class Posts(APIView):
         توجه شود که می توان درخواست های زیادی را پی در پی فرستاد که این موجب اخلال درکار وب سرویس خواهد کرد
         برای جلوگیری از این اتفاق باید یک timespan قرار داده شود.
         در production حتما این کار انجام شود.
-        :param request:
-        :return:
         """
         # اگر توکن صحیح نباشد، اصلا به این قسمت از کد نخواهیم رسید
         title = request.data.get('title')
@@ -271,8 +280,6 @@ class Posts(APIView):
             return Response({'post': 'title or content is empty'}, status=status.HTTP_400_BAD_REQUEST)
 
         user = request.user
-        title = request.data.get('title')
-        content = request.data.get('content')
         try:
             post = Post(user=user, title=title, content=content)
             post.save()
@@ -311,17 +318,26 @@ class UserSearch(APIView):
             return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PostSearch(APIView):
-    def get(self, request):
-        data = request.data
-        if data.get('search'):
-            posts = Post.objects.filter(Q(title__contains=data.get('search')) | Q(content__contains=data.get('search')))
-            data_serialized = PostSerializer(posts, many=True).data
-            # اگر چیزی پیدا نشود، 404 ارسال می کند.
-            return Response(data_serialized, status=(status.HTTP_200_OK if posts.count() > 0 else status.HTTP_404_NOT_FOUND))
-        else:
-            # اگر دیتا ارسال نشود 400 ارسال می کند.
-            return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
+class PostSearch(generics.ListAPIView):
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        title = self.request.GET.get('title') or False
+        content = self.request.GET.get('content') or False
+        try:
+            return Post.objects.filter(Q(title__contains=title) | Q(content__contains=content))
+        except:
+            return None
+    # def get(self, request, title=None, content=None):
+    #
+    #     if title:
+    #         posts = Post.objects.filter(Q(title__contains=title))
+    #         data_serialized = PostSerializer(posts, many=True).data
+    #         # اگر چیزی پیدا نشود، 404 ارسال می کند.
+    #         return Response(data_serialized, status=(status.HTTP_200_OK if posts.count() > 0 else status.HTTP_404_NOT_FOUND))
+    #     else:
+    #         # اگر دیتا ارسال نشود 400 ارسال می کند.
+    #         return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasswordRecovery(APIView):
@@ -425,7 +441,6 @@ class ResetPassword(APIView):
             return Response({'token': 'لینک خراب می باشد'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class VerifyMail(APIView):
 
     def get(self, request, decoded_str):
@@ -456,3 +471,9 @@ class VerifyMail(APIView):
             return Response({'email': 'ایمیل ثبت شد. باید به صفحه ی تایید ایمیل ریدایرکت کنم'}, status=status.HTTP_200_OK)
         # لینک دستکاری یا منقضی شده
         return Response({'email': 'لینک تایید ایمیل خراب می باشد'}, status=status.HTTP_404_NOT_FOUND)
+
+
+class UploadTest(ListAPIView):
+    serializer_class = PostSerializer
+    filter_backends = (filters.BaseFilterBackend)
+    filter_fields = ['title', ]
