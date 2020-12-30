@@ -39,7 +39,13 @@ class CreateUser(generics.CreateAPIView):
         data = request.data
         user = CustomUser()
         # username validate
-        if not data.get('username'):
+        if data.get('username'):
+            try:
+                user = CustomUser.objects.get(username=data.get('username'))
+                return Response(data={'username': 'نام کاربری تکراری است'}, status=status.HTTP_200_OK)
+            except:
+                pass
+        else:
             return Response(data={'username': 'نام کاربری الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
 
         # phone validate
@@ -90,8 +96,9 @@ class CreateUser(generics.CreateAPIView):
             # ارسال ایمیل برای تایید آدرس ایمیل
             # اول ایمیل فرستاده شود، اگر فرستاده نشد کاربر ثبت نشود
             SendMail.send(user=user, mail_type='verify')
-            # برای اینکه مقار null در دیتا بیس بگیرد
             user.last_date_sent_mail = datetime.now()
+            # برای اینکه مقار null در دیتا بیس بگیرد
+
             user.email = None
             user.save()
             Token.objects.create(user=user)
@@ -243,19 +250,6 @@ class Posts(APIView):
     # @swagger_auto_schema(operation_id='ID', operation_description='operation description',
     #                      responses={200: 'verified', 404: 'Not found item'})
     def get(self, request, post_pk=None):
-        """
-        get document of posts
-        parameters
-        -----
-        request : str
-                *request of client
-        post_pk : int
-                **post primary key
-        return : 200
-        """
-        # زمانی که این متد فراخوانی شود یعنی توکن تایید شده است و
-        # request.user
-        # در دسترس قرار می گیرد.
 
         objs = Post.objects.filter(user_id=request.user.id)
         if post_pk:
@@ -277,12 +271,13 @@ class Posts(APIView):
         content = request.data.get('content')
         # فیلدهای title و content هم باید ارسال شوند و هم باید مقدار داشته باشند.
         if title is None or content is None or title.strip() == "" or content.strip() == "":
-            return Response({'post': 'title or content is empty'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'post': 'صثtitle or content is empty'}, status=status.HTTP_400_BAD_REQUEST)
 
         user = request.user
         try:
             post = Post(user=user, title=title, content=content)
             post.save()
+
         except:
             return Response({'post': 'post title is duplicated'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(data={'id': post.pk, 'save': 'Ok'}, status=status.HTTP_201_CREATED)
@@ -304,18 +299,19 @@ class Posts(APIView):
         return Response({'post': 'deleted'}, status=status.HTTP_200_OK)
 
 
-class UserSearch(APIView):
+class UserSearch(generics.ListAPIView):
+    serializer_class = UserSerializer
 
-    def get(self, request):
-        data = request.data
-        if data.get('search'):
-            users = CustomUser.objects.filter(Q(username__contains=data.get('search')) |
-                                              Q(first_name__contains=data.get('search')) |
-                                              Q(last_name__contains=data.get('search'))).all()
-            data_serialized = UserSerializer(users, many=True).data
-            return Response(data_serialized, status=(status.HTTP_200_OK if users.count() > 0 else status.HTTP_404_NOT_FOUND))
-        else:
-            return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
+    def get_queryset(self):
+        username = self.request.GET.get('username') or False
+        first_name = self.request.GET.get('firstname') or False
+        last_name = self.request.GET.get('last_name') or False
+        try:
+            return CustomUser.objects.filter(Q(username__contains=username) |
+                                             Q(first_name__contains=first_name) |
+                                             Q(last_name__contains=last_name))
+        except:
+            return None
 
 
 class PostSearch(generics.ListAPIView):
@@ -328,16 +324,6 @@ class PostSearch(generics.ListAPIView):
             return Post.objects.filter(Q(title__contains=title) | Q(content__contains=content))
         except:
             return None
-    # def get(self, request, title=None, content=None):
-    #
-    #     if title:
-    #         posts = Post.objects.filter(Q(title__contains=title))
-    #         data_serialized = PostSerializer(posts, many=True).data
-    #         # اگر چیزی پیدا نشود، 404 ارسال می کند.
-    #         return Response(data_serialized, status=(status.HTTP_200_OK if posts.count() > 0 else status.HTTP_404_NOT_FOUND))
-    #     else:
-    #         # اگر دیتا ارسال نشود 400 ارسال می کند.
-    #         return Response({'search': 'Invalid value'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PasswordRecovery(APIView):

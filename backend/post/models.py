@@ -26,8 +26,9 @@ class CustomUser(AbstractUser):
                              blank=True, )
     adres = models.TextField('آدرس', null=True, blank=True)
     bio = models.TextField('توضیحات', null=True, blank=True)
-    avatar = models.ImageField('تصویر', upload_to='images', null=True, blank=True)
-    last_date_sent_mail = models.DateTimeField(auto_now_add=True)
+    avatar = models.ImageField('تصویر', upload_to='images/', null=True, blank=True)
+    date_sent = models.DateTimeField(auto_now_add=True, db_column='last_date_sent_mail')
+
 
     def clean(self):
         # phone validate
@@ -55,7 +56,7 @@ class Post(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.SET_DEFAULT, default='deleted')
     title = models.CharField('عنوان', max_length=100, null=False)
     content = models.TextField('محتوا', null=False)
-    send_date = models.DateTimeField('تاریخ ارسال', auto_now_add=True)
+    create_date = models.DateTimeField('تاریخ ارسال', auto_now_add=True)
     last_update = models.DateTimeField('تاریخ آخرین اپدیت', auto_now=True)
 
     class Meta:

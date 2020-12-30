@@ -25,7 +25,7 @@ urlpatterns = [
     # ([a-zA-z0-9-_.])+
     # جستوجو در نام کاربری، نام و نام خانوادگی
     # بدون نیاز به احراز هویت
-    path('users/search/', UserSearch.as_view()),
+    re_path(r'users/search/', UserSearch.as_view()),
     path('password-recovery/', PasswordRecovery.as_view()),
     # لینک ارسالی به کاربر برای ریست پسورد
     path('reset-password/<decoded_str>/', ResetPassword.as_view()),
