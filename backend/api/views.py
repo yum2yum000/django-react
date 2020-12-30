@@ -1,7 +1,7 @@
 import re
 from datetime import timedelta, datetime
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.mail import send_mail
 from django.db import IntegrityError
 from django.db.models import Q
@@ -17,7 +17,7 @@ from rest_framework.generics import get_object_or_404, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from api._serializer import UserSerializer, PostSerializer
+from api._serializer import UserSerializer, PostSerializer, UserSearchSerializer
 from api.customschema import auto_dict, login_user_response
 from first import settings
 from post.models import CustomUser, Post
@@ -37,11 +37,26 @@ class CreateUser(generics.CreateAPIView):
         ایجاد کاربر جدید
         '''
         data = request.data
-        user = CustomUser()
+        try:
+            username = data.get('username').strip()
+            password = data.get('password').strip()
+            first_name = data.get('first_name').strip()
+            last_name = data.get('last_name').strip()
+            adres = data.get('adres').strip()
+            bio = data.get('bio').strip()
+            avatar = data.get('avatar')
+            email = data.get('email')
+            # پشت سر هم کار نکرد
+            email = email.strip()
+            phone = data.get('phone').strip()
+
+        except:
+            return Response({'error': 'لطفا همه ی فیلد ها را ارسال کنید'}, status=status.HTTP_400_BAD_REQUEST)
+
         # username validate
-        if data.get('username'):
+        if username:
             try:
-                user = CustomUser.objects.get(username=data.get('username'))
+                user = CustomUser.objects.get(username=username)
                 return Response(data={'username': 'نام کاربری تکراری است'}, status=status.HTTP_200_OK)
             except:
                 pass
@@ -49,35 +64,33 @@ class CreateUser(generics.CreateAPIView):
             return Response(data={'username': 'نام کاربری الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
 
         # phone validate
-        phone = request.data.get('phone')
-        if phone is not None and re.match('^09[0-9]{9}$', phone) is None:
+        if phone is not '' and re.match('^09[0-9]{9}$', phone) is None:
             return Response(data={'phone': 'شماره تلفن صحیح نمی باشد'}, status=status.HTTP_400_BAD_REQUEST)
 
         # email validate
-        try:
-            email = request.data.get('email')
-            if not email.strip():
-                return Response(data={'email': 'ایمیل الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
-        except AttributeError:
-            return Response(data={'email': 'فیلد ایمیل ارسال نشده است'}, status=status.HTTP_400_BAD_REQUEST)
-
+        if not email:
+            return Response(data={'email': 'ایمیل الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                validate_email(email)
+            except ValidationError:
+                return Response({'email': 'فرمت ایمیل صحیح نمی باشد'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             email = CustomUser.objects.get(email=email)
             return Response({'email': 'آدرس ایمیل تکراری است'}, status=status.HTTP_400_BAD_REQUEST)
         except (IntegrityError, ObjectDoesNotExist):
             pass
 
-        user = ''
         try:
             # ایمیل بعد از تایید در دیتابیس ذخیره می شود
             user = CustomUser(
-                username=data.get('username'),
-                first_name=data.get('first_name'),
-                last_name=data.get('last_name'),
-                adres=data.get('adres'),
-                bio=data.get('bio'),
-                avatar=data.get('avatar'),
-                phone=data.get('phone'),
+                username=username,
+                first_name=first_name,
+                last_name=last_name,
+                adres=adres,
+                bio=bio,
+                avatar=avatar,
+                phone=phone,
             )
         except AttributeError:
             return Response({'username': 'فیلد نام کاربری ارسال شود'}, status=status.HTTP_400_BAD_REQUEST)
@@ -85,11 +98,10 @@ class CreateUser(generics.CreateAPIView):
             return Response({'username': 'نام کاربری تکراری است'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            user.set_password(data.get('password'))
-            # ایمیل آدرس فعلا ذخیره نمی شود
-            # فقط برای ارسال ایمیل خط زیر نوشته شده است
-        except AttributeError:
-            return Response({'password': 'فیلد پسورد ارسال شود'}, status=status.HTTP_400_BAD_REQUEST)
+            password_validation.validate_password(password)
+            user.set_password(password)
+        except ValidationError as msg:
+            return Response({'password':msg}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user.email = email
@@ -109,6 +121,22 @@ class CreateUser(generics.CreateAPIView):
         except AttributeError:
             return Response({'email': 'مشکلی در سرور ایجاد شده است. لطفا مجدد تلاش کنید و یا به پشتیبانی اطلاع دهید'},
                             status=status.HTTP_400_BAD_REQUEST)
+
+
+#
+# class CreateUser(generics.CreateAPIView):
+#     serializer_class = UserSerializer
+#
+#     def create(self, request, *args, **kwargs):
+#         user_serialize = UserSerializer(data=request.data)
+#         if user_serialize.is_valid():
+#             new_user = CustomUser(request.data)
+#             new_user.email = ''
+#             new_user.save()
+#             Token.objects.create(user=new_user)
+#             return Response({'register': 'Ok'}, status=status.HTTP_200_OK)
+#         else:
+#             return Response({'register': 'Fialed'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginUser(APIView):
@@ -267,11 +295,11 @@ class Posts(APIView):
         در production حتما این کار انجام شود.
         """
         # اگر توکن صحیح نباشد، اصلا به این قسمت از کد نخواهیم رسید
-        title = request.data.get('title')
-        content = request.data.get('content')
+        title = request.data.get('title').strip()
+        content = request.data.get('content').strip()
         # فیلدهای title و content هم باید ارسال شوند و هم باید مقدار داشته باشند.
-        if title is None or content is None or title.strip() == "" or content.strip() == "":
-            return Response({'post': 'صثtitle or content is empty'}, status=status.HTTP_400_BAD_REQUEST)
+        if title is None or content is None or title == "" or content == "":
+            return Response({'post': 'عنوان خالی است'}, status=status.HTTP_400_BAD_REQUEST)
 
         user = request.user
         try:
@@ -300,7 +328,7 @@ class Posts(APIView):
 
 
 class UserSearch(generics.ListAPIView):
-    serializer_class = UserSerializer
+    serializer_class = UserSearchSerializer
 
     def get_queryset(self):
         username = self.request.GET.get('username') or False
