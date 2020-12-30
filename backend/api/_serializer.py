@@ -20,10 +20,14 @@ from post.models import CustomUser, Post
 #         }
 
 
-class UserSerializer(serializers.ModelSerializer):
-
+class UserSearchSerializer(serializers.ModelSerializer):
     class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'first_name', 'last_name']
 
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
         model = CustomUser
         exclude = ['is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions']
         # fields = '__all__'
@@ -52,11 +56,13 @@ class PostSerializer(serializers.ModelSerializer):
         fields = '__all__'
         # depth=1
 
+    #اطلاعات سفارشی از یوزر در درخواست های مربوط به پست
     class UserDetails(serializers.ModelSerializer):
         class Meta:
             model = CustomUser
             fields = ('id', 'username',)
 
+    #فیلد یوزر دیتای خود رو از کلاس بالا می گیرد
     user = UserDetails()
 
     # fields = ('id', 'user__username', 'title', 'content')
