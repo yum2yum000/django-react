@@ -4,8 +4,11 @@
             <div class="dashCard">
                 <ul>
                     <li class="first-card">
-                        <div class="c-profile__user-avatar" style="display: inline-grid;">
-                            <img  :src="'http://127.0.0.1:8000'+userInfo.avatar" height="150">
+                        <div class="c-profile__user-avatar" v-if="userInfo.avatar" style="display: inline-grid;">
+                            <img  :src="baseUrl+userInfo.avatar" height="150">
+                        </div>
+                        <div class="c-profile__user-avatar" v-else style="display: inline-grid;">
+                            <img  :src="baseUrl+'/media/images/default.jpg'" height="150">
                         </div>
                         <p class="firstname d-inline-block">{{username}}</p></li>
                 </ul>
@@ -50,11 +53,13 @@
 
 <script>
     import {mapGetters} from 'vuex'
+    import { baseUrl } from '@/config'
     export default {
         name: "Sidebar",
         data(){
             return{
                 show:true,
+                baseUrl:baseUrl
 
             }
         },

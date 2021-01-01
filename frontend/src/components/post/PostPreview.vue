@@ -1,7 +1,7 @@
 <template>
 
         <div>
-            <div class="box">
+            <div class="box mb-2">
                 <i class="fas fa-quote-left quote" aria-hidden="true" style="font-size:12px;color:#c5245e"></i>
                 <p class="content">{{title}} </p>
                 <p >{{content}}</p>

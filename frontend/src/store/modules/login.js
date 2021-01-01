@@ -70,8 +70,9 @@ export const actions= {
     getUser({commit}) {
         return Service.getUser().then((res) => {
             commit('SET_USERINFO', res.data)
+            console.log('user',res.data)
             if (!res.data.user.email) {
-                let end = new Date(res.data.user.date_joined)
+                let end = new Date(res.data.user.date_sent)
                 const now = new Date()
                 const distance = now.getTime() - end.getTime()
                 const convertToDay = (24 * 60 * 60 * 1000)
