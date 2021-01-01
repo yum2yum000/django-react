@@ -79,19 +79,19 @@ const router = new Router({
                     props:true,
                 },
                 {
-                    path: 'create',
+                    path: 'postcreate',
                     name: 'postCreate',
                     component: PostCreate,
                     props:true,
                 },
                 {
-                    path: 'list',
+                    path: 'postlist',
                     name: 'postLists',
                     component: PostLists,
                     props:true,
                 },
                 {
-                    path: 'edit/:id',
+                    path: 'postedit/:id',
                     name: 'postEdit',
                     component: PostEdit,
                     props:true,

@@ -4,6 +4,8 @@
             <div class="shadowhead">
                لیست پست ها
             </div>
+            <loading loader="dots" :active.sync="isLoading"
+                     :can-cancel="true"></loading>
             <span>جستجو</span>
             <input class="input--style-4" label="جستجو" type="text" @input="input">
            <div class="row justify-content-center mt-5">
@@ -20,9 +22,8 @@
 <script>
     import PostList from '@/components/post/PostList'
     import store from '@/store/store'
-
-
     import {mapGetters} from 'vuex'
+    import EventBus  from '@/event-bus.js';
     export default {
         name: "PostLists",
         components: {
@@ -35,20 +36,22 @@
             },
 
             fetchPosts(){
-                store.dispatch('login/getPosts').then(()=>{
-
+                this.isLoading=true
+                store.dispatch('post/getPosts').then(()=>{
+                    this.isLoading=false
 
                 }).catch(()=>{
+                    this.isLoading=false
                     this.error='مشکلی در دریافت اطلاعات رخ داده است'
                 })
             },
             service(){
                 if(this.searchValue!=='')
                 {
+                    store.dispatch('post/filterPosts',this.searchValue).then(()=>{
 
-                    store.dispatch('login/filterPosts',this.searchValue).then((res)=>{
-                    console.log(res)
-                })}
+                })
+                }
                 else{
                     this.fetchPosts();
                 }
@@ -58,14 +61,19 @@
             return{
                 error:'',
                 value:'',
-                searchValue:''
+                searchValue:'',
+                isLoading:false,
 
             }
         },
         computed: {
-            ...mapGetters('login', ['posts'])
+            ...mapGetters('login', ['userInfo']),
+            ...mapGetters('post', ['posts'])
         },
         created(){
+            if(!this.userInfo){
+                store.dispatch('login/getUser')
+            }
             this.fetchPosts();
 
         }

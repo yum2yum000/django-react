@@ -4,6 +4,8 @@
             <div class="shadowhead">
                 ایجاد پست
             </div>
+            <loading loader="dots" :active.sync="isLoading"
+                     :can-cancel="true"></loading>
             <div class="row justify-content-center mt-5">
                 <div class="col-lg-12">
                     <form @submit.prevent="create">
@@ -49,6 +51,8 @@
 <script>
     import { required} from 'vuelidate/lib/validators'
     import Service from '@/services/Service.js'
+    import {mapGetters} from 'vuex'
+    import store from '@/store/store'
     export default {
         name: "PostCreate",
         validations:{
@@ -58,11 +62,20 @@
 
             }
         },
+        computed: {
+            ...mapGetters('login', ['userInfo'])
+        },
+        created(){
+            if(!this.userInfo){
+                store.dispatch('login/getUser')
+            }
+        },
         data(){
             return{
                 post:{},
                 error:'',
-                buttonClick:false
+                buttonClick:false,
+                isLoading:false,
             }
         },
         watch:{
@@ -78,14 +91,17 @@
                 this.$v.$touch()
                 if(!this.$v.$invalid){
                 this.buttonClick=true;
+                    this.isLoading=true,
                 Service.createPost(this.post).then((res)=>{
                     console.log('created post',res)
+                    this.isLoading=false,
                     this.buttonClick=false;
                     if (res.status === 201){
                         this.error='پست با موفقیت ایجاد شد'
                     }
                 }).catch((e)=>{
                     this.buttonClick=false;
+                    this.isLoading=false,
                     console.log(e.response)
                     if (e.response && e.response.status === 400) {
 

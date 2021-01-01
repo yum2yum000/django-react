@@ -40,6 +40,9 @@
                 console.log(res)
                 this.posts=res.data
             })
+        },
+        mounted () {
+            window.scrollTo(0, 0)
         }
 
     }

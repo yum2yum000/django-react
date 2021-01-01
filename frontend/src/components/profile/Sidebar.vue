@@ -5,7 +5,7 @@
                 <ul>
                     <li class="first-card">
                         <div class="c-profile__user-avatar" style="display: inline-grid;">
-                            <img src="https://hotlymall.com/storage/avatars/default.jpg" alt="09118012388">
+                            <img  :src="'http://127.0.0.1:8000'+userInfo.avatar" height="150">
                         </div>
                         <p class="firstname d-inline-block">{{username}}</p></li>
                 </ul>
@@ -65,7 +65,7 @@
             this.currentPage
         },
         computed:{
-            ...mapGetters('login', ['username']),
+            ...mapGetters('login', ['username','userInfo']),
             currentPage () {
                 return this.$route.path
             }

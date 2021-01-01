@@ -5,18 +5,17 @@
                 <i class="fas fa-quote-left quote" aria-hidden="true" style="font-size:12px;color:#c5245e"></i>
                 <p class="content">{{title}} </p>
                 <p >{{content}}</p>
+                <loading loader="dots" :active.sync="isLoading"
+                         :can-cancel="true"></loading>
                 <div class="content">
                     <span class="writer"> نوشته شده توسط {{user.username}} </span>
                     <div class="info">
                         <div class="job" >
                             <router-link v-if="user.id==userInfo.id" :to="{ name: 'postEdit', params: { id: id } }"> <i class="fas fa-edit"></i> </router-link>
+                            <div  v-if="user.id==userInfo.id" class="uk-container uk-container-center uk-margin-top" ></div>
 
-
-<<<<<<< HEAD
-                            <div  v-if="user.id==userInfo.id"class="uk-container uk-container-center uk-margin-top" >
-=======
                             <div  v-if="user.id==userInfo.id" class="uk-container uk-container-center uk-margin-top" >
->>>>>>> 86a24531cd3bae60cf9a0a078c1dcd4b451758d3
+
                                 <span @click="showModal = true" class="uk-button uk-button-primary delete" ><i class="fas fa-trash mr-2" ></i></span>
                                 <DeleteModal @apply="deletePost(id)" class="delete" @closeModal="showModal=false" :show="showModal">
                                 </DeleteModal>
@@ -43,7 +42,8 @@
         },
         data(){
             return{
-                showModal: false
+                showModal: false,
+                isLoading:false,
             }
         },
         props:{
@@ -71,10 +71,12 @@
         },
         methods:{
             deletePost(id){
-                store.dispatch('login/deletePost',id).then(()=>{
-
+                this.isLoading=true
+                store.dispatch('post/deletePost',id).then(()=>{
+                this.isLoading=false
 
                 }).catch(()=>{
+                    this.isLoading=false
                     this.error='مشکلی در دریافت اطلاعات رخ داده است'
                 })
             }
