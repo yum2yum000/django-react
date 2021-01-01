@@ -20,6 +20,12 @@ from post.models import CustomUser, Post
 #         }
 
 
+class UserSearchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=CustomUser
+        fields=['id','username','first_name','last_name']
+
+
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:

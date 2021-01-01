@@ -22,13 +22,11 @@ class CustomUser(AbstractUser):
     AbstractUser._meta.get_field('first_name').null = True
     AbstractUser._meta.get_field('last_name').null = True
     email = LowercaseEmailField(null=True, unique=True, default=None, blank=True, )
-    phone = models.CharField('شماره تلفن', max_length=11, null=True,
-                             blank=True, )
+    phone = models.CharField('شماره تلفن', max_length=11, null=True, blank=True, )
     adres = models.TextField('آدرس', null=True, blank=True)
     bio = models.TextField('توضیحات', null=True, blank=True)
     avatar = models.ImageField('تصویر', upload_to='images/', null=True, blank=True)
     date_sent = models.DateTimeField(auto_now_add=True, db_column='last_date_sent_mail')
-
 
     def clean(self):
         # phone validate
