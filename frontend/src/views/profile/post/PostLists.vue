@@ -23,7 +23,6 @@
     import PostList from '@/components/post/PostList'
     import store from '@/store/store'
     import {mapGetters} from 'vuex'
-    import EventBus  from '@/event-bus.js';
     export default {
         name: "PostLists",
         components: {
