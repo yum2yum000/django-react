@@ -14,6 +14,7 @@ from rest_framework import status, filters
 from rest_framework import generics
 from rest_framework.authtoken.models import Token
 from rest_framework.generics import get_object_or_404, ListAPIView
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.utils import json
@@ -266,8 +267,8 @@ class AllPostList(generics.ListAPIView):
     بدون نیاز به لاگین
     '''
     serializer_class = PostSerializer
-    queryset = Post.objects.all()
-
+    queryset = Post.objects.all().order_by('id')
+    # pagination_class = None
 
 class Posts(APIView):
     '''
