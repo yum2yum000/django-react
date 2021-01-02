@@ -16,12 +16,16 @@ from rest_framework.authtoken.models import Token
 from rest_framework.generics import get_object_or_404, ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.utils import json
 from rest_framework.views import APIView
 from api._serializer import UserSerializer, PostSerializer, UserSearchSerializer
-from api.customschema import auto_dict, login_user_response
+# from api.customschema import auto_dict, login_user_response
+
 from first import settings
 from post.models import CustomUser, Post
-from drf_yasg.utils import swagger_auto_schema
+
+
+# from drf_yasg.utils import swagger_auto_schema
 
 
 class CreateUser(generics.CreateAPIView):
@@ -37,24 +41,19 @@ class CreateUser(generics.CreateAPIView):
         ایجاد کاربر جدید
         '''
         data = request.data
-        try:
-            username = data.get('username').strip()
-            password = data.get('password').strip()
-            first_name = data.get('first_name').strip()
-            last_name = data.get('last_name').strip()
-            adres = data.get('adres').strip()
-            bio = data.get('bio').strip()
-            avatar = data.get('avatar')
-            email = data.get('email')
-            # پشت سر هم کار نکرد
-            email = email.strip()
-            phone = data.get('phone').strip()
-
-        except:
-            return Response({'error': 'لطفا همه ی فیلد ها را ارسال کنید'}, status=status.HTTP_400_BAD_REQUEST)
+        username = data.get('username')
+        password = data.get('password')
+        first_name = data.get('first_name')
+        last_name = data.get('last_name')
+        adres = data.get('adres')
+        bio = data.get('bio')
+        avatar = data.get('avatar')
+        email = data.get('email')
+        phone = data.get('phone')
 
         # username validate
         if username:
+            username=username.strip()
             try:
                 user = CustomUser.objects.get(username=username)
                 return Response(data={'username': 'نام کاربری تکراری است'}, status=status.HTTP_200_OK)
@@ -64,7 +63,7 @@ class CreateUser(generics.CreateAPIView):
             return Response(data={'username': 'نام کاربری الزامی است'}, status=status.HTTP_400_BAD_REQUEST)
 
         # phone validate
-        if phone is not '' and re.match('^09[0-9]{9}$', phone) is None:
+        if phone and (not re.match('^09[0-9]{9}$', phone)) :
             return Response(data={'phone': 'شماره تلفن صحیح نمی باشد'}, status=status.HTTP_400_BAD_REQUEST)
 
         # email validate
@@ -101,13 +100,14 @@ class CreateUser(generics.CreateAPIView):
             password_validation.validate_password(password)
             user.set_password(password)
         except ValidationError as msg:
-            return Response({'password':msg}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'password': msg}, status=status.HTTP_400_BAD_REQUEST)
+
 
         try:
             user.email = email
             # ارسال ایمیل برای تایید آدرس ایمیل
             # اول ایمیل فرستاده شود، اگر فرستاده نشد کاربر ثبت نشود
-            SendMail.send(user=user, mail_type='verify')
+            #SendMail.send(user=user, mail_type='verify')
             user.last_date_sent_mail = datetime.now()
             # برای اینکه مقار null در دیتا بیس بگیرد
 
@@ -145,7 +145,7 @@ class LoginUser(APIView):
     '''
     serializer_class = UserSerializer
 
-    @swagger_auto_schema(responses=login_user_response, )
+    # @swagger_auto_schema(responses=login_user_response, )
     def post(self, request):
         '''
         ارسال نام کاربری و رمز عبور
@@ -165,7 +165,7 @@ class ProfileUser(APIView):
     # دسترسی توسط توکن
     permission_classes = (IsAuthenticated,)
 
-    @swagger_auto_schema(auto_dict)
+    # @swagger_auto_schema(auto_dict)
     def put(self, request):
         # با استفاده از توکن ارسالی کاربر تشخیص داده شده است.
         # پس امکان ندارد کاربری وجود نداشته باشد
