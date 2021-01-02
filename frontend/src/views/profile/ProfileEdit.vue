@@ -4,6 +4,8 @@
             <div class="shadowhead">
                 ویرایش اطلاعات
             </div>
+            <loading loader="dots" :active.sync="isLoading"
+                     :can-cancel="true"></loading>
             <div class="row justify-content-center mt-5">
                 <div class="col-lg-12">
                     <form @submit.prevent="update">
@@ -51,7 +53,23 @@
                             </div>
 
                         </div>
-                        <div v-if="error" class="text-right error mt-2 mr-3">
+                        <div class="row ">
+                            <div class="col-lg-6">
+                                <div class="input-container">
+                                    <label class="label">عکس</label>
+                                    <input type="file" @change="onFileChanged" style="display:none" ref="fileInput" accept="image/*">
+                                    <button class="primary btn-img btn--radius-2 " @click.prevent="onPickFile">انتخاب عکس</button>
+                                   <div class="mt-2" v-if="user.avatar">
+                                       <img  :src="baseUrl+user.avatar" height="150">
+                                   </div>
+                                    <div class="mt-2" v-if="imageUrl">
+                                        <img  :src="imageUrl" height="150">
+                                    </div>
+
+                                </div>
+                            </div>
+                            </div>
+                        <div v-if="error" class="text-right error mt-4 mr-3">
                             {{error}}
                         </div>
                         <div class="p-t-15 text-center ">
@@ -70,6 +88,7 @@
     import { required,email } from 'vuelidate/lib/validators'
     import {mapGetters} from 'vuex'
     import store from '@/store/store'
+    import { baseUrl } from '@/config'
 
     export default {
         name: "ProfileEdit",
@@ -87,8 +106,15 @@
                     email:'',
                     phone:'',
                     adres:'',
+                    avatar:''
                 },
-                error:''
+                formData : new FormData(),
+                imageUrl:'',
+                error:'',
+                isLoading:false,
+                baseUrl: baseUrl
+
+
             }
         },
         computed: {
@@ -106,6 +132,20 @@
             }
         },
         methods:{
+            onFileChanged (event) {
+                this.formData.append('avatar', '')
+                this.user.avatar=null
+                const file = event.target.files[0]
+                let filename=file.name
+                if(filename.lastIndexOf('.')<=0){
+                    this.error='فرمت مناسب انتخاب کنید'
+                }
+                this.imageUrl = URL.createObjectURL(file)
+                this.formData.append('avatar', file, file.name)
+
+
+
+            },
             getUser(){
                   if(this.userInfo)
                   {
@@ -114,6 +154,7 @@
                   else{
                       store.dispatch('login/getUser').then(()=>{
                           this.setInfUser()
+                          console.log('userInfo',this.userInfo)
                       })
                   }
 
@@ -126,16 +167,30 @@
                 this.user.bio=user.bio
                 this.user.adres=user.adres
                 this.user.phone=user.phone
+                this.user.avatar=user.avatar
+
             },
             update(){
                 this.$v.$touch()
                 if(!this.$v.$invalid){
-                    store.dispatch('login/updateUser',this.user).then((res)=>{
+                    this.formData.append('update', 'data')
+                    this.formData.append('last_name',this.user.last_name)
+                    this.formData.append('first_name',this.user.first_name)
+                    this.formData.append('email',this.user.email)
+                    this.formData.append('bio',this.user.bio)
+                    this.formData.append('adres',this.user.adres)
+                    if(this.user.phone!=null)
+                    {
+                        this.formData.append('phone',this.user.phone)
+                    }
+                    this.isLoading=true;
+                    store.dispatch('login/updateUser',this.formData).then((res)=>{
+                        this.isLoading=false;
                         if (res.status === 200){
                             this.error='اطلاعات با موفقیت ویرایش شد'
                         }
                     }).catch((e)=>{
-                        console.log(e.response)
+                        this.isLoading=false;
                         if (e.response && e.response.status === 400) {
                             if(e.response.data.email)
                             {
@@ -154,11 +209,37 @@
                     })
 
             }
-            }
+            },
+            onPickFile(){
+                this.$refs.fileInput.click()
+
+            },
+            // removeImgPreview(){
+            //     this.imageUrl=null
+            //     this.formData.append('avatar', '')
+            // },
+            // removeImg(){
+            //     this.user.avatar=null
+            //     this.formData.append('avatar', null)
+            // }
+
         }
     }
 </script>
 
 <style scoped>
-
+.btn-img{
+    padding:5px;
+    color:white!important;
+    background: linear-gradient(315deg, rgb(148 18 82) 40%, rgba(151,8,150,1) 100%)!important;
+}
+.btn-img:focus{
+    border:0;
+    outline:0
+}
+    .remove{
+        color: red;
+        position: absolute;
+        cursor:pointer;
+    }
 </style>

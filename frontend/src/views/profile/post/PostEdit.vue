@@ -4,6 +4,8 @@
             <div class="shadowhead">
                 ویرایش پست
             </div>
+            <loading loader="dots" :active.sync="isLoading"
+                     :can-cancel="true"></loading>
             <div class="row justify-content-center mt-5">
                 <div class="col-lg-12">
                     <form @submit.prevent="update">
@@ -49,8 +51,9 @@
 <script>
     import { required} from 'vuelidate/lib/validators'
     import store from '@/store/store'
+    import {mapGetters} from 'vuex'
     export default {
-        name: "PostCreate",
+        name: "PostEdit",
         validations:{
             post:{
                 title: { required},
@@ -59,14 +62,20 @@
             }
         },
         created(){
-            store.dispatch('login/getPost',
+            if(!this.userInfo){
+                store.dispatch('login/getUser')
+            }
+            this.isLoading=true;
+            store.dispatch('post/getPost',
                 this.$route.params.id
             ).then((res)=>{
-                console.log('44444444444',res)
                 this.post.title=res.title
                 this.post.content=res.content
                 this.post.id=res.id
+                this.isLoading=false;
                 console.log('user',this.post)
+            }).catch(()=>{
+                this.isLoading=false;
             })
         },
         data(){
@@ -76,7 +85,8 @@
                     content:''
                 },
                 error:'',
-                buttonClick:false
+                buttonClick:false,
+                isLoading:false,
             }
         },
         watch:{
@@ -87,18 +97,24 @@
                 deep: true
             },
         },
+        computed: {
+            ...mapGetters('login', ['userInfo'])
+        },
         methods:{
             update(){
                 this.$v.$touch()
                 if(!this.$v.$invalid){
                 this.buttonClick=true;
-                    store.dispatch('login/editPost',this.post).then((res)=>{
+                    this.isLoading=true;
+                    store.dispatch('post/editPost',this.post).then((res)=>{
                         this.buttonClick=false;
+                        this.isLoading=false;
                         if (res.status === 200){
                             this.error='پست با موفقیت ویرایش شد'
                         }
 
                     }).catch((e)=>{
+                        this.isLoading=false;
                         console.log('g',e.response)
                     })
                 }

@@ -4,6 +4,8 @@
             <div class="shadowhead">
                 ویرایش رمز عبور
             </div>
+            <loading loader="dots" :active.sync="isLoading"
+                     :can-cancel="true"></loading>
             <div class="row justify-content-center mt-5">
                 <div class="col-lg-12">
                     <form @submit.prevent="update">
@@ -54,7 +56,8 @@
         data(){
             return{
                user:{},
-                error:''
+                error:'',
+                isLoading:false,
             }
         },
         watch:{
@@ -69,12 +72,14 @@
             update(){
                 this.$v.$touch()
                 if(!this.$v.$invalid){
+                    this.isLoading=true
                 Service.updatePassword(this.user).then((res)=>{
+                    this.isLoading=false
                     if (res.status === 200){
                         this.error='اطلاعات با موفقیت ویرایش شد'
                     }
                 }).catch((e)=>{
-                    console.log(e.response)
+                    this.isLoading=false
                     if (e.response && e.response.status === 400) {
 
                         if(e.response.data.password)

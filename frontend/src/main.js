@@ -1,12 +1,16 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
 import store from '@/store/store'
 Vue.config.productionTip = false
+Vue.config.baseurl = process.env.BASE_URL
 import Vuelidate from 'vuelidate'
 Vue.use(Vuelidate)
 Vue.component('BaseInput', BaseInput)
 Vue.component('BaseButton',BaseButton)
+Vue.component('Loading', Loading)
 import BaseInput from '@/components/BaseInput'
 import BaseButton from '@/components/BaseButton'
 import './assets/css/bootstrap.min.css';
