@@ -44,5 +44,18 @@
 </script>
 
 <style scoped>
-
+    .footer{
+        background-image:url('../assets/images/Layer-25.jpg');
+        height:200px;
+        position: relative;
+    }
+    .footer:before {
+        content: '';
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: #350b5782;
+    }
 </style>

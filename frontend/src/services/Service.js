@@ -21,15 +21,20 @@ export default {
         return apiClient.get('/posts/user/')
     },
     getPost(id){
-        return apiClient.get('/posts/user/'+id)
+        return apiClient.get('/posts/user/'+id+'/')
     },
     editPost(post){
         console.log('c',post)
         return apiClient.put('/posts/user/'+post.id+'/',{title:post.title,content:post.content})
     },
     updateUser(data){
-        return apiClient.put('/users/profile/',{update:'data',...data
-        })
+        console.log('00',data)
+        return apiClient.put('/users/profile/',data,{
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }
+        )
 
     },
     updatePassword(data){
@@ -45,7 +50,7 @@ export default {
         return apiClient.post('/posts/user/',post)
     },
     deletePost(id){
-        return apiClient.delete('posts/user/'+id)
+        return apiClient.delete('/posts/user/'+id+'/')
     },
 
      filterPosts(value){

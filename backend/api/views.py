@@ -20,6 +20,7 @@ from rest_framework.utils import json
 from rest_framework.views import APIView
 from api._serializer import UserSerializer, PostSerializer, UserSearchSerializer
 # from api.customschema import auto_dict, login_user_response
+
 from first import settings
 from post.models import CustomUser, Post
 
@@ -100,6 +101,7 @@ class CreateUser(generics.CreateAPIView):
             user.set_password(password)
         except ValidationError as msg:
             return Response({'password': msg}, status=status.HTTP_400_BAD_REQUEST)
+
 
         try:
             user.email = email
