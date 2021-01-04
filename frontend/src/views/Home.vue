@@ -63,7 +63,7 @@
                 },
                 deletedId:'',
 
-                perPage: 5,
+                perPage: 2,
                 eventsTotal:'',
                 currentPage:0
             }
