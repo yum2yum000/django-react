@@ -4,7 +4,7 @@ from rest_framework import routers
 from django.contrib.admin.templates import admin
 
 from api.converters import EncodeTokenPathConverter
-from api.views import (Posts, CreateUser, AllPostList, UserSearch,
+from api.views import (Posts, ListCreateUser, AllPostList, UserSearch,
                        PostSearch, PasswordRecovery, ResetPassword, VerifyMail, LoginUser, ProfileUser, UploadTest)
 
 # router = routers.DefaultRouter()
@@ -20,8 +20,12 @@ urlpatterns = [
     # -----------------------------------------------------------------------
 
     path('test/', UploadTest.as_view()),
+    path('users/', ListCreateUser.as_view(), name='create_user'),
+    # post لاگین کردن
+    # put اپدیت کردن پروفایل
+    path('users/login/', LoginUser.as_view(), name='user_login'),
+    path('users/profile/', ProfileUser.as_view(), name='user_login'),
 
-    path('users/', CreateUser.as_view(), name='create_user'),
     # ([a-zA-z0-9-_.])+
     # جستوجو در نام کاربری، نام و نام خانوادگی
     # بدون نیاز به احراز هویت

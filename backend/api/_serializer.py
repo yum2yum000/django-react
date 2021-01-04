@@ -26,8 +26,13 @@ class UserSearchSerializer(serializers.ModelSerializer):
         fields=['id','username','first_name','last_name']
 
 
-class UserSerializer(serializers.ModelSerializer):
+class PublicUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'first_name', 'last_name']
 
+
+class PrivateUserSerializer(serializers.ModelSerializer):
     class Meta:
 
         model = CustomUser
@@ -58,11 +63,13 @@ class PostSerializer(serializers.ModelSerializer):
         fields = '__all__'
         # depth=1
 
+    #اطلاعات سفارشی از یوزر در درخواست های مربوط به پست
     class UserDetails(serializers.ModelSerializer):
         class Meta:
             model = CustomUser
             fields = ('id', 'username',)
 
+    #فیلد یوزر دیتای خود رو از کلاس بالا می گیرد
     user = UserDetails()
 
     # fields = ('id', 'user__username', 'title', 'content')
