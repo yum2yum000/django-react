@@ -1,0 +1,13 @@
+[
+  {
+    "model": "post.post",
+    "pk": 72,
+    "fields": {
+      "user": 3001,
+      "title": "post 2",
+      "content": "post24",
+      "create_date": "2021-01-04T12:25:02.348Z",
+      "last_update": "2021-01-04T12:25:02.348Z"
+    }
+  }
+]
