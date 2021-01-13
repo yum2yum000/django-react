@@ -4,6 +4,8 @@ import Home from './views/Home.vue'
 //
 import Register from './views/Register.vue'
 import Login from './views/Login.vue'
+import About from './views/About.vue'
+import Contact from './views/Contact.vue'
 import EmailConfirm from './views/email/EmailConfirm.vue'
 import NewEmail from './views/email/NewEmail.vue'
 import ProfileEdit from './views/profile/ProfileEdit.vue'
@@ -30,6 +32,16 @@ const router = new Router({
             path: '/',
             name: 'home',
             component: Home
+        },
+        {
+            path: '/about',
+            name: 'about',
+            component: About
+        },
+        {
+            path: '/contact',
+            name: 'contact',
+            component: Contact
         },
         {
             path: '/register',

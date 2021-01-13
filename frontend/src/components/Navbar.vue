@@ -23,9 +23,9 @@
                 <div :class="{collapse:!show}" class=" navbar-collapse text-right" id="ftco-nav" >
                     <ul class="navbar-nav nav ml-auto">
                         <li class="nav-item ml-3"><router-link to="/" class="nav-link active">خانه</router-link></li>
-                        <li class="nav-item ml-3"><router-link to="/" class="nav-link active">درباره ما</router-link></li>
+                        <li class="nav-item ml-3"><router-link to="/about" class="nav-link active">درباره ما</router-link></li>
                         <li class="nav-item ml-3"><router-link to="/" class="nav-link active">بلاگ</router-link></li>
-                        <li class="nav-item ml-3"><router-link to="/" class="nav-link active">تماس با ما</router-link></li>
+                        <li class="nav-item ml-3"><router-link to="/contact" class="nav-link active">تماس با ما</router-link></li>
 
 
                     </ul>
