@@ -1921,5 +1921,15 @@ li .payment:after {
 	z-index:500;
 }
 
-position: relative;
-top: -3px;
+.searchbox3{
+	background: #fff;
+	padding-top: 14px;
+	border-top-left-radius: 25px;
+	border-bottom-left-radius: 25px;
+	border-top-right-radius: 25px;
+	border-bottom-right-radius: 25px;
+	box-shadow: 3px 2px 20px 8px #2f064d29;
+}
+.multiselect__tags {
+	padding: 3px 11px 0 8px!important;
+}

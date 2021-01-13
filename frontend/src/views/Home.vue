@@ -25,7 +25,7 @@
                                     <template slot="noResult">گزینه‌ای یافت نشد</template>
 
                                 </multiselect>
-                               </div>
+                            </div>
                             <div class="search-top">
                                 <i class="fas fa-search"></i>
                             </div>
@@ -38,30 +38,42 @@
                 </div>
             </div>
         </div>
+
         <div class="container latest-top">
             <div class="row justify-content-center mt-5">
                 <div class="col-lg-12 text-center">
-                  <span class="latest">  آخرین مطالب</span>
+                    <span class="latest">  آخرین مطالب</span>
                 </div>
             </div>
         </div>
         <div class="container">
-            <div class="row justify-content-center mt-5 posts-container">
-                <div class="col-lg-12" v-if="posts">
-                    <PostList :results="posts.results"></PostList>
-                    <infinite-loading
-                            spinner="waveDots"
-                            @infinite="infiniteScroll"
-                    >
-                        <div slot="no-more"> </div>
-                        <div slot="no-results"> </div>
-
-                    </infinite-loading>
-
-
+            <div class="row justify-content-center mt-5 mb-3">
+                <div class="col-lg-6 mb-5">
+                    <div class="row searchbox3" id="row-554569930">
+                        <div class="col-12">
+                            <div class="custom-search">
+                                <div class="text-field">
+                                    <input @input="input" type="text"  placeholder="جستجو در بین مطالب..."></div>
+                                <div class="search-top">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-lg-12 text-center" v-else>
-                    اطلاعاتی برای نمایش وجود ندارد
+                <div class="col-lg-12" id="posts">
+                    <PostList :results="posts.results"></PostList>
+                    <div class="load-wrapp" v-if="isLoading">
+                        <div class="load-1">
+                            <div class="line"></div>
+                            <div class="line"></div>
+                            <div class="line"></div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-5" v-if="!scroll &&!filter">دیگر اطلاعاتی برای نمایش وجود ندارد </div>
+                    <div class="text-center mt-5" v-if="noData">داده ای یافت نشد </div>
+
                 </div>
             </div>
         </div>
@@ -78,7 +90,7 @@
     export default {
         name: "Home",
         components: {
-            PostList, Multiselect
+            PostList,Multiselect
         },
         data(){
             return{
@@ -87,82 +99,107 @@
 
                     ]
                 },
-                deletedId:'',
-                meh:'',
-                user: null,
-                options: [
-                ],
+
                 perPage: 2,
                 eventsTotal:'',
                 currentPage:0,
-                searchData:true,
+                count:'',
+                filter:false,
+                isLoading:false,
+                scroll:true,
+                noData:false,
                 searchValue:'',
+                options: [
+                ],
+                searchData:true,
+                meh:'',
+                user: null,
             }
         },
         created(){
             if(this.loggedIn && !this.userInfo){
                 store.dispatch('login/getUser')
             }
-
-
+            this.fetchPosts()
+            window.addEventListener('scroll', this.infiniteScroll)
         },
         mounted () {
-
+            window.scrollTo(0, 0)
         },
-
         computed: {
             ...mapGetters('login', ['loggedIn','userInfo']),
 
-
         },
         watch:{
-            currentPage:function(value){
-                return value
-            },
             user:function(value){
                 this.$router.push({ name: 'profileUser', params: { id: value.id } })
             },
-
         },
         methods:{
-            infiniteScroll($state) {
-                setTimeout(() => {
-                        this.currentPage++;
+            service(){
+                if(this.searchValue!=='')
+                {
+                    store.dispatch('post/filterPosts',this.searchValue).then((res)=>{
+                         this.filter=true
+                        this.scroll=false
 
-                        Service.fetchAllPosts(
-                            this.perPage,
-                            this.currentPage-1,
-                        ).then((res)=>{
-                            console.log('3333333333',res)
-                            if (res.data.results.length > 1) {
-                                res.data.results.forEach((item) => this.posts.results.push(item))
-                                $state.loaded()
-                            } else {
-                                $state.complete()
-                            }
-                        })
-                    },500
-                )
-
-            },
-
-
-            fetchAllPosts(currentPage){
-                Service.fetchAllPosts(
-                    this.perPage,
-                    currentPage-1,
-                ).then((res)=>{
-                    this.posts=res.data
-                    this.eventsTotal=res.data.count
-                })
-            },
-            getRoute(){
-                if(this.$route.query.page){
-                    this.fetchAllPosts(this.$route.query.page)
+                        this.posts.results=res?.data
+                        if(this.posts.results.length>=1){
+                            this.noData=false
+                        }
+                        else{
+                            this.noData=true
+                        }
+                    })
                 }
                 else{
-                    this.fetchAllPosts()
+                    this.posts.results=[]
+                    this.scroll=true
+                    this.noData=false
+                    this.filter=false
+                    this.currentPage=0
+                    this.fetchPosts();
                 }
+            },
+            fetchPosts(){
+                Service.fetchAllPosts(
+                    this.perPage,
+                    this.currentPage,
+                ).then((res)=>{
+                    console.log('reees',res)
+                    if (res.data.results.length >=1 ) {
+                        res.data.results.forEach((item) =>
+                            this.posts.results.push(item))
+                        this.isLoading=false
+                    }
+                    else {
+                        this.isLoading=false
+                        this.scroll=false
+                    }
+
+                })
+            },
+            input(e){
+                this.searchValue=e.target.value
+                this.service()
+            },
+            infiniteScroll(){
+                window.onscroll=()=>{
+                    const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+                    if ((scrollTop + clientHeight >= scrollHeight - 30) && this.scroll) {
+                        console.log('vian1',this.count)
+                        console.log('vian2',this.perPage*this.currentPage)
+                                this.isLoading=true
+                            setTimeout(() => {
+                                this.currentPage++;
+                                this.fetchPosts()
+
+                            },500
+                        )
+
+                    }
+                }
+
             },
             asyncFind () {
                 if(this.searchData==true)
@@ -180,7 +217,12 @@
                 }
 
             }
-        }
+
+
+        },
+        destroyed () {
+            window.removeEventListener('scroll', this.infiniteScroll);
+        },
 
     }
 </script>
@@ -215,21 +257,50 @@
         color:purple;
         font-size:25px;
         float:left;
-        width:10%;
     }
-
-
     .text-field{
         float:right;
         width:50%;
     }
-    .no-more{
-        color:white!important;
+    .load-1 .line:nth-last-child(1) {
+        animation: loadingA 1.5s 1s infinite;
+    }
+    .load-1 .line:nth-last-child(2) {
+        animation: loadingA 1.5s 0.5s infinite;
+    }
+    .load-1 .line:nth-last-child(3) {
+        animation: loadingA 1.5s 0s infinite;
+    }
+
+    .line {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        border-radius: 15px;
+        margin-right:5px;
+        background-color: #301d47;
+    }
+    .load-wrapp{
+        margin-top: 44px;
+        text-align: center;
+        height: 10px;
+        display: flex;
+        justify-content: center;
+    }
+    @keyframes loadingA {
+    0 {
+        height: 15px;
+    }
+    50% {
+        height: 35px;
+    }
+    100% {
+        height: 15px;
+    }
     }
     .latest{
         border-bottom: 2px solid purple;
     }
-
 
 
 </style>

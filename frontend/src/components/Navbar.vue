@@ -3,7 +3,8 @@
         <nav class="navbar navbar-expand-lg navbar-bg ftco_navbar  ftco-navbar-light site-navbar-target" id="ftco-navbar">
             <div class="container">
                 <button @click="show=!show" class="navbar-toggler js-fh5co-nav-toggle fh5co-nav-toggle" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="oi oi-menu"></span><img src="@/assets/images/icons8-menu-24.png" alt="">
+                    <span class="oi oi-menu"></span>
+                    <img src="@/assets/images/icons8-menu-24.png" alt="">
                 </button>
 
                 <div class="flex-items">

@@ -5,20 +5,14 @@
                 <div class="card card-4">
                     <div class="card-body">
                         <h2 class="title text-right">فرم ورود</h2>
-                        <form @submit.prevent="login">
+                       <app-form :onSubmit="login">
                             <div class="row row-space">
                                 <div class="input-container">
-                                    <div class="input-group">
-                                        <label class="label">نام کاربری</label>
-                                        <input v-model="user.username" class="input--style-4" type="text" >
-                                    </div>
+                                        <BaseInput label="نام کاربری" v-model="user.username" inputClass="input--style-4" type="text"></BaseInput>
                                 </div>
-                                <div class="input-container">
-                                    <div class="input-group">
-                                        <label class="label">رمز عبور</label>
-                                        <input v-model="user.password" class="input--style-4" :type="passwordFieldType" >
-                                        <span @mouseover="showText" @mouseleave="showPassword"> <i class="fas fa-eye eye-password" ></i></span>
-                                    </div>
+                                <div class="input-container" style="position:relative">
+                                        <BaseInput  label="رمز عبور" v-model="user.password" inputClass="input--style-4" type="password"></BaseInput>
+                                        <span class="showpassword" @mouseover="showText" @mouseleave="showPassword"> <i class="fas fa-eye eye-password" ></i></span>
                                 </div>
                                 <label >
                                     <input type="checkbox" name="rememberme" v-model="saveLog" style="width:20px">
@@ -33,7 +27,7 @@
                             <div v-if="error" class="text-right error mt-3">
                                 {{error}}
                             </div>
-                        </form>
+                       </app-form>
                     </div>
                 </div>
             </div>
@@ -42,11 +36,14 @@
 </template>
 
 <script>
-
+    import AppForm from '@/components/ui/AppForm'
     import { required } from 'vuelidate/lib/validators'
     import store from '@/store/store'
     export default {
         name: "Login",
+        components:{
+            AppForm
+        },
         validations:{
             user:{
                 username: { required },
@@ -79,7 +76,6 @@
                 this.passwordFieldType='password'
             },
            login(){
-               console.log('45',this.user)
                store.dispatch('login/login',{
                    user:this.user,
                    saveLog:this.saveLog
@@ -108,5 +104,7 @@
         top: 46px;
         left: 11px;
     }
+
+
 
 </style>
